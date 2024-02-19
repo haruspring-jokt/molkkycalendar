@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=yes">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+    <title>全国モルックイベント大会カレンダー</title>
+</head>
+
+<body>
+    <div class="docs-container off-canvas off-canvas-sidebar-show">
+        <div class="off-canvas-content" style="padding: 0;">
+            <div class="docs-content" id="content">
+                <div class="container grid-xl">
+                    <div class="hero bg-dark hero-sm">
+                        <div class="hero-body">
+                            <h1 id="s-title">
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="column col-mx-auto">
+                        <p></p>
+                    </div>
+                    <div class="hero bg-gray hero-sm">
+                        <div class="hero-body">
+                            <h2 id="events-title">直近のイベント一覧</h2>
+                            <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。</p>
+                            <p>詳細は各イベントのソース、もしくはスプレッドシートへ</p>
+                            <ul class="menu">
+                                <li class="menu-item btn btn-success"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/spreadsheets/d/1l_SJn1SiqcdoG_s41Dd5tN6EZkTsDfe_9RHfkvuZoe8/edit"><i
+                                            class="icon icon-share"></i> 閲覧用 | 2024年版全国モルック大会イベントカレンダー |
+                                        モルックカレンダー管理委員会</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://twitter.com/molkkycalendar"><i class="icon icon-share"></i>
+                                        Twitter(X): @molkkycalendar</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://bsky.app/profile/calendar.jajapatatas.com"><i
+                                            class="icon icon-share"></i>
+                                        BlueSky: @calendar.jajapatatas.com</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://blog.jajapatatas.com/"><i class="icon icon-share"></i>
+                                        全国モルックカレンダーニュース（ブログ）</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container grid-xl" id="cards">
+                    <div id="tech-message" class="column col-mx-auto">
+                        <p>情報取得中...</p>
+                        <progress class="progress" max="100"></progress>
+                    </div>
+                    <div id="event-columns" class="columns">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
