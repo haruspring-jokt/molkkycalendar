@@ -1,0 +1,24 @@
+.topIcon {
+    display: inline-block;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 10px;
+    background: #303742;
+    color: #ffffff;
+    opacity: 0.5;
+    border-radius: 50%;
+    font-size: 14pt;
+    font-weight: bold;
+    line-height: 1.2em;
+    letter-spacing: 2px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 999;
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+}
+
+.topIcon:hover {
+    opacity: 0.9;
+    /* カーソル時透明度 */
+}
