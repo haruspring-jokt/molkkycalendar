@@ -29,27 +29,66 @@
                     <div class="column col-mx-auto">
                         <p></p>
                     </div>
-                    <div class="hero bg-gray hero-sm">
+                    <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body">
-                            <h2 id="events-title">直近のイベント一覧</h2>
-                            <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。</p>
-                            <p>詳細は各イベントのソース、もしくはスプレッドシートへ</p>
-                            <ul class="menu">
+                            <h2 id="whatis" class="p-2">イベントカレンダーとは</h2>
+                            <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。</p>
+                        </div>
+                    </div>
+                    <div class="hero hero-sm columns">
+                        <div class="hero-body">
+                            <h3 class="col-12 p-2">
+                                元データ
+                            </h3>
+                            <ul class="menu col-12">
                                 <li class="menu-item btn btn-success"><a class="btn btn-link text-left"
                                         href="https://docs.google.com/spreadsheets/d/1l_SJn1SiqcdoG_s41Dd5tN6EZkTsDfe_9RHfkvuZoe8/edit"><i
-                                            class="icon icon-share"></i> 閲覧用 | 2024年版全国モルック大会イベントカレンダー |
-                                        モルックカレンダー管理委員会</a></li>
+                                            class="icon icon-share" target="_blank"></i> 閲覧用 |
+                                        2024年版全国モルック大会イベントカレンダー</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="hero-body">
+                            <h3 class="col-12 p-2">
+                                SNS・ブログ
+                            </h3>
+                            <ul class="menu col-12">
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://twitter.com/molkkycalendar"><i class="icon icon-share"></i>
+                                        href="https://twitter.com/molkkycalendar" target="_blank"><i
+                                            class="icon icon-share"></i>
                                         Twitter(X): @molkkycalendar</a></li>
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://bsky.app/profile/calendar.jajapatatas.com"><i
+                                        href="https://bsky.app/profile/calendar.jajapatatas.com" target="_blank"><i
                                             class="icon icon-share"></i>
                                         BlueSky: @calendar.jajapatatas.com</a></li>
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://blog.jajapatatas.com/"><i class="icon icon-share"></i>
+                                        href="https://blog.jajapatatas.com/" target="_blank"><i
+                                            class="icon icon-share"></i>
                                         全国モルックカレンダーニュース（ブログ）</a></li>
                             </ul>
+                        </div>
+                        <div class="hero-body">
+                            <h3 class="col-12 p-2">
+                                情報提供をお願いします
+                            </h3>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn btn-primary"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（項目別）</a></li>
+                                <li class="menu-item btn btn-primary"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（フリーフォーム）</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container grid-xl">
+                    <div class="hero bg-gray hero-sm columns">
+                        <div class="hero-body">
+                            <h2 id="events-title">直近のイベント一覧</h2>
+                            <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。詳細は各イベントのソース、もしくはスプレッドシートをチェックしてください。
                         </div>
                     </div>
                 </div>
@@ -64,6 +103,7 @@
             </div>
         </div>
     </div>
+    <div id="topScroll" class="topIcon" onclick="goTop()">Top</div>
 </body>
 
 </html>
