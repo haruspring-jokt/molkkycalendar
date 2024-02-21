@@ -1,9 +1,15 @@
+/**
+ * ページ読み込み時実行
+ */
 $(function () {
     //処理を書く部分
     $('#s-title').append('全国モルックイベント大会カレンダー');
 
     console.log('start getting events.')
 
+    /**
+     * イベント情報一覧読み込み・表示
+     */
     $.ajax({
         url: 'https://script.google.com/macros/s/AKfycbxVFTgYPbWTy_iCmqfHiKYwWkipNELkvFVXERRMo4oPi85F9x_YwBHT4WGUmoClp_KG/exec',
         type: 'GET',
@@ -11,6 +17,8 @@ $(function () {
     }).done(function (datas) {
         var datasStringify = JSON.stringify(datas);
         var datasJson = JSON.parse(datasStringify);
+
+        // 件数分イベントカードを生成して追加する
         for (const i in datasJson) {
             const event = datas[i];
 
@@ -34,32 +42,37 @@ $(function () {
             // 個人・チーム構成
             var composition = '';
             if (event['composition'] == 'チーム') {
-                composition = event['composition'] + '（' + event['minMember'] + '～' + event['maxMember'] + '）';
+                composition = event['composition'] + '（' + event['minMember'] + '～' + event['maxMember'] + '）' + ' ' + event['rule'];
             } else {
-                composition = event['composition'];
+                composition = event['composition'] + ' ' + event['rule'];
             }
 
             // 備考
             // エントリー備考
+            var isThereRemark = false;
             var entryRemarks = '';
             if (!event['entryRemarks']) { } else {
                 entryRemarks = event['entryRemarks'] + '<br>';
+                isThereRemark = true;
             }
             // 備考・メモ
             var remarks = '';
             if (!(event['remarks'] + event['memo'])) { } else {
+                remarks = `${event['remarks']} ${event['memo']}`;
+                isThereRemark = true;
+            }
+            if (isThereRemark) {
                 remarks = `
-                    <div name="card-remarks-${i}" class="card-body">
-                        <div class="toast">
-                            ${entryRemarks}
-                            ${event['remarks']} ${event['memo']}
-                        </div>
-                    </div>`;
+                <div name="card-remarks-${i}" class="card-body">
+                    <div class="toast">
+                        ${entryRemarks + remarks}
+                    </div>
+                </div>`;
             }
 
             // イベントカード要素の追加
             $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12">
+                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
                     <div name="card-${i}" class="card">
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${event['eventName']}</div>
@@ -67,7 +80,7 @@ $(function () {
                         </div>
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
-                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
                                 <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
                                 <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
@@ -80,18 +93,21 @@ $(function () {
                         ${remarks}
                         <div name="card-footer-${i}" class="card-footer"></div>
                     </div>
-                    <div name="outer-card-lower-${i}" class="">
-                        <p></p>
-                    </div>
+                    <div name="outer-card-lower-${i}" class=""></div>
                 </div>`
             );
         }
+
+        // 一覧表示完了イベント
         $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
     });
 });
 
+/**
+ * トップスクロール
+ */
 var vGoTop = {};
 function goTop() {
 
@@ -115,6 +131,9 @@ function goTop() {
     // --- スクロール開始 ---------------
     goTopLoop();
 }
+/**
+ * トップスクロース制御
+ */
 function goTopLoop() {
     // ============================================================================
     //  スクロール実行
