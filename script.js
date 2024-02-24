@@ -5,13 +5,51 @@ $(function () {
     //処理を書く部分
     $('#s-title').append('全国モルックイベント大会カレンダー');
 
+    /**
+     * init event
+     */
     console.log('start getting events.')
+    $('#tech-message').append(
+        `<p>情報取得中...</p>
+        <progress class="progress" max="100"></progress>`
+    );
+    fetchEvents("00");
 
+    /**
+     * 都道府県選択イベント
+     */
+    $("#select-prefecture").change(function () {
+        console.log("都道府県イベント: " + $(this).val());
+        var str = $(this).val();
+        removeEvents();
+        $("#tech-message").empty();
+        $('#tech-message').append(
+            `<p>情報取得中...</p>
+            <progress class="progress" max="100"></progress>`
+        );
+        fetchEvents(str);
+    });
+});
+
+/**
+ * イベント一覧削除
+ */
+function removeEvents() {
+    $("#event-columns").empty();
+}
+
+function fetchEvents(prefecture) {
     /**
      * イベント情報一覧読み込み・表示
      */
+    var url = 'https://script.google.com/macros/s/AKfycbxYyHUDhjYjIb8X9_fdWPPV4CFTYCjxvUgpsF8El69uLEtkrce278ENw2iWyZ7cYQ0V/exec';
+    if (prefecture != "00") {
+        url = url + "?prefecture=" + prefecture;
+        console.log(url);
+    }
+
     $.ajax({
-        url: 'https://script.google.com/macros/s/AKfycbxVFTgYPbWTy_iCmqfHiKYwWkipNELkvFVXERRMo4oPi85F9x_YwBHT4WGUmoClp_KG/exec',
+        url: url,
         type: 'GET',
         dataType: 'json',
     }).done(function (datas) {
@@ -97,13 +135,14 @@ $(function () {
                 </div>`
             );
         }
-
-        // 一覧表示完了イベント
         $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
+
+        // 一覧表示完了イベント
+        return datasJson.length;
     });
-});
+}
 
 /**
  * トップスクロール
