@@ -42,7 +42,7 @@ function fetchEvents(prefecture) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbxYyHUDhjYjIb8X9_fdWPPV4CFTYCjxvUgpsF8El69uLEtkrce278ENw2iWyZ7cYQ0V/exec';
+    var url = 'https://script.google.com/macros/s/AKfycbwHCBZRsPBx7eRpfJ5fFl5BgXET63X-J7mOEyzquKq3VTfLIQBsQb7FFhyMMHUKsl_F/exec';
     if (prefecture != "00") {
         url = url + "?prefecture=" + prefecture;
         console.log(url);
