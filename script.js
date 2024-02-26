@@ -38,11 +38,15 @@ function removeEvents() {
     $("#event-columns").empty();
 }
 
+/**
+ * イベント情報HTMLを作成してHTMLに追加する。
+ * @param {string} prefecture 都道府県コード 
+ */
 function fetchEvents(prefecture) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbwHCBZRsPBx7eRpfJ5fFl5BgXET63X-J7mOEyzquKq3VTfLIQBsQb7FFhyMMHUKsl_F/exec';
+    var url = 'https://script.google.com/macros/s/AKfycbx7u0G-uwjba2VTHRYBUQwE9l7r3k_rzw943qiECFhmaHvIScqg-axMSQm9mCbGB2UV/exec';
     if (prefecture != "00") {
         url = url + "?prefecture=" + prefecture;
         console.log(url);
@@ -62,12 +66,9 @@ function fetchEvents(prefecture) {
 
             // イベント種類のラベルカラー
             const labelColor = {
-                '大会': 'primary',
-                '大会（長期）': 'success',
-                '体験会': 'default',
-                '練習会': 'default',
-                'ブース': 'default',
-                'その他': 'default'
+                '大会': 'primary', '大会（長期）': 'success',
+                '体験会': 'default', '練習会': 'default',
+                'ブース': 'default', 'その他': 'default'
             }[event['category']];
 
             // 開催日の日付フォーマット変更
@@ -77,36 +78,17 @@ function fetchEvents(prefecture) {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
             }
 
+            // 更新日時の日付フォーマット変更
+            const updateDate = new Date(event['updateDate']).toLocaleDateString();
+
             // 個人・チーム構成
-            var composition = '';
-            if (event['composition'] == 'チーム') {
-                composition = event['composition'] + '（' + event['minMember'] + '～' + event['maxMember'] + '）' + ' ' + event['rule'];
-            } else {
-                composition = event['composition'] + ' ' + event['rule'];
-            }
+            var composition = createComposition(event);
 
             // 備考
-            // エントリー備考
-            var isThereRemark = false;
-            var entryRemarks = '';
-            if (!event['entryRemarks']) { } else {
-                entryRemarks = event['entryRemarks'] + '<br>';
-                isThereRemark = true;
-            }
-            // 備考・メモ
-            var remarks = '';
-            if (!(event['remarks'] + event['memo'])) { } else {
-                remarks = `${event['remarks']} ${event['memo']}`;
-                isThereRemark = true;
-            }
-            if (isThereRemark) {
-                remarks = `
-                <div name="card-remarks-${i}" class="card-body">
-                    <div class="toast">
-                        ${entryRemarks + remarks}
-                    </div>
-                </div>`;
-            }
+            var remarks = createRemarksDiv(event);
+
+            // 画像
+            var imageArea = createImageDiv(evnet);
 
             // イベントカード要素の追加
             $('#event-columns').append(
@@ -115,6 +97,7 @@ function fetchEvents(prefecture) {
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${event['eventName']}</div>
                             <div name="card-subtitle-${i} class="card-subtitle text-gray">${eventDate} ${eventTime} <span class="label label-rounded label-${labelColor}"> ${event['category']}</span></div>
+                            ${imageArea}
                         </div>
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
@@ -127,6 +110,7 @@ function fetchEvents(prefecture) {
                                 <li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>
                                 <li class="menu-item"> <small class="label text-bold">参加費</small> ${event['entryFee']}</li>
                             </ul>
+                            <p class="text-gray text-small">更新日: ${updateDate}</p>
                         </div>
                         ${remarks}
                         <div name="card-footer-${i}" class="card-footer"></div>
@@ -142,6 +126,68 @@ function fetchEvents(prefecture) {
         // 一覧表示完了イベント
         return datasJson.length;
     });
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON 
+ * @returns チーム構成Div要素
+ */
+function createComposition(event) {
+    if (event['composition'] == 'チーム') {
+        return event['composition']
+            + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
+            + ' ' + event['rule'];
+    } else {
+        return event['composition'] + ' ' + event['rule'];
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON 
+ * @returns 備考Div要素
+ */
+function createRemarksDiv(event) {
+    var isThereRemark = false;
+    var entryRemarks = '';
+    if (!event['entryRemarks']) { } else {
+        entryRemarks = event['entryRemarks'] + '<br>';
+        isThereRemark = true;
+    }
+    // 備考・メモ
+    var remarks = '';
+    if (!(event['remarks'] + event['memo'])) { } else {
+        remarks = `${event['remarks']} ${event['memo']}`;
+        isThereRemark = true;
+    }
+    if (isThereRemark) {
+        return `
+            <div name="card-remarks-${i}" class="card-body">
+                <div class="toast">
+                    ${entryRemarks + remarks}
+                </div>
+            </div>`;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 画像URLが含まれている場合画像エリアDivを返す
+ */
+function createImageDiv(event) {
+    if (event['image']) {
+        return `
+            <div name="card-image-${i}" class="card-image">
+                <img class="img-responsive" src="${event['image']}" alt="image of ${event['eventName']}">
+            </div>
+        `;
+    } else {
+        return '';
+    }
 }
 
 /**
@@ -170,6 +216,7 @@ function goTop() {
     // --- スクロール開始 ---------------
     goTopLoop();
 }
+
 /**
  * トップスクロース制御
  */
