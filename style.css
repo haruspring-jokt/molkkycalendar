@@ -1,3 +1,8 @@
+body {
+    font-family: "Noto Sans JP", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-optical-sizing: auto;
+}
+
 .topIcon {
     display: inline-block;
     position: fixed;
@@ -15,10 +20,16 @@
     text-align: center;
     cursor: pointer;
     z-index: 999;
-    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .topIcon:hover {
     opacity: 0.9;
     /* カーソル時透明度 */
+}
+
+.event-img {
+    object-fit: cover;
+    height: 150px;
+    width: 100%;
 }

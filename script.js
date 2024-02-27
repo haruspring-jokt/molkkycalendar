@@ -85,10 +85,10 @@ function fetchEvents(prefecture) {
             var composition = createComposition(event);
 
             // 備考
-            var remarks = createRemarksDiv(event);
+            var remarks = createRemarksDiv(event, i);
 
             // 画像
-            var imageArea = createImageDiv(evnet);
+            var imageArea = createImageDiv(event, i);
 
             // イベントカード要素の追加
             $('#event-columns').append(
@@ -110,10 +110,10 @@ function fetchEvents(prefecture) {
                                 <li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>
                                 <li class="menu-item"> <small class="label text-bold">参加費</small> ${event['entryFee']}</li>
                             </ul>
-                            <p class="text-gray text-small">更新日: ${updateDate}</p>
                         </div>
                         ${remarks}
                         <div name="card-footer-${i}" class="card-footer"></div>
+                        <small class="text-gray text-small p-2">更新日: ${updateDate}</small>
                     </div>
                     <div name="outer-card-lower-${i}" class=""></div>
                 </div>`
@@ -145,10 +145,11 @@ function createComposition(event) {
 
 /**
  * 
- * @param {json} event イベントJSON 
+ * @param {json} event イベントJSON
+ * @param {int} i
  * @returns 備考Div要素
  */
-function createRemarksDiv(event) {
+function createRemarksDiv(event, i) {
     var isThereRemark = false;
     var entryRemarks = '';
     if (!event['entryRemarks']) { } else {
@@ -164,7 +165,7 @@ function createRemarksDiv(event) {
     if (isThereRemark) {
         return `
             <div name="card-remarks-${i}" class="card-body">
-                <div class="toast">
+                <div class="toast text-small">
                     ${entryRemarks + remarks}
                 </div>
             </div>`;
@@ -176,13 +177,14 @@ function createRemarksDiv(event) {
 /**
  * 
  * @param {json} event イベントJSON
+ * @param {int} i
  * @returns 画像URLが含まれている場合画像エリアDivを返す
  */
-function createImageDiv(event) {
+function createImageDiv(event, i) {
     if (event['image']) {
         return `
             <div name="card-image-${i}" class="card-image">
-                <img class="img-responsive" src="${event['image']}" alt="image of ${event['eventName']}">
+                <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}">
             </div>
         `;
     } else {
