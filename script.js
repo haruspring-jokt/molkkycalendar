@@ -46,7 +46,7 @@ function fetchEvents(prefecture) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbx7u0G-uwjba2VTHRYBUQwE9l7r3k_rzw943qiECFhmaHvIScqg-axMSQm9mCbGB2UV/exec';
+    var url = 'https://script.google.com/macros/s/AKfycbyGESZXIgPThsYLVGywYS7K0G_76hTaETBrThKLWNsyRAquwrqdIqZIt9sqHIFEn88M/exec';
     if (prefecture != "00") {
         url = url + "?prefecture=" + prefecture;
         console.log(url);
@@ -90,20 +90,30 @@ function fetchEvents(prefecture) {
             // 画像
             var imageArea = createImageDiv(event, i);
 
+            // 記事
+            var eventTitle = createTitle(event);
+
+            // 詳細ありラベル
+            var detailLabel = createDetailLabel(event);
+
             // イベントカード要素の追加
             $('#event-columns').append(
                 `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
                     <div name="card-${i}" class="card">
                         <div name ="card-header-${i}" class="card-header text-large">
-                            <div name="card-title-${i}" class="card-title h3">${event['eventName']}</div>
-                            <div name="card-subtitle-${i} class="card-subtitle text-gray">${eventDate} ${eventTime} <span class="label label-rounded label-${labelColor}"> ${event['category']}</span></div>
+                            <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
+                            <div name="card-subtitle-${i} class="card-subtitle text-gray">
+                                <i class="lar la-calendar"></i> ${eventDate} ${eventTime}
+                                <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
+                                ${detailLabel}
+                            </div>
                             ${imageArea}
                         </div>
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
                                 <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
-                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
+                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
                                 <li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>
                                 <li class="menu-item"> <small class="label text-bold">チーム/人</small> ${event['teamNum']}</li>
@@ -182,10 +192,53 @@ function createRemarksDiv(event, i) {
  */
 function createImageDiv(event, i) {
     if (event['image']) {
+        if (event['article']) {
+            return `
+                <div name="card-image-${i}" class="card-image">
+                    <a class="" href="${event['article']}" target="_blank">
+                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
+                </div>
+            `;
+        } else {
+            return `
+                <div name="card-image-${i}" class="card-image">
+                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}">
+                </div>
+            `;
+        }
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns イベントタイトルを返す
+ */
+function createTitle(event) {
+    if (event['article']) {
+        // 詳細記事URLがある場合リンクとして返す
         return `
-            <div name="card-image-${i}" class="card-image">
-                <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}">
-            </div>
+            <a class="text-primary" href="${event['article']}" target="_blank"> ${event['eventName']}</a>
+        `;
+    } else {
+        return `${event['eventName']}`;
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 詳細記事がある場合追加のラベルを返す
+ * 
+ */
+function createDetailLabel(event) {
+    if (event['article']) {
+        return `
+            <a class="text-primary" href="${event['article']}" target="_blank">
+                <span class="label label-rounded">くわしく見る</span>
+            </a>
         `;
     } else {
         return '';

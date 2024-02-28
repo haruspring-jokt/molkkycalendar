@@ -72,6 +72,8 @@ function createEvents(prefectureParam) {
   const lastRow = sheet.getLastRow();
   const range = sheet.getRange("A2:AJ" + lastRow + "");
   var values = range.getValues();
+  // 現在日付以降のイベントを取得する
+  values = values.filter(record => record[0].slice(0, 1) === "0");
   // 都道府県で絞り込む
   if (prefectureParam == "00") {
   } else {
@@ -134,8 +136,7 @@ function createEvents(prefectureParam) {
       counter++;
     }
   }
-
-  return objectArray
+  return objectArray;
 }
 
 /**
