@@ -1,0 +1,5 @@
+RewriteEngine On
+
+#www有りのURLに統一
+RewriteCond %{HTTP_HOST}^jajapatatas.com
+RewriteRule ^(.*) https://www.jajapatatas.com/$1 [R=301,L]

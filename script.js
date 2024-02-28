@@ -38,11 +38,15 @@ function removeEvents() {
     $("#event-columns").empty();
 }
 
+/**
+ * イベント情報HTMLを作成してHTMLに追加する。
+ * @param {string} prefecture 都道府県コード 
+ */
 function fetchEvents(prefecture) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbxYyHUDhjYjIb8X9_fdWPPV4CFTYCjxvUgpsF8El69uLEtkrce278ENw2iWyZ7cYQ0V/exec';
+    var url = 'https://script.google.com/macros/s/AKfycbyGESZXIgPThsYLVGywYS7K0G_76hTaETBrThKLWNsyRAquwrqdIqZIt9sqHIFEn88M/exec';
     if (prefecture != "00") {
         url = url + "?prefecture=" + prefecture;
         console.log(url);
@@ -62,12 +66,9 @@ function fetchEvents(prefecture) {
 
             // イベント種類のラベルカラー
             const labelColor = {
-                '大会': 'primary',
-                '大会（長期）': 'success',
-                '体験会': 'default',
-                '練習会': 'default',
-                'ブース': 'default',
-                'その他': 'default'
+                '大会': 'primary', '大会（長期）': 'success',
+                '体験会': 'default', '練習会': 'default',
+                'ブース': 'default', 'その他': 'default'
             }[event['category']];
 
             // 開催日の日付フォーマット変更
@@ -77,50 +78,42 @@ function fetchEvents(prefecture) {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
             }
 
+            // 更新日時の日付フォーマット変更
+            const updateDate = new Date(event['updateDate']).toLocaleDateString();
+
             // 個人・チーム構成
-            var composition = '';
-            if (event['composition'] == 'チーム') {
-                composition = event['composition'] + '（' + event['minMember'] + '～' + event['maxMember'] + '）' + ' ' + event['rule'];
-            } else {
-                composition = event['composition'] + ' ' + event['rule'];
-            }
+            var composition = createComposition(event);
 
             // 備考
-            // エントリー備考
-            var isThereRemark = false;
-            var entryRemarks = '';
-            if (!event['entryRemarks']) { } else {
-                entryRemarks = event['entryRemarks'] + '<br>';
-                isThereRemark = true;
-            }
-            // 備考・メモ
-            var remarks = '';
-            if (!(event['remarks'] + event['memo'])) { } else {
-                remarks = `${event['remarks']} ${event['memo']}`;
-                isThereRemark = true;
-            }
-            if (isThereRemark) {
-                remarks = `
-                <div name="card-remarks-${i}" class="card-body">
-                    <div class="toast">
-                        ${entryRemarks + remarks}
-                    </div>
-                </div>`;
-            }
+            var remarks = createRemarksDiv(event, i);
+
+            // 画像
+            var imageArea = createImageDiv(event, i);
+
+            // 記事
+            var eventTitle = createTitle(event);
+
+            // 詳細ありラベル
+            var detailLabel = createDetailLabel(event);
 
             // イベントカード要素の追加
             $('#event-columns').append(
                 `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
                     <div name="card-${i}" class="card">
                         <div name ="card-header-${i}" class="card-header text-large">
-                            <div name="card-title-${i}" class="card-title h3">${event['eventName']}</div>
-                            <div name="card-subtitle-${i} class="card-subtitle text-gray">${eventDate} ${eventTime} <span class="label label-rounded label-${labelColor}"> ${event['category']}</span></div>
+                            <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
+                            <div name="card-subtitle-${i} class="card-subtitle text-gray">
+                                <i class="lar la-calendar"></i> ${eventDate} ${eventTime}
+                                <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
+                                ${detailLabel}
+                            </div>
+                            ${imageArea}
                         </div>
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
                                 <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
-                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
+                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
                                 <li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>
                                 <li class="menu-item"> <small class="label text-bold">チーム/人</small> ${event['teamNum']}</li>
@@ -130,6 +123,7 @@ function fetchEvents(prefecture) {
                         </div>
                         ${remarks}
                         <div name="card-footer-${i}" class="card-footer"></div>
+                        <small class="text-gray text-small p-2">更新日: ${updateDate}</small>
                     </div>
                     <div name="outer-card-lower-${i}" class=""></div>
                 </div>`
@@ -142,6 +136,113 @@ function fetchEvents(prefecture) {
         // 一覧表示完了イベント
         return datasJson.length;
     });
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON 
+ * @returns チーム構成Div要素
+ */
+function createComposition(event) {
+    if (event['composition'] == 'チーム') {
+        return event['composition']
+            + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
+            + ' ' + event['rule'];
+    } else {
+        return event['composition'] + ' ' + event['rule'];
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @param {int} i
+ * @returns 備考Div要素
+ */
+function createRemarksDiv(event, i) {
+    var isThereRemark = false;
+    var entryRemarks = '';
+    if (!event['entryRemarks']) { } else {
+        entryRemarks = event['entryRemarks'] + '<br>';
+        isThereRemark = true;
+    }
+    // 備考・メモ
+    var remarks = '';
+    if (!(event['remarks'] + event['memo'])) { } else {
+        remarks = `${event['remarks']} ${event['memo']}`;
+        isThereRemark = true;
+    }
+    if (isThereRemark) {
+        return `
+            <div name="card-remarks-${i}" class="card-body">
+                <div class="toast text-small">
+                    ${entryRemarks + remarks}
+                </div>
+            </div>`;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @param {int} i
+ * @returns 画像URLが含まれている場合画像エリアDivを返す
+ */
+function createImageDiv(event, i) {
+    if (event['image']) {
+        if (event['article']) {
+            return `
+                <div name="card-image-${i}" class="card-image">
+                    <a class="" href="${event['article']}" target="_blank">
+                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
+                </div>
+            `;
+        } else {
+            return `
+                <div name="card-image-${i}" class="card-image">
+                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}">
+                </div>
+            `;
+        }
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns イベントタイトルを返す
+ */
+function createTitle(event) {
+    if (event['article']) {
+        // 詳細記事URLがある場合リンクとして返す
+        return `
+            <a class="text-primary" href="${event['article']}" target="_blank"> ${event['eventName']}</a>
+        `;
+    } else {
+        return `${event['eventName']}`;
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 詳細記事がある場合追加のラベルを返す
+ * 
+ */
+function createDetailLabel(event) {
+    if (event['article']) {
+        return `
+            <a class="text-primary" href="${event['article']}" target="_blank">
+                <span class="label label-rounded">くわしく見る</span>
+            </a>
+        `;
+    } else {
+        return '';
+    }
 }
 
 /**
@@ -170,6 +271,7 @@ function goTop() {
     // --- スクロール開始 ---------------
     goTopLoop();
 }
+
 /**
  * トップスクロース制御
  */

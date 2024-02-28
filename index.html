@@ -14,10 +14,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, shrink-to-fit=yes">
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" >
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="script.js"></script>
@@ -46,6 +50,8 @@
                         <div class="column">
                             <p class="bg-secondary">
                                 最近の更新:<br>
+                                2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
+                                2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
                                 2023-2-24: 都道府県絞り込みフィルターを追加しました。
                             </p>
                         </div>
@@ -65,7 +71,7 @@
                         </div>
                         <div class="hero-body">
                             <h3 class="col-12 p-2">
-                                SNS・ブログ
+                                関連リンク
                             </h3>
                             <ul class="menu col-12">
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
@@ -80,6 +86,10 @@
                                         href="https://blog.jajapatatas.com/" target="_blank"><i
                                             class="icon icon-share"></i>
                                         全国モルックカレンダーニュース（ブログ）</a></li>
+                                <li class="menu-item btn btn-error"><a class="btn btn-link text-left"
+                                    href="https://drive.google.com/drive/folders/1RjfjBd7vstGFG33rkcTG1tHcXKe4-Rnx?usp=drive_link" target="_blank"><i
+                                        class="icon icon-share"></i>
+                                    スコアシートPDF</a></li>
                             </ul>
                         </div>
                         <div class="hero-body">
@@ -114,7 +124,7 @@
                                 <option value="03">岩手県</option>
                                 <option value="04">宮城県</option>
                                 <option value="05">秋田県</option>
-                                <option value="06">山形県県</option>
+                                <option value="06">山形県</option>
                                 <option value="07">福島県</option>
                                 <option value="08">茨城県</option>
                                 <option value="09">栃木県</option>
@@ -138,7 +148,7 @@
                                 <option value="27">大阪府</option>
                                 <option value="28">兵庫県</option>
                                 <option value="29">奈良県</option>
-                                <option value="30">和歌山</option>
+                                <option value="30">和歌山県</option>
                                 <option value="31">鳥取県</option>
                                 <option value="32">島根県</option>
                                 <option value="33">岡山県</option>
