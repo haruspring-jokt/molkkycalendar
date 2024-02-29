@@ -96,10 +96,13 @@ function fetchEvents(prefecture) {
             // 詳細ありラベル
             var detailLabel = createDetailLabel(event);
 
+            // カードCSSクラス
+            var cardClass = createCardClass(event);
+
             // イベントカード要素の追加
             $('#event-columns').append(
                 `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
-                    <div name="card-${i}" class="card">
+                    <div name="card-${i}" class="card ${cardClass}">
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
                             <div name="card-subtitle-${i} class="card-subtitle text-gray">
@@ -237,9 +240,22 @@ function createDetailLabel(event) {
     if (event['article']) {
         return `
             <a class="text-primary" href="${event['article']}" target="_blank">
-                <span class="label label-rounded">くわしく見る</span>
+                <span class="label label-rounded label-secondary">くわしく見る</span>
             </a>
         `;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 詳細記事がある場合カードの背景CSSクラスを返す
+ */
+function createCardClass(event) {
+    if (event['article']) {
+        return 'bg-secondary';
     } else {
         return '';
     }
