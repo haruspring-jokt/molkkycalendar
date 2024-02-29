@@ -21,7 +21,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" >
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="script.js"></script>
@@ -47,8 +48,8 @@
                             <h2 id="whatis" class="p-2">イベントカレンダーとは</h2>
                             <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。</p>
                         </div>
-                        <div class="column">
-                            <p class="bg-secondary">
+                        <div class="column" id="recent-updates">
+                            <p class="text-small">
                                 最近の更新:<br>
                                 2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
                                 2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
@@ -86,10 +87,10 @@
                                         href="https://blog.jajapatatas.com/" target="_blank"><i
                                             class="icon icon-share"></i>
                                         全国モルックカレンダーニュース（ブログ）</a></li>
-                                <li class="menu-item btn btn-error"><a class="btn btn-link text-left"
-                                    href="https://drive.google.com/drive/folders/1RjfjBd7vstGFG33rkcTG1tHcXKe4-Rnx?usp=drive_link" target="_blank"><i
-                                        class="icon icon-share"></i>
-                                    スコアシートPDF</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://drive.google.com/drive/folders/1RjfjBd7vstGFG33rkcTG1tHcXKe4-Rnx?usp=drive_link"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        スコアシートPDF</a></li>
                             </ul>
                         </div>
                         <div class="hero-body">
@@ -97,11 +98,11 @@
                                 情報提供をお願いします
                             </h3>
                             <ul class="menu col-12">
-                                <li class="menu-item btn btn-primary"><a class="btn btn-link text-left"
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
                                         href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
                                         target="_blank"><i class="icon icon-share"></i>
                                         情報提供フォーム（項目別）</a></li>
-                                <li class="menu-item btn btn-primary"><a class="btn btn-link text-left"
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
                                         href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
                                         target="_blank"><i class="icon icon-share"></i>
                                         情報提供フォーム（フリーフォーム）</a></li>
@@ -116,7 +117,7 @@
                             <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。詳細は各イベントのソース、もしくはスプレッドシートをチェックしてください。
                         </div>
                         <div class="form-group column">
-                            <span class="label label-primary">都道府県を絞り込む:</span>
+                            <span class="label label-dark">都道府県をしぼりこむ:</span>
                             <select class="form-select" id="select-prefecture">
                                 <option value="00">すべて</option>
                                 <option value="01">北海道</option>
@@ -173,7 +174,32 @@
                 <div class="container grid-xl" id="cards">
                     <div id="tech-message" class="column col-mx-auto">
                     </div>
-                    <div id="event-columns" class="columns">
+                    <div class="filter">
+                        <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden checked>
+                        <input class="filter-tag" value="tag-1" id="tag-1" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-2" id="tag-2" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-3" id="tag-3" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-4" id="tag-4" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-5" id="tag-5" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-6" id="tag-6" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-7" id="tag-7" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-8" id="tag-8" type="radio" name="filter-radio" hidden>
+                        <div class="filter-nav" id="filter-nav">
+                            <span class="label label-dark">種類でしぼりこむ: </span>
+                            <label class="chip" for="tag-0">すべて</label>
+                            <label class="chip" for="tag-1">大会</label>
+                            <label class="chip" for="tag-2">大会（長期）</label>
+                            <label class="chip" for="tag-7">大会すべて</label>
+                            <label class="chip" for="tag-3">体験会</label>
+                            <label class="chip" for="tag-4">練習会</label>
+                            <label class="chip" for="tag-8">体験・練習会どちらも</label>
+                            <label class="chip" for="tag-5">ブース</label>
+                            <label class="chip" for="tag-6">その他</label>
+                        </div>
+                        <div class="filter-body">
+                            <div id="event-columns" class="columns">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="footer" class="container grid-xl">

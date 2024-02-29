@@ -29,6 +29,15 @@ $(function () {
         );
         fetchEvents(str);
     });
+
+    // $("#filter-nav > label").on('click', function () {
+    //     var activeTag = $('input[name=filter-radio]:checked').val();
+    //     let count = 0;
+    //     $(`.${activeTag}`).each(function () {
+    //         count++;
+    //     });
+    //     $('#tech-message > p').text(`情報取得完了: ${count}件`);
+    // })
 });
 
 /**
@@ -99,9 +108,12 @@ function fetchEvents(prefecture) {
             // カードCSSクラス
             var cardClass = createCardClass(event);
 
+            // イベント種類フィルタ用data-tag値
+            var dataTag = createDataTag(event);
+
             // イベントカード要素の追加
             $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
+                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
                     <div name="card-${i}" class="card ${cardClass}">
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
@@ -240,7 +252,7 @@ function createDetailLabel(event) {
     if (event['article']) {
         return `
             <a class="text-primary" href="${event['article']}" target="_blank">
-                <span class="label label-rounded label-secondary">くわしく見る</span>
+                <span class="label label-rounded label-secondary">くわしく</span>
             </a>
         `;
     } else {
@@ -259,6 +271,20 @@ function createCardClass(event) {
     } else {
         return '';
     }
+}
+
+function createDataTag(event) {
+    if (!event['category']) {
+        return 'tag-0';
+    }
+    if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
+        return 'tag-0';
+    }
+    return {
+        '大会': 'tag-1 tag-7', '大会（長期）': 'tag-2 tag-7',
+        '体験会': 'tag-3 tag-8', '練習会': 'tag-4 tag-8',
+        'ブース': 'tag-5', 'その他': 'tag-6'
+    }[event['category']];
 }
 
 /**

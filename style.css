@@ -33,3 +33,9 @@ body {
     height: 150px;
     width: 100%;
 }
+
+.chip {
+    font-size: 110%;
+    height: 2.0em;
+    padding: 0.5em;
+}
