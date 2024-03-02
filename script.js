@@ -111,6 +111,9 @@ function fetchEvents(prefecture) {
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
 
+            // 記事リンクボタン
+            var articleLink = createArticleLink(event);
+
             // イベントカード要素の追加
             $('#event-columns').append(
                 `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
@@ -127,6 +130,7 @@ function fetchEvents(prefecture) {
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
                                 <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
+                                ${articleLink}
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
                                 <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
@@ -160,9 +164,15 @@ function fetchEvents(prefecture) {
  */
 function createComposition(event) {
     if (event['composition'] == 'チーム') {
-        return event['composition']
-            + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
-            + ' ' + event['rule'];
+        if (event['maxMember']) {
+            return event['composition']
+                + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
+                + ' ' + event['rule'];
+        } else {
+            return event['composition']
+                + '（' + event['minMember'] + '）'
+                + ' ' + event['rule'];
+        }
     } else {
         return event['composition'] + ' ' + event['rule'];
     }
@@ -252,7 +262,7 @@ function createDetailLabel(event) {
     if (event['article']) {
         return `
             <a class="text-primary" href="${event['article']}" target="_blank">
-                <span class="label label-rounded label-secondary">くわしく</span>
+                <span class="label label-rounded label-warning">注目</span>
             </a>
         `;
     } else {
@@ -273,6 +283,24 @@ function createCardClass(event) {
     }
 }
 
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 記事リンクがある場合btn要素を返す
+ */
+function createArticleLink(event) {
+    if (event['article']) {
+        return `<li class="menu-item btn"><a class="btn btn-link text-left" href="${event['article']}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a></li>`;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 種類フィルタ用のdeta-tagを返す
+ */
 function createDataTag(event) {
     if (!event['category']) {
         return 'tag-0';
@@ -280,11 +308,15 @@ function createDataTag(event) {
     if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
         return 'tag-0';
     }
-    return {
+    var tag = {
         '大会': 'tag-1 tag-7', '大会（長期）': 'tag-2 tag-7',
         '体験会': 'tag-3 tag-8', '練習会': 'tag-4 tag-8',
         'ブース': 'tag-5', 'その他': 'tag-6'
     }[event['category']];
+    if (event['article']) {
+        tag = tag + ' tag-9';
+    }
+    return tag;
 }
 
 /**
