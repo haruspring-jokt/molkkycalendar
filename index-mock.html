@@ -36,6 +36,7 @@
                     <div class="hero bg-dark hero-sm">
                         <div class="hero-body">
                             <h1 id="s-title">
+                                全国モルックイベント大会カレンダー
                             </h1>
                         </div>
                     </div>
@@ -44,12 +45,15 @@
                     </div>
                     <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body column">
-                            <h2 id="whatis" class="p-2">イベントカレンダーとは</h2>
+                            <h2 id="whatis" class="">イベントカレンダーとは</h2>
                             <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。</p>
+                            <p>インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。</p>
                         </div>
                         <div class="column" id="recent-updates">
                             <p class="text-small">
                                 最近の更新:<br>
+                                2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
+                                2023-3-1: イベント種類で絞り込めるフィルタを追加しました。<br>
                                 2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
                                 2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
                                 2023-2-24: 都道府県絞り込みフィルターを追加しました。
@@ -58,30 +62,29 @@
                     </div>
                     <div class="hero hero-sm columns">
                         <div class="hero-body">
-                            <h3 class="col-12 p-2">
-                                元データ
+                            <h3 class="col-12">
+                                こまかいデータ
                             </h3>
                             <ul class="menu col-12">
                                 <li class="menu-item btn btn-success"><a class="btn btn-link text-left"
                                         href="https://docs.google.com/spreadsheets/d/1l_SJn1SiqcdoG_s41Dd5tN6EZkTsDfe_9RHfkvuZoe8/edit"><i
-                                            class="icon icon-share" target="_blank"></i> 閲覧用 |
-                                        2024年版全国モルック大会イベントカレンダー</a>
+                                            class="icon icon-share" target="_blank"></i>2024年版全国モルック大会イベントカレンダー</a>
                                 </li>
                             </ul>
                         </div>
                         <div class="hero-body">
-                            <h3 class="col-12 p-2">
-                                関連リンク
+                            <h3 class="col-12">
+                                リンク
                             </h3>
                             <ul class="menu col-12">
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
                                         href="https://twitter.com/molkkycalendar" target="_blank"><i
                                             class="icon icon-share"></i>
-                                        Twitter(X): @molkkycalendar</a></li>
+                                        Twitter(X)</a></li>
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
                                         href="https://bsky.app/profile/calendar.jajapatatas.com" target="_blank"><i
                                             class="icon icon-share"></i>
-                                        BlueSky: @calendar.jajapatatas.com</a></li>
+                                        BlueSky</a></li>
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
                                         href="https://blog.jajapatatas.com/" target="_blank"><i
                                             class="icon icon-share"></i>
@@ -93,8 +96,8 @@
                             </ul>
                         </div>
                         <div class="hero-body">
-                            <h3 class="col-12 p-2">
-                                情報提供をお願いします
+                            <h3 class="col-12">
+                                情報提供のおねがい
                             </h3>
                             <ul class="menu col-12">
                                 <li class="menu-item btn"><a class="btn btn-link text-left"
@@ -112,70 +115,73 @@
                 <div class="container grid-xl">
                     <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body">
-                            <h2 id="events-title">直近のイベント一覧</h2>
+                            <h2 id="events-title">きょうからのイベント</h2>
                             <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。詳細は各イベントのソース、もしくはスプレッドシートをチェックしてください。
                         </div>
-                        <div class="form-group column">
-                            <span class="label label-dark">都道府県を絞り込む:</span>
-                            <select class="form-select" id="select-prefecture">
-                                <option value="00">すべて</option>
-                                <option value="01">北海道</option>
-                                <option value="02">青森県</option>
-                                <option value="03">岩手県</option>
-                                <option value="04">宮城県</option>
-                                <option value="05">秋田県</option>
-                                <option value="06">山形県</option>
-                                <option value="07">福島県</option>
-                                <option value="08">茨城県</option>
-                                <option value="09">栃木県</option>
-                                <option value="10">群馬県</option>
-                                <option value="11">埼玉県</option>
-                                <option value="12">千葉県</option>
-                                <option value="13">東京都</option>
-                                <option value="14">神奈川県</option>
-                                <option value="15">新潟県</option>
-                                <option value="16">富山県</option>
-                                <option value="17">石川県</option>
-                                <option value="18">福井県</option>
-                                <option value="19">山梨県</option>
-                                <option value="20">長野県</option>
-                                <option value="21">岐阜県</option>
-                                <option value="22">静岡県</option>
-                                <option value="23">愛知県</option>
-                                <option value="24">三重県</option>
-                                <option value="25">滋賀県</option>
-                                <option value="26">京都府</option>
-                                <option value="27">大阪府</option>
-                                <option value="28">兵庫県</option>
-                                <option value="29">奈良県</option>
-                                <option value="30">和歌山県</option>
-                                <option value="31">鳥取県</option>
-                                <option value="32">島根県</option>
-                                <option value="33">岡山県</option>
-                                <option value="34">広島県</option>
-                                <option value="35">山口県</option>
-                                <option value="36">徳島県</option>
-                                <option value="37">香川県</option>
-                                <option value="38">愛媛県</option>
-                                <option value="39">高知県</option>
-                                <option value="40">福岡県</option>
-                                <option value="41">佐賀県</option>
-                                <option value="42">長崎県</option>
-                                <option value="43">熊本県</option>
-                                <option value="44">大分県</option>
-                                <option value="45">宮崎県</option>
-                                <option value="46">鹿児島県</option>
-                                <option value="47">沖縄県</option>
-                            </select>
-                        </div>
                     </div>
+                    <div class="column p-2"></div>
                 </div>
-                <div class="container grid-xl" id="cards">
-                    <div id="tech-message" class="column col-mx-auto">
-                        <p class="bg-success">情報取得完了: 170件</p>
+                <div class="container grid-xl column" id="cards">
+                    <div class="form-group column">
+                        <span class="label label-dark">都道府県をしぼりこむ:</span>
+                        <select class="form-select" id="select-prefecture">
+                            <option value="00">すべて</option>
+                            <option value="01">北海道</option>
+                            <option value="02">青森県</option>
+                            <option value="03">岩手県</option>
+                            <option value="04">宮城県</option>
+                            <option value="05">秋田県</option>
+                            <option value="06">山形県</option>
+                            <option value="07">福島県</option>
+                            <option value="08">茨城県</option>
+                            <option value="09">栃木県</option>
+                            <option value="10">群馬県</option>
+                            <option value="11">埼玉県</option>
+                            <option value="12">千葉県</option>
+                            <option value="13">東京都</option>
+                            <option value="14">神奈川県</option>
+                            <option value="15">新潟県</option>
+                            <option value="16">富山県</option>
+                            <option value="17">石川県</option>
+                            <option value="18">福井県</option>
+                            <option value="19">山梨県</option>
+                            <option value="20">長野県</option>
+                            <option value="21">岐阜県</option>
+                            <option value="22">静岡県</option>
+                            <option value="23">愛知県</option>
+                            <option value="24">三重県</option>
+                            <option value="25">滋賀県</option>
+                            <option value="26">京都府</option>
+                            <option value="27">大阪府</option>
+                            <option value="28">兵庫県</option>
+                            <option value="29">奈良県</option>
+                            <option value="30">和歌山県</option>
+                            <option value="31">鳥取県</option>
+                            <option value="32">島根県</option>
+                            <option value="33">岡山県</option>
+                            <option value="34">広島県</option>
+                            <option value="35">山口県</option>
+                            <option value="36">徳島県</option>
+                            <option value="37">香川県</option>
+                            <option value="38">愛媛県</option>
+                            <option value="39">高知県</option>
+                            <option value="40">福岡県</option>
+                            <option value="41">佐賀県</option>
+                            <option value="42">長崎県</option>
+                            <option value="43">熊本県</option>
+                            <option value="44">大分県</option>
+                            <option value="45">宮崎県</option>
+                            <option value="46">鹿児島県</option>
+                            <option value="47">沖縄県</option>
+                        </select>
+                    </div>
+                    <div class="form-group column">
+                        <span class="label label-dark">開催日でしぼりこむ: </span>
+                        <input type="date" min="" max="" id="calendar-from" value="2024-01-01"></input> から <input type="date" min="" max="" id="calendar-to" value="2024-12-31"></input> まで
                     </div>
                     <div class="filter">
-                        <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden checked>
+                        <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden
+                            checked>
                         <input class="filter-tag" value="tag-1" id="tag-1" type="radio" name="filter-radio" hidden>
                         <input class="filter-tag" value="tag-2" id="tag-2" type="radio" name="filter-radio" hidden>
                         <input class="filter-tag" value="tag-3" id="tag-3" type="radio" name="filter-radio" hidden>
@@ -184,9 +190,11 @@
                         <input class="filter-tag" value="tag-6" id="tag-6" type="radio" name="filter-radio" hidden>
                         <input class="filter-tag" value="tag-7" id="tag-7" type="radio" name="filter-radio" hidden>
                         <input class="filter-tag" value="tag-8" id="tag-8" type="radio" name="filter-radio" hidden>
-                        <div class="filter-nav">
+                        <input class="filter-tag" value="tag-9" id="tag-9" type="radio" name="filter-radio" hidden>
+                        <div class="filter-nav column p-2" id="filter-nav">
                             <span class="label label-dark">種類でしぼりこむ: </span>
                             <label class="chip" for="tag-0">すべて</label>
+                            <label class="chip" for="tag-9">注目イベント</label>
                             <label class="chip" for="tag-1">大会</label>
                             <label class="chip" for="tag-2">大会（長期）</label>
                             <label class="chip" for="tag-7">大会すべて</label>
@@ -195,6 +203,9 @@
                             <label class="chip" for="tag-8">体験・練習会どちらも</label>
                             <label class="chip" for="tag-5">ブース</label>
                             <label class="chip" for="tag-6">その他</label>
+                        </div>
+                        <div id="tech-message" class="column col-mx-auto">
+                            <p class="bg-success">情報取得完了: 170件</p>
                         </div>
                         <div class="filter-body">
                             <div id="event-columns" class="columns">
@@ -213,7 +224,7 @@
                                                 <a class="text-primary"
                                                     href="https://blog.jajapatatas.com/entry/2024/02/28/233132"
                                                     target="_blank">
-                                                    <span class="label label-rounded label-secondary">くわしく</span>
+                                                    <span class="label label-rounded label-warning">注目</span>
                                                 </a>
                                             </div>
                                             <div name="card-image-39" class="card-image">
@@ -229,6 +240,9 @@
                                                 <li class="menu-item btn"><a class="btn btn-link text-left"
                                                         href="https://molkky.jp/tournament/20946/" target="_blank">
                                                         <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
+                                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                                        href="${event['article']}" target="_blank"> <i
+                                                            class="icon icon-link"></i> 記事をみる</a></li>
                                                 <li class="menu-item"> <small class="label text-bold">主催</small>
                                                     ザ・森東、日本モルック協会、横浜市</li>
                                                 <li class="menu-item"> <small class="label text-bold">シリーズ</small>
@@ -562,188 +576,6 @@
                                         <small class="text-gray text-small p-2">更新日: 2024/2/21</small>
                                     </div>
                                     <div name="outer-card-lower-6" class=""></div>
-                                </div>
-                                <div name="outer-card-upper-7" class="column col-6 col-xs-12 p-2 filter-item"
-                                    data-tag="tag-4 tag-8">
-                                    <div name="card-7" class="card ">
-                                        <div name="card-header-7" class="card-header text-large">
-                                            <div name="card-title-7" class="card-title h3">Möt's広島 新春モルック合同練習会</div>
-                                            <div name="card-subtitle-7 class=" card-subtitle="" text-gray"="">
-                                                <i class="lar la-calendar"></i> 2024/3/2 10:00 - 17:00
-                                                <span class="label label-rounded label-default"> 練習会</span>
-                                            </div>
-                                            <div name="card-image-7" class="card-image">
-                                                <img class="event-img"
-                                                    src="https://pbs.twimg.com/media/GGvkfg3a8AAk79i?format=jpg&amp;name=900x900"
-                                                    alt="image of Möt's広島 新春モルック合同練習会">
-                                            </div>
-                                        </div>
-                                        <div name="card-body-7" class="card-body">
-                                            <ul class="menu">
-                                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                                        href="https://x.com/HiroshimaMots/status/1759751316505805254?s=20"
-                                                        target="_blank"> <i class="icon icon-link"></i>
-                                                        ソース（情報取得元）</a></li>
-                                                <li class="menu-item"> <small class="label text-bold">主催</small>
-                                                    Möt's広島
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">シリーズ</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">場所</small>
-                                                    <span class="label label-rounded">広島 </span> 尾道ふれあいの里
-                                                    屋根付きゲートボールコート
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">ルール</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">チーム/人</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">参加費</small>
-                                                    会場使用料割り勘
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div name="card-footer-7" class="card-footer"></div>
-                                        <small class="text-gray text-small p-2">更新日: 2024/2/21</small>
-                                    </div>
-                                    <div name="outer-card-lower-7" class=""></div>
-                                </div>
-                                <div name="outer-card-upper-8" class="column col-6 col-xs-12 p-2 filter-item"
-                                    data-tag="tag-3 tag-8">
-                                    <div name="card-8" class="card ">
-                                        <div name="card-header-8" class="card-header text-large">
-                                            <div name="card-title-8" class="card-title h3">モルック広島 体験会&amp;チャレンジゲーム
-                                            </div>
-                                            <div name="card-subtitle-8 class=" card-subtitle="" text-gray"="">
-                                                <i class="lar la-calendar"></i> 2024/3/2 13:00 - 15:00
-                                                <span class="label label-rounded label-default"> 体験会</span>
-                                            </div>
-                                            <div name="card-image-8" class="card-image">
-                                                <img class="event-img"
-                                                    src="https://pbs.twimg.com/media/GGwMqDFbQAAwuBL?format=jpg&amp;name=small"
-                                                    alt="image of モルック広島 体験会&amp;チャレンジゲーム">
-                                            </div>
-                                        </div>
-                                        <div name="card-body-8" class="card-body">
-                                            <ul class="menu">
-                                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                                        href="https://x.com/molkkyhiroshima/status/1759795475530895613?s=20"
-                                                        target="_blank"> <i class="icon icon-link"></i>
-                                                        ソース（情報取得元）</a></li>
-                                                <li class="menu-item"> <small class="label text-bold">主催</small>
-                                                    モルック広島</li>
-                                                <li class="menu-item"> <small class="label text-bold">シリーズ</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">場所</small>
-                                                    <span class="label label-rounded">広島 </span> 広島城北側堀端広場
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">ルール</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">チーム/人</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">参加費</small>
-                                                    200円（小学生以下無料）</li>
-                                            </ul>
-                                        </div>
-                                        <div name="card-footer-8" class="card-footer"></div>
-                                        <small class="text-gray text-small p-2">更新日: 2024/2/21</small>
-                                    </div>
-                                    <div name="outer-card-lower-8" class=""></div>
-                                </div>
-                                <div name="outer-card-upper-9" class="column col-6 col-xs-12 p-2 filter-item"
-                                    data-tag="tag-1 tag-7">
-                                    <div name="card-9" class="card ">
-                                        <div name="card-header-9" class="card-header text-large">
-                                            <div name="card-title-9" class="card-title h3">たこるくんモルックFES 2024
-                                                Presented by
-                                                アウトドアフェス</div>
-                                            <div name="card-subtitle-9 class=" card-subtitle="" text-gray"="">
-                                                <i class="lar la-calendar"></i> 2024/3/2 9:30 -
-                                                <span class="label label-rounded label-primary"> 大会</span>
-                                            </div>
-                                            <div name="card-image-9" class="card-image">
-                                                <img class="event-img"
-                                                    src="https://www.tv-osaka.co.jp/outdoor/images/molkky_001_002_pc.jpg?20170628-1143"
-                                                    alt="image of たこるくんモルックFES 2024 Presented by アウトドアフェス">
-                                            </div>
-                                        </div>
-                                        <div name="card-body-9" class="card-body">
-                                            <ul class="menu">
-                                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                                        href="https://www.tv-osaka.co.jp/outdoor/molkky.php"
-                                                        target="_blank"> <i class="icon icon-link"></i>
-                                                        ソース（情報取得元）</a></li>
-                                                <li class="menu-item"> <small class="label text-bold">主催</small>
-                                                    テレビ大阪</li>
-                                                <li class="menu-item"> <small class="label text-bold">シリーズ</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">場所</small>
-                                                    <span class="label label-rounded">大阪 </span> 万博記念公園 下の広場
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">ルール</small>
-                                                    チーム（2～2）
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">チーム/人</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">参加費</small>
-                                                    1チーム3000円
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div name="card-remarks-9" class="card-body">
-                                            <div class="toast text-small">
-                                                体験コーナー（参加料500円）あり<br>
-                                            </div>
-                                        </div>
-                                        <div name="card-footer-9" class="card-footer"></div>
-                                        <small class="text-gray text-small p-2">更新日: 2024/2/21</small>
-                                    </div>
-                                    <div name="outer-card-lower-9" class=""></div>
-                                </div>
-                                <div name="outer-card-upper-10" class="column col-6 col-xs-12 p-2 filter-item"
-                                    data-tag="tag-4 tag-8">
-                                    <div name="card-10" class="card ">
-                                        <div name="card-header-10" class="card-header text-large">
-                                            <div name="card-title-10" class="card-title h3">モルック世田谷 練習会</div>
-                                            <div name="card-subtitle-10 class=" card-subtitle="" text-gray"="">
-                                                <i class="lar la-calendar"></i> 2024/3/2 10:00 - 12:00
-                                                <span class="label label-rounded label-default"> 練習会</span>
-                                            </div>
-                                        </div>
-                                        <div name="card-body-10" class="card-body">
-                                            <ul class="menu">
-                                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                                        href="https://x.com/molkkysetagaya/status/1761644658076328186?s=20"
-                                                        target="_blank"> <i class="icon icon-link"></i>
-                                                        ソース（情報取得元）</a></li>
-                                                <li class="menu-item"> <small class="label text-bold">主催</small>
-                                                    モルック世田谷
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">シリーズ</small>
-                                                    モルック世田谷
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">場所</small>
-                                                    <span class="label label-rounded">東京 </span> 砧公園
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">ルール</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">チーム/人</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small>
-                                                </li>
-                                                <li class="menu-item"> <small class="label text-bold">参加費</small>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div name="card-footer-10" class="card-footer"></div>
-                                        <small class="text-gray text-small p-2">更新日: 2024/2/26</small>
-                                    </div>
-                                    <div name="outer-card-lower-10" class=""></div>
                                 </div>
                             </div>
                         </div>

@@ -13,21 +13,68 @@ $(function () {
         `<p>情報取得中...</p>
         <progress class="progress" max="100"></progress>`
     );
-    fetchEvents("00");
+    var param = {
+        'prefecture': '00',
+        'calendarFrom': '',
+        'calendarTo': '',
+    };
+    fetchEvents(param, true);
 
     /**
      * 都道府県選択イベント
      */
     $("#select-prefecture").change(function () {
         console.log("都道府県イベント: " + $(this).val());
-        var str = $(this).val();
+        var param = {
+            'prefecture': $(this).val(),
+            'calendarFrom': $("#calendar-from").val(),
+            'calendarTo': $("#calendar-to").val(),
+        };
         removeEvents();
         $("#tech-message").empty();
         $('#tech-message').append(
             `<p>情報取得中...</p>
             <progress class="progress" max="100"></progress>`
         );
-        fetchEvents(str);
+        fetchEvents(param, false);
+    });
+
+    /**
+     * 開催日フィルタイベント
+     */
+    $("#calendar-from").change(function () {
+        console.log("日付FROMイベント: " + $(this).val());
+        var param = {
+            'prefecture': $("#select-prefecture").val(),
+            'calendarFrom': $("#calendar-from").val(),
+            'calendarTo': $("#calendar-to").val(),
+        };
+        removeEvents();
+        $("#tech-message").empty();
+        $('#tech-message').append(
+            `<p>情報取得中...</p>
+            <progress class="progress" max="100"></progress>`
+        );
+        fetchEvents(param, false);
+    });
+
+    /**
+     * 開催日フィルタイベント
+     */
+    $("#calendar-to").change(function () {
+        console.log("日付TOイベント: " + $(this).val());
+        var param = {
+            'prefecture': $("#select-prefecture").val(),
+            'calendarFrom': $("#calendar-from").val(),
+            'calendarTo': $("#calendar-to").val(),
+        };
+        removeEvents();
+        $("#tech-message").empty();
+        $('#tech-message').append(
+            `<p>情報取得中...</p>
+            <progress class="progress" max="100"></progress>`
+        );
+        fetchEvents(param, false);
     });
 
     // $("#filter-nav > label").on('click', function () {
@@ -49,17 +96,35 @@ function removeEvents() {
 
 /**
  * イベント情報HTMLを作成してHTMLに追加する。
- * @param {string} prefecture 都道府県コード 
+ * @param {json} param パラメータ 
+ * @param {boolean} isInit 初回動作か
  */
-function fetchEvents(prefecture) {
+function fetchEvents(param, isInit) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbyGESZXIgPThsYLVGywYS7K0G_76hTaETBrThKLWNsyRAquwrqdIqZIt9sqHIFEn88M/exec';
-    if (prefecture != "00") {
-        url = url + "?prefecture=" + prefecture;
-        console.log(url);
+    var url = 'https://script.google.com/macros/s/AKfycbwqTnusWS8wxR3p6fdPgdeCPux-Wafpgq9-Z2TE24fPqnSallmcMWeZcFZSAnbN5Z1J/exec';
+    console.log(param);
+
+    if (param) {
+        url = url + "?";
     }
+
+    if (!param['prefecture']) {
+        url = url + "prefecture=" + "00";
+    } else {
+        url = url + "prefecture=" + param['prefecture'];
+    }
+
+    if (param['calendarFrom']) {
+        url = url + "&calendarFrom=" + param['calendarFrom'];
+    }
+
+    if (param['calendarTo']) {
+        url = url + "&calendarTo=" + param['calendarTo'];
+    }
+
+    console.log(url);
 
     $.ajax({
         url: url,
@@ -89,34 +154,28 @@ function fetchEvents(prefecture) {
 
             // 更新日時の日付フォーマット変更
             const updateDate = new Date(event['updateDate']).toLocaleDateString();
-
             // 個人・チーム構成
             var composition = createComposition(event);
-
             // 備考
             var remarks = createRemarksDiv(event, i);
-
             // 画像
             var imageArea = createImageDiv(event, i);
-
             // 記事
             var eventTitle = createTitle(event);
-
             // 詳細ありラベル
             var detailLabel = createDetailLabel(event);
-
             // カードCSSクラス
             var cardClass = createCardClass(event);
-
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
-
             // 記事リンクボタン
             var articleLink = createArticleLink(event);
+            // カード幅
+            var cardCol = datasJson.length === 1 ? '' : 'col-6';
 
             // イベントカード要素の追加
             $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
+                `<div name="outer-card-upper-${i}" class="column ${cardCol} col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
                     <div name="card-${i}" class="card ${cardClass}">
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
@@ -151,6 +210,12 @@ function fetchEvents(prefecture) {
         $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
+
+        if (isInit && datasJson.length > 0) {
+            // 初回の場合開催日フィルタの日付を設定する
+            $('#calendar-from').val(datas[0]['eventDate'].slice(0, 10));
+            $('#calendar-to').val(datas.slice(-1)[0]['eventDate'].slice(0, 10));
+        }
 
         // 一覧表示完了イベント
         return datasJson.length;

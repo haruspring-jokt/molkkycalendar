@@ -52,6 +52,7 @@
                         <div class="column" id="recent-updates">
                             <p class="text-small">
                                 最近の更新:<br>
+                                2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
                                 2023-3-1: イベント種類で絞り込めるフィルタを追加しました。<br>
                                 2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
                                 2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
@@ -173,6 +174,10 @@
                             <option value="46">鹿児島県</option>
                             <option value="47">沖縄県</option>
                         </select>
+                    </div>
+                    <div class="form-group column">
+                        <span class="label label-dark">開催日でしぼりこむ: </span>
+                        <input type="date" min="" max="" id="calendar-from"></input> から <input type="date" min="" max="" id="calendar-to"></input> まで
                     </div>
                     <div class="filter">
                         <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden
