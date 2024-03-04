@@ -40,14 +40,119 @@
                             </h1>
                         </div>
                     </div>
-                    <div class="column col-mx-auto">
-                        <p></p>
+                </div>
+                <div class="column col-mx-auto">
+                    <p></p>
+                </div>
+                <div class="container grid-xl">
+                    <div class="hero bg-gray hero-sm columns">
+                        <div class="hero-body">
+                            <h2 id="events-title">きょうからのイベント</h2>
+                            <p>現在日付以降の大会・練習会・体験会などが表示されます。くわしくはソースから主催者の発表をチェックしてください。</p>
+                            <a href="#info">そのほかのおしらせへ</a>
+                        </div>
                     </div>
+                    <div class="column p-2"></div>
+                </div>
+                <div class="container grid-xl column" id="cards">
+                    <div class="form-group column">
+                        <span class="label label-dark col-12">都道府県でしぼりこむ:</span>
+                        <select class="form-select col-12 in-blk" id="select-prefecture">
+                            <option value="00">すべて</option>
+                            <option value="01">北海道</option>
+                            <option value="02">青森県</option>
+                            <option value="03">岩手県</option>
+                            <option value="04">宮城県</option>
+                            <option value="05">秋田県</option>
+                            <option value="06">山形県</option>
+                            <option value="07">福島県</option>
+                            <option value="08">茨城県</option>
+                            <option value="09">栃木県</option>
+                            <option value="10">群馬県</option>
+                            <option value="11">埼玉県</option>
+                            <option value="12">千葉県</option>
+                            <option value="13">東京都</option>
+                            <option value="14">神奈川県</option>
+                            <option value="15">新潟県</option>
+                            <option value="16">富山県</option>
+                            <option value="17">石川県</option>
+                            <option value="18">福井県</option>
+                            <option value="19">山梨県</option>
+                            <option value="20">長野県</option>
+                            <option value="21">岐阜県</option>
+                            <option value="22">静岡県</option>
+                            <option value="23">愛知県</option>
+                            <option value="24">三重県</option>
+                            <option value="25">滋賀県</option>
+                            <option value="26">京都府</option>
+                            <option value="27">大阪府</option>
+                            <option value="28">兵庫県</option>
+                            <option value="29">奈良県</option>
+                            <option value="30">和歌山県</option>
+                            <option value="31">鳥取県</option>
+                            <option value="32">島根県</option>
+                            <option value="33">岡山県</option>
+                            <option value="34">広島県</option>
+                            <option value="35">山口県</option>
+                            <option value="36">徳島県</option>
+                            <option value="37">香川県</option>
+                            <option value="38">愛媛県</option>
+                            <option value="39">高知県</option>
+                            <option value="40">福岡県</option>
+                            <option value="41">佐賀県</option>
+                            <option value="42">長崎県</option>
+                            <option value="43">熊本県</option>
+                            <option value="44">大分県</option>
+                            <option value="45">宮崎県</option>
+                            <option value="46">鹿児島県</option>
+                            <option value="47">沖縄県</option>
+                        </select>
+                    </div>
+                    <div class="form-group column">
+                        <span class="label label-dark col-12">開催日でしぼりこむ: </span>
+                        <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-from"></input>
+                        <span class="col-1">～</span>
+                        <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-to"></input>
+                    </div>
+                    <div class="filter">
+                        <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden
+                            checked>
+                        <input class="filter-tag" value="tag-1" id="tag-1" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-2" id="tag-2" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-3" id="tag-3" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-4" id="tag-4" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-5" id="tag-5" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-6" id="tag-6" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-7" id="tag-7" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-8" id="tag-8" type="radio" name="filter-radio" hidden>
+                        <input class="filter-tag" value="tag-9" id="tag-9" type="radio" name="filter-radio" hidden>
+                        <div class="filter-nav column p-2" id="filter-nav">
+                            <span class="label label-dark col-12">種類でしぼりこむ: </span>
+                            <label class="chip" for="tag-0">すべて</label>
+                            <label class="chip" for="tag-9">注目イベント</label>
+                            <label class="chip" for="tag-1">大会</label>
+                            <label class="chip" for="tag-2">大会（長期）</label>
+                            <label class="chip" for="tag-7">大会すべて</label>
+                            <label class="chip" for="tag-3">体験会</label>
+                            <label class="chip" for="tag-4">練習会</label>
+                            <label class="chip" for="tag-8">体験・練習会どちらも</label>
+                            <label class="chip" for="tag-5">ブース</label>
+                            <label class="chip" for="tag-6">その他</label>
+                        </div>
+                        <div id="tech-message" class="column col-mx-auto p-2">
+                        </div>
+                        <div class="filter-body">
+                            <div id="event-columns" class="columns">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container grid-xl" id="info">
                     <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body column">
                             <h2 id="whatis" class="">イベントカレンダーとは</h2>
-                            <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。</p>
-                            <p>インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。</p>
+                            <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。
+                            </p>
                         </div>
                         <div class="column" id="recent-updates">
                             <p class="text-small">
@@ -112,108 +217,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="container grid-xl">
-                    <div class="hero bg-gray hero-sm columns">
-                        <div class="hero-body">
-                            <h2 id="events-title">きょうからのイベント</h2>
-                            <p>現在日付以降の大会・練習会・体験会などが表示されます。詳細は各イベントの主催者発表情報をチェックしてください。
-                        </div>
-                    </div>
-                    <div class="column p-2"></div>
-                </div>
-                <div class="container grid-xl column" id="cards">
-                    <div class="form-group column">
-                        <span class="label label-dark">都道府県をしぼりこむ:</span>
-                        <select class="form-select" id="select-prefecture">
-                            <option value="00">すべて</option>
-                            <option value="01">北海道</option>
-                            <option value="02">青森県</option>
-                            <option value="03">岩手県</option>
-                            <option value="04">宮城県</option>
-                            <option value="05">秋田県</option>
-                            <option value="06">山形県</option>
-                            <option value="07">福島県</option>
-                            <option value="08">茨城県</option>
-                            <option value="09">栃木県</option>
-                            <option value="10">群馬県</option>
-                            <option value="11">埼玉県</option>
-                            <option value="12">千葉県</option>
-                            <option value="13">東京都</option>
-                            <option value="14">神奈川県</option>
-                            <option value="15">新潟県</option>
-                            <option value="16">富山県</option>
-                            <option value="17">石川県</option>
-                            <option value="18">福井県</option>
-                            <option value="19">山梨県</option>
-                            <option value="20">長野県</option>
-                            <option value="21">岐阜県</option>
-                            <option value="22">静岡県</option>
-                            <option value="23">愛知県</option>
-                            <option value="24">三重県</option>
-                            <option value="25">滋賀県</option>
-                            <option value="26">京都府</option>
-                            <option value="27">大阪府</option>
-                            <option value="28">兵庫県</option>
-                            <option value="29">奈良県</option>
-                            <option value="30">和歌山県</option>
-                            <option value="31">鳥取県</option>
-                            <option value="32">島根県</option>
-                            <option value="33">岡山県</option>
-                            <option value="34">広島県</option>
-                            <option value="35">山口県</option>
-                            <option value="36">徳島県</option>
-                            <option value="37">香川県</option>
-                            <option value="38">愛媛県</option>
-                            <option value="39">高知県</option>
-                            <option value="40">福岡県</option>
-                            <option value="41">佐賀県</option>
-                            <option value="42">長崎県</option>
-                            <option value="43">熊本県</option>
-                            <option value="44">大分県</option>
-                            <option value="45">宮崎県</option>
-                            <option value="46">鹿児島県</option>
-                            <option value="47">沖縄県</option>
-                        </select>
-                    </div>
-                    <div class="form-group column">
-                        <span class="label label-dark">開催日でしぼりこむ: </span>
-                        <input type="date" min="" max="" id="calendar-from"></input> から <input type="date" min="" max="" id="calendar-to"></input> まで
-                    </div>
-                    <div class="filter">
-                        <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden
-                            checked>
-                        <input class="filter-tag" value="tag-1" id="tag-1" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-2" id="tag-2" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-3" id="tag-3" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-4" id="tag-4" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-5" id="tag-5" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-6" id="tag-6" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-7" id="tag-7" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-8" id="tag-8" type="radio" name="filter-radio" hidden>
-                        <input class="filter-tag" value="tag-9" id="tag-9" type="radio" name="filter-radio" hidden>
-                        <div class="filter-nav column p-2" id="filter-nav">
-                            <span class="label label-dark">種類でしぼりこむ: </span>
-                            <label class="chip" for="tag-0">すべて</label>
-                            <label class="chip" for="tag-9">注目イベント</label>
-                            <label class="chip" for="tag-1">大会</label>
-                            <label class="chip" for="tag-2">大会（長期）</label>
-                            <label class="chip" for="tag-7">大会すべて</label>
-                            <label class="chip" for="tag-3">体験会</label>
-                            <label class="chip" for="tag-4">練習会</label>
-                            <label class="chip" for="tag-8">体験・練習会どちらも</label>
-                            <label class="chip" for="tag-5">ブース</label>
-                            <label class="chip" for="tag-6">その他</label>
-                        </div>
-                        <div id="tech-message" class="column col-mx-auto p-2">
-                        </div>
-                        <div class="filter-body">
-                            <div id="event-columns" class="columns">
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div id="footer" class="container grid-xl">
-                    <div class="hero bg-dark hero-sm">
+                    <div class="hero bg-dark hero-sm columns">
                         <div class="hero-body">
                             <p>2024 Mölkky clan jaja patatas</p>
                         </div>

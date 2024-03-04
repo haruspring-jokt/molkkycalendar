@@ -9,14 +9,12 @@ $(function () {
      * init event
      */
     console.log('start getting events.')
-    $('#tech-message').append(
-        `<p>情報取得中...</p>
-        <progress class="progress" max="100"></progress>`
-    );
+    resetTechMessage();
+    var dateParam = fetchInitDateParam();
     var param = {
         'prefecture': '00',
-        'calendarFrom': '',
-        'calendarTo': '',
+        'calendarFrom': dateParam['from'],
+        'calendarTo': dateParam['to'],
     };
     fetchEvents(param, true);
 
@@ -25,56 +23,29 @@ $(function () {
      */
     $("#select-prefecture").change(function () {
         console.log("都道府県イベント: " + $(this).val());
-        var param = {
-            'prefecture': $(this).val(),
-            'calendarFrom': $("#calendar-from").val(),
-            'calendarTo': $("#calendar-to").val(),
-        };
         removeEvents();
-        $("#tech-message").empty();
-        $('#tech-message').append(
-            `<p>情報取得中...</p>
-            <progress class="progress" max="100"></progress>`
-        );
-        fetchEvents(param, false);
+        resetTechMessage();
+        fetchEventsWithFilter();
     });
 
     /**
-     * 開催日フィルタイベント
+     * 開催日FROMフィルタイベント
      */
     $("#calendar-from").change(function () {
         console.log("日付FROMイベント: " + $(this).val());
-        var param = {
-            'prefecture': $("#select-prefecture").val(),
-            'calendarFrom': $("#calendar-from").val(),
-            'calendarTo': $("#calendar-to").val(),
-        };
         removeEvents();
-        $("#tech-message").empty();
-        $('#tech-message').append(
-            `<p>情報取得中...</p>
-            <progress class="progress" max="100"></progress>`
-        );
-        fetchEvents(param, false);
+        resetTechMessage();
+        fetchEventsWithFilter();
     });
 
     /**
-     * 開催日フィルタイベント
+     * 開催日TOフィルタイベント
      */
     $("#calendar-to").change(function () {
         console.log("日付TOイベント: " + $(this).val());
-        var param = {
-            'prefecture': $("#select-prefecture").val(),
-            'calendarFrom': $("#calendar-from").val(),
-            'calendarTo': $("#calendar-to").val(),
-        };
         removeEvents();
-        $("#tech-message").empty();
-        $('#tech-message').append(
-            `<p>情報取得中...</p>
-            <progress class="progress" max="100"></progress>`
-        );
-        fetchEvents(param, false);
+        resetTechMessage();
+        fetchEventsWithFilter();
     });
 
     // $("#filter-nav > label").on('click', function () {
@@ -87,11 +58,31 @@ $(function () {
     // })
 });
 
+function resetTechMessage() {
+    $("#tech-message").empty();
+    $('#tech-message').append(
+        `<p>情報取得中...</p>
+        <progress class="progress" max="100"></progress>`
+    );
+}
+
 /**
  * イベント一覧削除
  */
 function removeEvents() {
     $("#event-columns").empty();
+}
+
+/**
+ * イベント情報一覧読み込み・表示（画面フィルター適用時）
+ */
+function fetchEventsWithFilter() {
+    var param = {
+        'prefecture': $("#select-prefecture").val(),
+        'calendarFrom': $("#calendar-from").val(),
+        'calendarTo': $("#calendar-to").val(),
+    };
+    fetchEvents(param, false);
 }
 
 /**
@@ -109,21 +100,17 @@ function fetchEvents(param, isInit) {
     if (param) {
         url = url + "?";
     }
-
     if (!param['prefecture']) {
         url = url + "prefecture=" + "00";
     } else {
         url = url + "prefecture=" + param['prefecture'];
     }
-
     if (param['calendarFrom']) {
         url = url + "&calendarFrom=" + param['calendarFrom'];
     }
-
     if (param['calendarTo']) {
         url = url + "&calendarTo=" + param['calendarTo'];
     }
-
     console.log(url);
 
     $.ajax({
@@ -155,7 +142,8 @@ function fetchEvents(param, isInit) {
             // 更新日時の日付フォーマット変更
             const updateDate = new Date(event['updateDate']).toLocaleDateString();
             // 個人・チーム構成
-            var composition = createComposition(event);
+            var composition = createComposition(
+                event['composition'], event['maxMember'], event['minMember'], event['rule']);
             // 備考
             var remarks = createRemarksDiv(event, i);
             // 画像
@@ -163,13 +151,13 @@ function fetchEvents(param, isInit) {
             // 記事
             var eventTitle = createTitle(event);
             // 詳細ありラベル
-            var detailLabel = createDetailLabel(event);
+            var detailLabel = createDetailLabel(event['article']);
             // カードCSSクラス
-            var cardClass = createCardClass(event);
+            var cardClass = createCardClass(event['article']);
             // イベント種類フィルタ用data-tag値
-            var dataTag = createDataTag(event);
+            var dataTag = createDataTag(event['article']);
             // 記事リンクボタン
-            var articleLink = createArticleLink(event);
+            var articleLink = createArticleLink(event['article']);
             // カード幅
             var cardCol = datasJson.length === 1 ? '' : 'col-6';
 
@@ -213,8 +201,9 @@ function fetchEvents(param, isInit) {
 
         if (isInit && datasJson.length > 0) {
             // 初回の場合開催日フィルタの日付を設定する
-            $('#calendar-from').val(datas[0]['eventDate'].slice(0, 10));
-            $('#calendar-to').val(datas.slice(-1)[0]['eventDate'].slice(0, 10));
+            var dateParam = fetchInitDateParam();
+            $('#calendar-from').val(dateParam['from']);
+            $('#calendar-to').val(dateParam['to']);
         }
 
         // 一覧表示完了イベント
@@ -224,22 +213,40 @@ function fetchEvents(param, isInit) {
 
 /**
  * 
+ * @returns 初期の日付パラメータ
+ */
+function fetchInitDateParam() {
+    var date = new Date();
+    var y = date.getFullYear();
+    var m = ("00" + (date.getMonth() + 1)).slice(-2);
+    var d = ("00" + date.getDate()).slice(-2);
+    var calendarFrom = y + "-" + m + "-" + d;
+    m = ("00" + (date.getMonth() + 2)).slice(-2);
+    var calendarTo = y + "-" + m + "-" + d;
+    return {
+        'from': calendarFrom,
+        'to': calendarTo
+    };
+}
+
+/**
+ * 
  * @param {json} event イベントJSON 
  * @returns チーム構成Div要素
  */
-function createComposition(event) {
-    if (event['composition'] == 'チーム') {
-        if (event['maxMember']) {
-            return event['composition']
-                + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
-                + ' ' + event['rule'];
+function createComposition(composition, maxMember, minMember, rule) {
+    if (composition == 'チーム') {
+        if (maxMember) {
+            return composition
+                + '（' + minMember + '～' + maxMember + '）'
+                + ' ' + rule;
         } else {
-            return event['composition']
-                + '（' + event['minMember'] + '）'
-                + ' ' + event['rule'];
+            return composition
+                + '（' + minMember + '）'
+                + ' ' + rule;
         }
     } else {
-        return event['composition'] + ' ' + event['rule'];
+        return composition + ' ' + rule;
     }
 }
 
@@ -323,10 +330,10 @@ function createTitle(event) {
  * @returns 詳細記事がある場合追加のラベルを返す
  * 
  */
-function createDetailLabel(event) {
-    if (event['article']) {
+function createDetailLabel(article) {
+    if (article) {
         return `
-            <a class="text-primary" href="${event['article']}" target="_blank">
+            <a class="text-primary" href="${article}" target="_blank">
                 <span class="label label-rounded label-warning">注目</span>
             </a>
         `;
@@ -340,8 +347,8 @@ function createDetailLabel(event) {
  * @param {json} event イベントJSON
  * @returns 詳細記事がある場合カードの背景CSSクラスを返す
  */
-function createCardClass(event) {
-    if (event['article']) {
+function createCardClass(article) {
+    if (article) {
         return 'bg-secondary';
     } else {
         return '';
@@ -353,9 +360,9 @@ function createCardClass(event) {
  * @param {json} event イベントJSON
  * @returns 記事リンクがある場合btn要素を返す
  */
-function createArticleLink(event) {
-    if (event['article']) {
-        return `<li class="menu-item btn"><a class="btn btn-link text-left" href="${event['article']}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a></li>`;
+function createArticleLink(article) {
+    if (article) {
+        return `<li class="menu-item btn"><a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a></li>`;
     } else {
         return '';
     }

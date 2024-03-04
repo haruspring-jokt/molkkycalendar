@@ -9,7 +9,9 @@ function testGet() {
   var e =
   {
     "parameter": {
-      // "prefecture": "",
+      "prefecture": "01",
+      "calendarFrom": "2024-04-01",
+      "calendarTo": "2024-04-14",
     }
   };
   return doGet(e);
@@ -24,6 +26,7 @@ function doGet(e) {
    * パラメータの確認
    */
   var param = e.parameter;
+  Logger.log(param);
 
   if (param == undefined) {
     //パラメータ不良の場合はundefinedで返す
@@ -51,8 +54,24 @@ function doGet(e) {
       prefectureKey = convertPrefectureToName(prefectureParam);
     }
 
+    var calendarFrom = "";
+    var calendarTo = "";
+    // 開催日付パラメータ
+    if (param.calendarFrom) {
+      calendarFrom = param.calendarFrom;
+    }
+    if (param.calendarTo) {
+      calendarTo = param.calendarTo;
+    }
+
+    var param = {
+      'prefecture': prefectureKey,
+      'calendarFrom': calendarFrom,
+      'calendarTo': calendarTo,
+    }
+
     // listデータをjsonに変換
-    payload = JSON.stringify(createEvents(prefectureKey));
+    payload = JSON.stringify(createEvents(param));
     ContentService.createTextOutput();
     var output = ContentService.createTextOutput();
     output.setMimeType(ContentService.MimeType.JSON);
@@ -64,20 +83,31 @@ function doGet(e) {
 
 /**
  * イベント取得
+ * @param フィルター用パラメータ
  */
-function createEvents(prefectureParam) {
+function createEvents(param) {
   const id = "1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";
   const ss = SpreadsheetApp.openById(id)
   const sheet = ss.getSheetByName("イベント情報")
   const lastRow = sheet.getLastRow();
   const range = sheet.getRange("A2:AJ" + lastRow + "");
+
+  Logger.log(param);
+
   var values = range.getValues();
   // 現在日付以降のイベントを取得する
   values = values.filter(record => record[0].slice(0, 1) === "0");
-  // 都道府県で絞り込む
-  if (prefectureParam == "00") {
-  } else {
-    values = values.filter(record => record[16] === prefectureParam);
+  // 絞り込み
+  if (param.prefecture && param.prefecture !== "00") {
+    values = values.filter(record => (record[16] === param.prefecture));
+  }
+  if (param.calendarFrom) {
+    values = values.filter(record => (
+      record[5].getTime() >= new Date(param.calendarFrom + " 00:00:00").getTime()));
+  }
+  if (param.calendarTo) {
+    values = values.filter(record => (
+      record[5].getTime() <= new Date(param.calendarTo + " 23:59:59").getTime()));
   }
 
   let objectArray = [];
@@ -136,6 +166,8 @@ function createEvents(prefectureParam) {
       counter++;
     }
   }
+  Logger.log(objectArray);
+
   return objectArray;
 }
 

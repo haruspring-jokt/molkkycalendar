@@ -33,98 +33,31 @@
         <div class="off-canvas-content" style="padding: 0;">
             <div class="docs-content" id="content">
                 <div class="container grid-xl">
-                    <div class="hero bg-dark hero-sm">
+                    <div class="hero bg-dark hero-sm columns">
                         <div class="hero-body">
                             <h1 id="s-title">
                                 全国モルックイベント大会カレンダー
                             </h1>
                         </div>
                     </div>
-                    <div class="column col-mx-auto">
-                        <p></p>
-                    </div>
-                    <div class="hero bg-gray hero-sm columns">
-                        <div class="hero-body column">
-                            <h2 id="whatis" class="">イベントカレンダーとは</h2>
-                            <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。</p>
-                            <p>インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。</p>
-                        </div>
-                        <div class="column" id="recent-updates">
-                            <p class="text-small">
-                                最近の更新:<br>
-                                2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
-                                2023-3-1: イベント種類で絞り込めるフィルタを追加しました。<br>
-                                2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
-                                2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
-                                2023-2-24: 都道府県絞り込みフィルターを追加しました。
-                            </p>
-                        </div>
-                    </div>
-                    <div class="hero hero-sm columns">
-                        <div class="hero-body">
-                            <h3 class="col-12">
-                                こまかいデータ
-                            </h3>
-                            <ul class="menu col-12">
-                                <li class="menu-item btn btn-success"><a class="btn btn-link text-left"
-                                        href="https://docs.google.com/spreadsheets/d/1l_SJn1SiqcdoG_s41Dd5tN6EZkTsDfe_9RHfkvuZoe8/edit"><i
-                                            class="icon icon-share" target="_blank"></i>2024年版全国モルック大会イベントカレンダー</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="hero-body">
-                            <h3 class="col-12">
-                                リンク
-                            </h3>
-                            <ul class="menu col-12">
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://twitter.com/molkkycalendar" target="_blank"><i
-                                            class="icon icon-share"></i>
-                                        Twitter(X)</a></li>
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://bsky.app/profile/calendar.jajapatatas.com" target="_blank"><i
-                                            class="icon icon-share"></i>
-                                        BlueSky</a></li>
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://blog.jajapatatas.com/" target="_blank"><i
-                                            class="icon icon-share"></i>
-                                        全国モルックカレンダーニュース（ブログ）</a></li>
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://drive.google.com/drive/folders/1RjfjBd7vstGFG33rkcTG1tHcXKe4-Rnx?usp=drive_link"
-                                        target="_blank"><i class="icon icon-share"></i>
-                                        スコアシートPDF</a></li>
-                            </ul>
-                        </div>
-                        <div class="hero-body">
-                            <h3 class="col-12">
-                                情報提供のおねがい
-                            </h3>
-                            <ul class="menu col-12">
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
-                                        target="_blank"><i class="icon icon-share"></i>
-                                        情報提供フォーム（項目別）</a></li>
-                                <li class="menu-item btn"><a class="btn btn-link text-left"
-                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
-                                        target="_blank"><i class="icon icon-share"></i>
-                                        情報提供フォーム（フリーフォーム）</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                </div>
+                <div class="column col-mx-auto">
+                    <p></p>
                 </div>
                 <div class="container grid-xl">
                     <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body">
                             <h2 id="events-title">きょうからのイベント</h2>
-                            <p>現在日付移行のイベント・大会・練習会・体験会などが表示されます。詳細は各イベントのソース、もしくはスプレッドシートをチェックしてください。
+                            <p>現在日付以降の大会・練習会・体験会などが表示されます。くわしくはソースから主催者の発表をチェックしてください。</p>
+                            <a href="#info">そのほかのおしらせへ</a>
                         </div>
                     </div>
                     <div class="column p-2"></div>
                 </div>
                 <div class="container grid-xl column" id="cards">
                     <div class="form-group column">
-                        <span class="label label-dark">都道府県をしぼりこむ:</span>
-                        <select class="form-select" id="select-prefecture">
+                        <span class="label label-dark col-12">都道府県でしぼりこむ:</span>
+                        <select class="form-select col-12 in-blk" id="select-prefecture">
                             <option value="00">すべて</option>
                             <option value="01">北海道</option>
                             <option value="02">青森県</option>
@@ -176,8 +109,12 @@
                         </select>
                     </div>
                     <div class="form-group column">
-                        <span class="label label-dark">開催日でしぼりこむ: </span>
-                        <input type="date" min="" max="" id="calendar-from" value="2024-01-01"></input> から <input type="date" min="" max="" id="calendar-to" value="2024-12-31"></input> まで
+                        <span class="label label-dark col-12">開催日でしぼりこむ: </span>
+                        <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-from"
+                            value="2024-04-01"></input>
+                        <span class="col-1">～</span>
+                        <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-to"
+                            value="2024-04-30"></input>
                     </div>
                     <div class="filter">
                         <input class="filter-tag" value="tag-0" id="tag-0" type="radio" name="filter-radio" hidden
@@ -192,7 +129,7 @@
                         <input class="filter-tag" value="tag-8" id="tag-8" type="radio" name="filter-radio" hidden>
                         <input class="filter-tag" value="tag-9" id="tag-9" type="radio" name="filter-radio" hidden>
                         <div class="filter-nav column p-2" id="filter-nav">
-                            <span class="label label-dark">種類でしぼりこむ: </span>
+                            <span class="label label-dark col-12">種類でしぼりこむ: </span>
                             <label class="chip" for="tag-0">すべて</label>
                             <label class="chip" for="tag-9">注目イベント</label>
                             <label class="chip" for="tag-1">大会</label>
@@ -204,7 +141,7 @@
                             <label class="chip" for="tag-5">ブース</label>
                             <label class="chip" for="tag-6">その他</label>
                         </div>
-                        <div id="tech-message" class="column col-mx-auto">
+                        <div id="tech-message" class="column col-mx-auto p-2">
                             <p class="bg-success">情報取得完了: 170件</p>
                         </div>
                         <div class="filter-body">
@@ -581,9 +518,79 @@
                         </div>
                     </div>
                 </div>
+                <div class="container grid-xl" id="info">
+                    <div class="hero bg-gray hero-sm columns">
+                        <div class="hero-body column">
+                            <h2 id="whatis" class="">イベントカレンダーとは</h2>
+                            <p>日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。
+                            </p>
+                        </div>
+                        <div class="column" id="recent-updates">
+                            <p class="text-small">
+                                最近の更新:<br>
+                                2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
+                                2023-3-1: イベント種類で絞り込めるフィルタを追加しました。<br>
+                                2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
+                                2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
+                                2023-2-24: 都道府県絞り込みフィルターを追加しました。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="hero hero-sm columns">
+                        <div class="hero-body">
+                            <h3 class="col-12">
+                                こまかいデータ
+                            </h3>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn btn-success"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/spreadsheets/d/1l_SJn1SiqcdoG_s41Dd5tN6EZkTsDfe_9RHfkvuZoe8/edit"><i
+                                            class="icon icon-share" target="_blank"></i>2024年版全国モルック大会イベントカレンダー</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="hero-body">
+                            <h3 class="col-12">
+                                リンク
+                            </h3>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://twitter.com/molkkycalendar" target="_blank"><i
+                                            class="icon icon-share"></i>
+                                        Twitter(X)</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://bsky.app/profile/calendar.jajapatatas.com" target="_blank"><i
+                                            class="icon icon-share"></i>
+                                        BlueSky</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://blog.jajapatatas.com/" target="_blank"><i
+                                            class="icon icon-share"></i>
+                                        全国モルックカレンダーニュース（ブログ）</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://drive.google.com/drive/folders/1RjfjBd7vstGFG33rkcTG1tHcXKe4-Rnx?usp=drive_link"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        スコアシートPDF</a></li>
+                            </ul>
+                        </div>
+                        <div class="hero-body">
+                            <h3 class="col-12">
+                                情報提供のおねがい
+                            </h3>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（項目別）</a></li>
+                                <li class="menu-item btn"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（フリーフォーム）</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="footer" class="container grid-xl">
-                <div class="hero bg-dark hero-sm">
+                <div class="hero bg-dark hero-sm columns">
                     <div class="hero-body">
                         <p>2024 Mölkky clan jaja patatas</p>
                     </div>
