@@ -3,7 +3,7 @@
  */
 $(function () {
     //処理を書く部分
-    $('#s-title').append('全国モルックイベント大会カレンダー');
+    $('#s-title').append('全国モルックカレンダー | 国内のモルック大会やイベントを紹介');
 
     /**
      * init event
@@ -134,6 +134,8 @@ function fetchEvents(param, isInit) {
 
             // 開催日の日付フォーマット変更
             const eventDate = new Date(event['eventDate']).toLocaleDateString();
+            var week = ['日', '月', '火', '水', '木', '金', '土'];
+            const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
             var eventTime = '';
             if (!(event['eventStart'] + event['eventEnd'])) { } else {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
@@ -155,7 +157,7 @@ function fetchEvents(param, isInit) {
             // カードCSSクラス
             var cardClass = createCardClass(event['article']);
             // イベント種類フィルタ用data-tag値
-            var dataTag = createDataTag(event['article']);
+            var dataTag = createDataTag(event);
             // 記事リンクボタン
             var articleLink = createArticleLink(event['article']);
             // カード幅
@@ -168,7 +170,7 @@ function fetchEvents(param, isInit) {
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
                             <div name="card-subtitle-${i} class="card-subtitle text-gray">
-                                <i class="lar la-calendar"></i> ${eventDate} ${eventTime}
+                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
                                 <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
                                 ${detailLabel}
                             </div>

@@ -1,3 +1,7 @@
+html {
+    font-size: 18px;
+}
+
 body {
     font-family: "Noto Sans JP", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     font-optical-sizing: auto;
@@ -5,6 +9,10 @@ body {
 
 .in-blk {
     display: inline-block;
+}
+
+ins {
+    border-bottom: 0 !important;
 }
 
 .topIcon {
