@@ -3,33 +3,68 @@
  */
 $(function () {
     //処理を書く部分
-    $('#s-title').append('全国モルックイベント大会カレンダー');
+    $('#s-title').append('全国モルックカレンダー | 国内のモルック大会やイベントを紹介');
 
     /**
      * init event
      */
     console.log('start getting events.')
-    $('#tech-message').append(
-        `<p>情報取得中...</p>
-        <progress class="progress" max="100"></progress>`
-    );
-    fetchEvents("00");
+    resetTechMessage();
+    var dateParam = fetchInitDateParam();
+    var param = {
+        'prefecture': '00',
+        'calendarFrom': dateParam['from'],
+        'calendarTo': dateParam['to'],
+    };
+    fetchEvents(param, true);
 
     /**
      * 都道府県選択イベント
      */
     $("#select-prefecture").change(function () {
         console.log("都道府県イベント: " + $(this).val());
-        var str = $(this).val();
         removeEvents();
-        $("#tech-message").empty();
-        $('#tech-message').append(
-            `<p>情報取得中...</p>
-            <progress class="progress" max="100"></progress>`
-        );
-        fetchEvents(str);
+        resetTechMessage();
+        fetchEventsWithFilter();
     });
+
+    /**
+     * 開催日FROMフィルタイベント
+     */
+    $("#calendar-from").change(function () {
+        console.log("日付FROMイベント: " + $(this).val());
+        removeEvents();
+        resetTechMessage();
+        fetchEventsWithFilter();
+    });
+
+    /**
+     * 開催日TOフィルタイベント
+     */
+    $("#calendar-to").change(function () {
+        console.log("日付TOイベント: " + $(this).val());
+        removeEvents();
+        resetTechMessage();
+        fetchEventsWithFilter();
+    });
+
+    // $("#filter-nav > label").on('click', function () {
+    //     var activeTag = $('input[name=filter-radio]:checked').val();
+    //     let count = 0;
+    //     $(`.${activeTag}`).each(function () {
+    //         count++;
+    //     });
+    //     $('#tech-message > p').text(`情報取得完了: ${count}件`);
+    // })
 });
+
+function resetTechMessage() {
+    $("#tech-message").empty();
+    $('#tech-message').append(
+        `<p>情報取得中...</p>
+        <progress class="progress" max="100"></progress>`
+    );
+}
 
 /**
  * イベント一覧削除
@@ -39,18 +74,44 @@ function removeEvents() {
 }
 
 /**
- * イベント情報HTMLを作成してHTMLに追加する。
- * @param {string} prefecture 都道府県コード 
+ * イベント情報一覧読み込み・表示（画面フィルター適用時）
  */
-function fetchEvents(prefecture) {
+function fetchEventsWithFilter() {
+    var param = {
+        'prefecture': $("#select-prefecture").val(),
+        'calendarFrom': $("#calendar-from").val(),
+        'calendarTo': $("#calendar-to").val(),
+    };
+    fetchEvents(param, false);
+}
+
+/**
+ * イベント情報HTMLを作成してHTMLに追加する。
+ * @param {json} param パラメータ 
+ * @param {boolean} isInit 初回動作か
+ */
+function fetchEvents(param, isInit) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbyGESZXIgPThsYLVGywYS7K0G_76hTaETBrThKLWNsyRAquwrqdIqZIt9sqHIFEn88M/exec';
-    if (prefecture != "00") {
-        url = url + "?prefecture=" + prefecture;
-        console.log(url);
+    var url = 'https://script.google.com/macros/s/AKfycbwqTnusWS8wxR3p6fdPgdeCPux-Wafpgq9-Z2TE24fPqnSallmcMWeZcFZSAnbN5Z1J/exec';
+    console.log(param);
+
+    if (param) {
+        url = url + "?";
     }
+    if (!param['prefecture']) {
+        url = url + "prefecture=" + "00";
+    } else {
+        url = url + "prefecture=" + param['prefecture'];
+    }
+    if (param['calendarFrom']) {
+        url = url + "&calendarFrom=" + param['calendarFrom'];
+    }
+    if (param['calendarTo']) {
+        url = url + "&calendarTo=" + param['calendarTo'];
+    }
+    console.log(url);
 
     $.ajax({
         url: url,
@@ -73,6 +134,8 @@ function fetchEvents(prefecture) {
 
             // 開催日の日付フォーマット変更
             const eventDate = new Date(event['eventDate']).toLocaleDateString();
+            var week = ['日', '月', '火', '水', '木', '金', '土'];
+            const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
             var eventTime = '';
             if (!(event['eventStart'] + event['eventEnd'])) { } else {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
@@ -80,30 +143,34 @@ function fetchEvents(prefecture) {
 
             // 更新日時の日付フォーマット変更
             const updateDate = new Date(event['updateDate']).toLocaleDateString();
-
             // 個人・チーム構成
-            var composition = createComposition(event);
-
+            var composition = createComposition(
+                event['composition'], event['maxMember'], event['minMember'], event['rule']);
             // 備考
             var remarks = createRemarksDiv(event, i);
-
             // 画像
             var imageArea = createImageDiv(event, i);
-
             // 記事
             var eventTitle = createTitle(event);
-
             // 詳細ありラベル
-            var detailLabel = createDetailLabel(event);
+            var detailLabel = createDetailLabel(event['article']);
+            // カードCSSクラス
+            var cardClass = createCardClass(event['article']);
+            // イベント種類フィルタ用data-tag値
+            var dataTag = createDataTag(event);
+            // 記事リンクボタン
+            var articleLink = createArticleLink(event['article']);
+            // カード幅
+            var cardCol = datasJson.length === 1 ? '' : 'col-6';
 
             // イベントカード要素の追加
             $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column col-6 col-xs-12 p-2">
-                    <div name="card-${i}" class="card">
+                `<div name="outer-card-upper-${i}" class="column ${cardCol} col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
+                    <div name="card-${i}" class="card ${cardClass}">
                         <div name ="card-header-${i}" class="card-header text-large">
                             <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
                             <div name="card-subtitle-${i} class="card-subtitle text-gray">
-                                <i class="lar la-calendar"></i> ${eventDate} ${eventTime}
+                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
                                 <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
                                 ${detailLabel}
                             </div>
@@ -112,6 +179,7 @@ function fetchEvents(prefecture) {
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
                                 <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
+                                ${articleLink}
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
                                 <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
                                 <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
@@ -133,6 +201,13 @@ function fetchEvents(prefecture) {
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
 
+        if (isInit && datasJson.length > 0) {
+            // 初回の場合開催日フィルタの日付を設定する
+            var dateParam = fetchInitDateParam();
+            $('#calendar-from').val(dateParam['from']);
+            $('#calendar-to').val(dateParam['to']);
+        }
+
         // 一覧表示完了イベント
         return datasJson.length;
     });
@@ -140,16 +215,40 @@ function fetchEvents(prefecture) {
 
 /**
  * 
+ * @returns 初期の日付パラメータ
+ */
+function fetchInitDateParam() {
+    var date = new Date();
+    var y = date.getFullYear();
+    var m = ("00" + (date.getMonth() + 1)).slice(-2);
+    var d = ("00" + date.getDate()).slice(-2);
+    var calendarFrom = y + "-" + m + "-" + d;
+    m = ("00" + (date.getMonth() + 2)).slice(-2);
+    var calendarTo = y + "-" + m + "-" + d;
+    return {
+        'from': calendarFrom,
+        'to': calendarTo
+    };
+}
+
+/**
+ * 
  * @param {json} event イベントJSON 
  * @returns チーム構成Div要素
  */
-function createComposition(event) {
-    if (event['composition'] == 'チーム') {
-        return event['composition']
-            + '（' + event['minMember'] + '～' + event['maxMember'] + '）'
-            + ' ' + event['rule'];
+function createComposition(composition, maxMember, minMember, rule) {
+    if (composition == 'チーム') {
+        if (maxMember) {
+            return composition
+                + '（' + minMember + '～' + maxMember + '）'
+                + ' ' + rule;
+        } else {
+            return composition
+                + '（' + minMember + '）'
+                + ' ' + rule;
+        }
     } else {
-        return event['composition'] + ' ' + event['rule'];
+        return composition + ' ' + rule;
     }
 }
 
@@ -233,16 +332,65 @@ function createTitle(event) {
  * @returns 詳細記事がある場合追加のラベルを返す
  * 
  */
-function createDetailLabel(event) {
-    if (event['article']) {
+function createDetailLabel(article) {
+    if (article) {
         return `
-            <a class="text-primary" href="${event['article']}" target="_blank">
-                <span class="label label-rounded">くわしく見る</span>
+            <a class="text-primary" href="${article}" target="_blank">
+                <span class="label label-rounded label-warning">注目</span>
             </a>
         `;
     } else {
         return '';
     }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 詳細記事がある場合カードの背景CSSクラスを返す
+ */
+function createCardClass(article) {
+    if (article) {
+        return 'bg-secondary';
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 記事リンクがある場合btn要素を返す
+ */
+function createArticleLink(article) {
+    if (article) {
+        return `<li class="menu-item btn"><a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a></li>`;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * 
+ * @param {json} event イベントJSON
+ * @returns 種類フィルタ用のdeta-tagを返す
+ */
+function createDataTag(event) {
+    if (!event['category']) {
+        return 'tag-0';
+    }
+    if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
+        return 'tag-0';
+    }
+    var tag = {
+        '大会': 'tag-1 tag-7', '大会（長期）': 'tag-2 tag-7',
+        '体験会': 'tag-3 tag-8', '練習会': 'tag-4 tag-8',
+        'ブース': 'tag-5', 'その他': 'tag-6'
+    }[event['category']];
+    if (event['article']) {
+        tag = tag + ' tag-9';
+    }
+    return tag;
 }
 
 /**

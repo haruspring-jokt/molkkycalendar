@@ -1,6 +1,18 @@
+html {
+    font-size: 18px;
+}
+
 body {
     font-family: "Noto Sans JP", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     font-optical-sizing: auto;
+}
+
+.in-blk {
+    display: inline-block;
+}
+
+ins {
+    border-bottom: 0 !important;
 }
 
 .topIcon {
@@ -32,4 +44,37 @@ body {
     object-fit: cover;
     height: 150px;
     width: 100%;
+}
+
+.chip {
+    font-size: 110%;
+    height: 2.0em;
+    padding: 0.5em;
+}
+
+/* フィルターのオーバーライド */
+.filter .filter-tag#tag-0:checked~.filter-nav .chip[for=tag-0],
+.filter .filter-tag#tag-1:checked~.filter-nav .chip[for=tag-1],
+.filter .filter-tag#tag-2:checked~.filter-nav .chip[for=tag-2],
+.filter .filter-tag#tag-3:checked~.filter-nav .chip[for=tag-3],
+.filter .filter-tag#tag-4:checked~.filter-nav .chip[for=tag-4],
+.filter .filter-tag#tag-5:checked~.filter-nav .chip[for=tag-5],
+.filter .filter-tag#tag-6:checked~.filter-nav .chip[for=tag-6],
+.filter .filter-tag#tag-7:checked~.filter-nav .chip[for=tag-7],
+.filter .filter-tag#tag-8:checked~.filter-nav .chip[for=tag-8],
+.filter .filter-tag#tag-9:checked~.filter-nav .chip[for=tag-9] {
+    background: #5755d9;
+    color: #fff;
+}
+
+.filter .filter-tag#tag-1:checked~.filter-body .filter-item:not([data-tag~=tag-1]),
+.filter .filter-tag#tag-2:checked~.filter-body .filter-item:not([data-tag~=tag-2]),
+.filter .filter-tag#tag-3:checked~.filter-body .filter-item:not([data-tag~=tag-3]),
+.filter .filter-tag#tag-4:checked~.filter-body .filter-item:not([data-tag~=tag-4]),
+.filter .filter-tag#tag-5:checked~.filter-body .filter-item:not([data-tag~=tag-5]),
+.filter .filter-tag#tag-6:checked~.filter-body .filter-item:not([data-tag~=tag-6]),
+.filter .filter-tag#tag-7:checked~.filter-body .filter-item:not([data-tag~=tag-7]),
+.filter .filter-tag#tag-8:checked~.filter-body .filter-item:not([data-tag~=tag-8]),
+.filter .filter-tag#tag-9:checked~.filter-body .filter-item:not([data-tag~=tag-9]) {
+    display: none;
 }
