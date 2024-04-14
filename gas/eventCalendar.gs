@@ -6,7 +6,12 @@ function myFunction() {
  * GETメソッドテスト用
  */
 function testGet() {
-  var e =
+  var e = {
+    "parameter": {
+      "api": "recent",
+    }
+  }
+  /** 
   {
     "parameter": {
       "prefecture": "01",
@@ -14,6 +19,7 @@ function testGet() {
       "calendarTo": "2024-04-14",
     }
   };
+  */
   return doGet(e);
 }
 
@@ -27,6 +33,16 @@ function doGet(e) {
    */
   var param = e.parameter;
   Logger.log(param);
+
+  if (param.api == "recent") {
+    // listデータをjsonに変換
+    payload = JSON.stringify(createRecentEvents());
+    ContentService.createTextOutput();
+    var output = ContentService.createTextOutput();
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setContent(payload);
+    return output;
+  }
 
   if (param == undefined) {
     //パラメータ不良の場合はundefinedで返す
@@ -163,6 +179,55 @@ function createEvents(param) {
       objectArray[counter]["result"] = values[i][33];
       objectArray[counter]["article"] = values[i][34];
       objectArray[counter]["image"] = values[i][35];
+      counter++;
+    }
+  }
+  Logger.log(objectArray);
+
+  return objectArray;
+}
+
+/**
+ * イベント取得
+ */
+function createRecentEvents() {
+  const id = "1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";
+  const ss = SpreadsheetApp.openById(id)
+  const sheet = ss.getSheetByName("最近追加したイベント")
+  const lastRow = sheet.getLastRow();
+  const range = sheet.getRange("A2:L" + lastRow + "");
+
+  var values = range.getValues();
+
+  let objectArray = [];
+
+  var counter = 0;
+
+  for (var i = 0; i < lastRow; i++) {
+    if (typeof values[i] === 'undefined') {
+      break;
+    }
+    if (values[i] == null) {
+      break;
+    }
+    if (values[i][0] === "") {
+      break;
+    }
+    if (Number(values[i][0]) < 10000) {
+      // 各項目をJSONマップに格納する
+      objectArray[counter] = {};
+      objectArray[counter]["sk"] = values[i][0];
+      objectArray[counter]["id"] = values[i][1];
+      objectArray[counter]["updateDate"] = values[i][2];
+      objectArray[counter]["eventDate"] = values[i][3];
+      objectArray[counter]["eventTime"] = values[i][4];
+      objectArray[counter]["eventName"] = values[i][5];
+      objectArray[counter]["category"] = values[i][6];
+      objectArray[counter]["prefecture"] = values[i][7];
+      objectArray[counter]["place"] = values[i][8];
+      objectArray[counter]["org"] = values[i][9];
+      objectArray[counter]["source"] = values[i][10];
+      objectArray[counter]["article"] = values[i][11];
       counter++;
     }
   }

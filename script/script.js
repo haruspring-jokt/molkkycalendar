@@ -2,9 +2,6 @@
  * ページ読み込み時実行
  */
 $(function () {
-    //処理を書く部分
-    $('#s-title').append('全国モルックカレンダー | 国内のモルック大会やイベントを紹介');
-
     /**
      * init event
      */
@@ -364,7 +361,7 @@ function createCardClass(article) {
  */
 function createArticleLink(article) {
     if (article) {
-        return `<li class="menu-item btn"><a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a></li>`;
+        return `<a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a>`;
     } else {
         return '';
     }
