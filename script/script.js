@@ -298,7 +298,8 @@ function createImageDiv(event, i) {
         } else {
             return `
                 <div name="card-image-${i}" class="card-image">
-                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}">
+                    <a class="" href="${event['source']}" target="_blank">
+                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
                 </div>
             `;
         }
@@ -319,7 +320,9 @@ function createTitle(event) {
             <a class="text-primary" href="${event['article']}" target="_blank"> ${event['eventName']}</a>
         `;
     } else {
-        return `${event['eventName']}`;
+        return `
+            <a class="text-primary" href="${event['source']}" target="_blank"> ${event['eventName']}</a>
+        `;
     }
 }
 
