@@ -221,6 +221,10 @@ function fetchInitDateParam() {
     var d = ("00" + date.getDate()).slice(-2);
     var calendarFrom = y + "-" + m + "-" + d;
     m = ("00" + (date.getMonth() + 2)).slice(-2);
+    if (m == "13") {
+        y = date.getFullYear() + 1;
+        m = "01";
+    }
     var calendarTo = y + "-" + m + "-" + d;
     return {
         'from': calendarFrom,
