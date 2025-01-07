@@ -67,7 +67,7 @@ function resetTechMessage() {
  * イベント一覧削除
  */
 function removeEvents() {
-    $("#event-columns").empty();
+    $("#simple-body").empty();
 }
 
 /**
@@ -92,15 +92,14 @@ function fetchEvents(param, isInit) {
      * イベント情報一覧読み込み・表示
      */
     var url = 'https://script.google.com/macros/s/AKfycby6RrUbRI75MG4DAeXRRaIFo3xmwuGCg9S1hLQRBcvuPY_B20TNRWjXfb1nyBgXJ5JW/exec';
-    console.log(param);
-
     if (param) {
         url = url + "?";
     }
+    url = url + "api=" + "simple";
     if (!param['prefecture']) {
-        url = url + "prefecture=" + "00";
+        url = url + "&prefecture=" + "00";
     } else {
-        url = url + "prefecture=" + param['prefecture'];
+        url = url + "&prefecture=" + param['prefecture'];
     }
     if (param['calendarFrom']) {
         url = url + "&calendarFrom=" + param['calendarFrom'];
@@ -128,70 +127,55 @@ function fetchEvents(param, isInit) {
                 '体験会': 'default', '練習会': 'default',
                 'ブース': 'default', 'その他': 'default'
             }[event['category']];
+            var category = event['category'];
 
             // 開催日の日付フォーマット変更
             const eventDate = new Date(event['eventDate']).toLocaleDateString();
             var week = ['日', '月', '火', '水', '木', '金', '土'];
             const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
+            var dateBgClass = '';
+            if (youbi == '(日)') {
+                dateBgClass = 'bg-sunday';
+            } else if (youbi == '(土)') {
+                dateBgClass = 'bg-saturday';
+            } else {
+                dateBgClass = 'bg-gray';
+            }
             var eventTime = '';
             if (!(event['eventStart'] + event['eventEnd'])) { } else {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
             }
 
-            // 更新日時の日付フォーマット変更
-            const updateDate = new Date(event['updateDate']).toLocaleDateString();
             // 個人・チーム構成
             var composition = createComposition(
                 event['composition'], event['maxMember'], event['minMember'], event['rule']);
-            // 備考
-            var remarks = createRemarksDiv(event, i);
             // 画像
             var imageArea = createImageDiv(event, i);
             // 記事
             var eventTitle = createTitle(event);
             // 詳細ありラベル
             var detailLabel = createDetailLabel(event['article']);
-            // カードCSSクラス
-            var cardClass = createCardClass(event['article']);
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
             // 記事リンクボタン
             var articleLink = createArticleLink(event['article']);
-            // カード幅
-            var cardCol = datasJson.length === 1 ? '' : 'col-6';
+            var url = '';
+            if (articleLink === '') {
+                url = event['source'];
+            } else {
+                url = articleLink;
+            }
 
             // イベントカード要素の追加
-            $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column ${cardCol} col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
-                    <div name="card-${i}" class="card ${cardClass}">
-                        <div name ="card-header-${i}" class="card-header text-large">
-                            <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
-                            <div name="card-subtitle-${i} class="card-subtitle text-gray">
-                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
-                                <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
-                                ${detailLabel}
-                            </div>
-                            ${imageArea}
-                        </div>
-                        <div name="card-body-${i}" class="card-body">
-                            <ul class="menu">
-                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
-                                ${articleLink}
-                                <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
-                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
-                                <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
-                                <li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>
-                                <li class="menu-item"> <small class="label text-bold">チーム/人</small> ${event['teamNum']}</li>
-                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>
-                                <li class="menu-item"> <small class="label text-bold">参加費</small> ${event['entryFee']}</li>
-                            </ul>
-                        </div>
-                        ${remarks}
-                        <div name="card-footer-${i}" class="card-footer"></div>
-                        <small class="text-gray text-small p-2">更新日: ${updateDate}</small>
-                    </div>
-                    <div name="outer-card-lower-${i}" class=""></div>
-                </div>`
+            $('#simple-body').append(
+                `<tr class="${dateBgClass} filter-item ${dataTag}" data-tag="${dataTag}">
+                    <td>${eventDate}${youbi}</td>
+                    <td>
+                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span> ${eventTitle}<br/>
+                        ${detailLabel} <span class="text-gray">${composition}</span>
+                    </td>
+                    <td align="right">${imageArea}</td>
+                </tr>`
             );
         }
         $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
@@ -237,50 +221,17 @@ function fetchInitDateParam() {
  * @param {json} event イベントJSON 
  * @returns チーム構成Div要素
  */
-function createComposition(composition, maxMember, minMember, rule) {
+function createComposition(composition, maxMember, minMember) {
     if (composition == 'チーム') {
         if (maxMember) {
             return composition
-                + '（' + minMember + '～' + maxMember + '）'
-                + ' ' + rule;
+                + '（' + minMember + '～' + maxMember + '）';
         } else {
             return composition
-                + '（' + minMember + '）'
-                + ' ' + rule;
+                + '（' + minMember + '）';
         }
     } else {
-        return composition + ' ' + rule;
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @param {int} i
- * @returns 備考Div要素
- */
-function createRemarksDiv(event, i) {
-    var isThereRemark = false;
-    var entryRemarks = '';
-    if (!event['entryRemarks']) { } else {
-        entryRemarks = event['entryRemarks'] + '<br>';
-        isThereRemark = true;
-    }
-    // 備考・メモ
-    var remarks = '';
-    if (!(event['remarks'] + event['memo'])) { } else {
-        remarks = `${event['remarks']} ${event['memo']}`;
-        isThereRemark = true;
-    }
-    if (isThereRemark) {
-        return `
-            <div name="card-remarks-${i}" class="card-body">
-                <div class="toast text-small">
-                    ${entryRemarks + remarks}
-                </div>
-            </div>`;
-    } else {
-        return '';
+        return composition + ' ';
     }
 }
 
@@ -292,21 +243,9 @@ function createRemarksDiv(event, i) {
  */
 function createImageDiv(event, i) {
     if (event['image']) {
-        if (event['article']) {
-            return `
-                <div name="card-image-${i}" class="card-image">
-                    <a class="" href="${event['article']}" target="_blank">
-                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
-                </div>
+        return `
+                <img class="event-simple-img" src="${event['image']}" alt="image of ${event['eventName']}">
             `;
-        } else {
-            return `
-                <div name="card-image-${i}" class="card-image">
-                    <a class="" href="${event['source']}" target="_blank">
-                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
-                </div>
-            `;
-        }
     } else {
         return '';
     }
@@ -343,19 +282,6 @@ function createDetailLabel(article) {
                 <span class="label label-rounded label-warning">注目</span>
             </a>
         `;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 詳細記事がある場合カードの背景CSSクラスを返す
- */
-function createCardClass(article) {
-    if (article) {
-        return 'bg-secondary';
     } else {
         return '';
     }

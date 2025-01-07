@@ -46,6 +46,20 @@ ins {
     width: 100%;
 }
 
+.event-simple-img {
+    object-fit: cover;
+    height: 90px;
+    width: 160px;
+}
+
+.bg-sunday {
+    background-color: #fcf1f8;
+}
+
+.bg-saturday {
+    background-color: #f1f1fc;
+}
+
 .chip {
     font-size: 110%;
     height: 2.0em;

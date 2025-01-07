@@ -35,7 +35,7 @@ function fetchRecentEvents(param, isInit) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbxSTrIN96dp8wzECRFqCWAhK4YnSG7M2bvCVahmvgsTNjxz-bkkAGFvSU2xd2DS0UWO/exec';
+    var url = 'https://script.google.com/macros/s/AKfycby6RrUbRI75MG4DAeXRRaIFo3xmwuGCg9S1hLQRBcvuPY_B20TNRWjXfb1nyBgXJ5JW/exec';
     console.log(param);
 
     if (param) {
