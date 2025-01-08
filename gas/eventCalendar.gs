@@ -29,7 +29,7 @@ function testGet() {
 function doGet(e) {
 
   /*
-   * パラメータの確認
+   * パラメータの確認・ディスパッチ
    */
   var param = e.parameter;
   Logger.log(param);
@@ -37,6 +37,46 @@ function doGet(e) {
   if (param.api == "recent") {
     // listデータをjsonに変換
     payload = JSON.stringify(createRecentEvents());
+    ContentService.createTextOutput();
+    var output = ContentService.createTextOutput();
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setContent(payload);
+    return output;
+  }
+
+  if (param.api == "simple") {
+    /*
+     * イベントデータの取得 シンプル表示用
+     */
+    // 都道府県パラメータ
+    var prefectureParam = param.prefecture;
+
+    var prefectureKey = "";
+    if (!prefectureParam || prefectureParam == "00") {
+      // 都道府県パラメータが指定されていない場合は全取得とする
+      prefectureKey = "00";
+    } else {
+      prefectureKey = convertPrefectureToName(prefectureParam);
+    }
+
+    var calendarFrom = "";
+    var calendarTo = "";
+    // 開催日付パラメータ
+    if (param.calendarFrom) {
+      calendarFrom = param.calendarFrom;
+    }
+    if (param.calendarTo) {
+      calendarTo = param.calendarTo;
+    }
+
+    var param = {
+      'prefecture': prefectureKey,
+      'calendarFrom': calendarFrom,
+      'calendarTo': calendarTo,
+    }
+
+    // listデータをjsonに変換
+    payload = JSON.stringify(createEvents(param));
     ContentService.createTextOutput();
     var output = ContentService.createTextOutput();
     output.setMimeType(ContentService.MimeType.JSON);
@@ -98,7 +138,7 @@ function doGet(e) {
 }
 
 /**
- * イベント取得
+ * イベント取得 トップページ用
  * @param フィルター用パラメータ
  */
 function createEvents(param) {
@@ -188,7 +228,78 @@ function createEvents(param) {
 }
 
 /**
- * イベント取得
+ * イベント取得 シンプル表示用
+ */
+function createEventsSimple(param) {
+  const id = "1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";
+  const ss = SpreadsheetApp.openById(id)
+  const sheet = ss.getSheetByName("イベント情報")
+  const lastRow = sheet.getLastRow();
+  const range = sheet.getRange("A2:AJ" + lastRow + "");
+
+  Logger.log(param);
+
+  var values = range.getValues();
+  // 現在日付以降のイベントを取得する
+  values = values.filter(record => record[0].slice(0, 1) === "0");
+  // 絞り込み
+  if (param.prefecture && param.prefecture !== "00") {
+    values = values.filter(record => (record[16] === param.prefecture));
+  }
+  if (param.calendarFrom) {
+    values = values.filter(record => (
+      record[5].getTime() >= new Date(param.calendarFrom + " 00:00:00").getTime()));
+  }
+  if (param.calendarTo) {
+    values = values.filter(record => (
+      record[5].getTime() <= new Date(param.calendarTo + " 23:59:59").getTime()));
+  }
+
+  let objectArray = [];
+
+  var counter = 0;
+
+  for (var i = 0; i < lastRow; i++) {
+    if (typeof values[i] === 'undefined') {
+      break;
+    }
+    if (values[i] == null) {
+      break;
+    }
+    if (values[i][0] === "") {
+      break;
+    }
+    if (Number(values[i][0]) < 10000) {
+      // 各項目をJSONマップに格納する
+      objectArray[counter] = {};
+      objectArray[counter]["sk"] = values[i][0];
+      objectArray[counter]["id"] = values[i][1];
+      objectArray[counter]["serial"] = values[i][2];
+      objectArray[counter]["registerDate"] = values[i][3];
+      objectArray[counter]["updateDate"] = values[i][4];
+      objectArray[counter]["eventDate"] = values[i][5];
+      objectArray[counter]["eventStart"] = values[i][6];
+      objectArray[counter]["eventEnd"] = values[i][7];
+      objectArray[counter]["category"] = values[i][8];
+      objectArray[counter]["longEventName"] = values[i][9];
+      objectArray[counter]["seriesName"] = values[i][10];
+      objectArray[counter]["source"] = values[i][11];
+      objectArray[counter]["eventName"] = values[i][12];
+      objectArray[counter]["org"] = values[i][14];
+      objectArray[counter]["prefecture"] = values[i][16];
+      objectArray[counter]["place"] = values[i][17];
+      objectArray[counter]["article"] = values[i][34];
+      objectArray[counter]["image"] = values[i][35];
+      counter++;
+    }
+  }
+  Logger.log(objectArray);
+
+  return objectArray;
+}
+
+/**
+ * イベント取得 最近追加したイベント
  */
 function createRecentEvents() {
   const id = "1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";

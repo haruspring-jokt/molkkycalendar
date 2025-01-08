@@ -133,48 +133,47 @@ function fetchEvents(param, isInit) {
             const eventDate = new Date(event['eventDate']).toLocaleDateString();
             var week = ['日', '月', '火', '水', '木', '金', '土'];
             const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
-            var dateBgClass = '';
-            if (youbi == '(日)') {
-                dateBgClass = 'bg-sunday';
-            } else if (youbi == '(土)') {
-                dateBgClass = 'bg-saturday';
-            } else {
-                dateBgClass = 'bg-gray';
-            }
             var eventTime = '';
             if (!(event['eventStart'] + event['eventEnd'])) { } else {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
             }
 
+            // 土日の場合背景色変更
+            var dateBgClass = 'bg-gray';
+            if (youbi == '(日)') {
+                dateBgClass = 'bg-sunday';
+            } else if (youbi == '(土)') {
+                dateBgClass = 'bg-saturday';
+            }
+
+            // 主催
+            var org = event['org'];
+            // 記事
+            var eventTitle = createTitle(event);
+
+            // 詳細ありラベル
+            var detailLabel = createDetailLabel(event['article']);
             // 個人・チーム構成
             var composition = createComposition(
                 event['composition'], event['maxMember'], event['minMember'], event['rule']);
-            // 画像
-            var imageArea = createImageDiv(event, i);
-            // 記事
-            var eventTitle = createTitle(event);
-            // 詳細ありラベル
-            var detailLabel = createDetailLabel(event['article']);
+            // 長期大会・シリーズ
+            var longEventOrSeries = createLongEventOrSeries(event);
+
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
-            // 記事リンクボタン
-            var articleLink = createArticleLink(event['article']);
-            var url = '';
-            if (articleLink === '') {
-                url = event['source'];
-            } else {
-                url = articleLink;
-            }
 
             // イベントカード要素の追加
             $('#simple-body').append(
                 `<tr class="${dateBgClass} filter-item ${dataTag}" data-tag="${dataTag}">
-                    <td>${eventDate}${youbi}</td>
                     <td>
-                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span> ${eventTitle}<br/>
-                        ${detailLabel} <span class="text-gray">${composition}</span>
+                        ${eventDate}${youbi}<br/>
+                        <small>${eventTime}</small>
                     </td>
-                    <td align="right">${imageArea}</td>
+                    <td>
+                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span>${detailLabel} ${eventTitle}<br/>
+                        ${composition} ${longEventOrSeries}<br/>
+                        <small>${org}</small>
+                    </td>
                 </tr>`
             );
         }
@@ -224,28 +223,29 @@ function fetchInitDateParam() {
 function createComposition(composition, maxMember, minMember) {
     if (composition == 'チーム') {
         if (maxMember) {
-            return composition
-                + '（' + minMember + '～' + maxMember + '）';
+            return '<span class="text-gray">' + composition
+                + '（' + minMember + '～' + maxMember + '）' + '</span>';
         } else {
-            return composition
-                + '（' + minMember + '）';
+            return '<span class="text-gray">' + composition
+                + '（' + minMember + '）' + '</span>';
         }
+    } else if (composition == '個人') {
+        return '<span class="text-gray">個人</span>';
     } else {
-        return composition + ' ';
+        return '';
     }
 }
 
 /**
- * 
- * @param {json} event イベントJSON
- * @param {int} i
- * @returns 画像URLが含まれている場合画像エリアDivを返す
+ * 長期大会またはシリーズ名を返す
+ * @param {json} event イベントJSON 
+ * @returns 長期大会名、空の場合はシリーズ名、いずれも空の場合は空文字
  */
-function createImageDiv(event, i) {
-    if (event['image']) {
-        return `
-                <img class="event-simple-img" src="${event['image']}" alt="image of ${event['eventName']}">
-            `;
+function createLongEventOrSeries(event) {
+    if (event['longEventName']) {
+        return '<span class="text-gray">[' + event['longEventName'] + ']</span>';
+    } else if (event['seriesName']) {
+        return '<span class="text-gray">[' + event['seriesName'] + ']</span>';
     } else {
         return '';
     }
@@ -282,19 +282,6 @@ function createDetailLabel(article) {
                 <span class="label label-rounded label-warning">注目</span>
             </a>
         `;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 記事リンクがある場合btn要素を返す
- */
-function createArticleLink(article) {
-    if (article) {
-        return `<a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a>`;
     } else {
         return '';
     }
