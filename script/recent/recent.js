@@ -35,25 +35,20 @@ function fetchRecentEvents(param, isInit) {
     /**
      * イベント情報一覧読み込み・表示
      */
-    var url = 'https://script.google.com/macros/s/AKfycbzXY_kRPq4HYPRTeWXZjX0YuHK_sYU6y0QYsXeoYU8A0fDqUt7JHhoorDzlqdo7MqaF/exec';
-    console.log(param);
-
-    if (param) {
-        url = url + "?";
-    }
-    url = url + "api=" + "recent";
-    console.log(url);
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/recent.json";
+    const maxItems = 100;
 
     $.ajax({
-        url: url,
+        url: publicUrl,
         type: 'GET',
         dataType: 'json',
     }).done(function (datas) {
-        var datasStringify = JSON.stringify(datas);
-        var datasJson = JSON.parse(datasStringify);
 
         // 件数分イベントカードを生成して追加する
-        for (const i in datasJson) {
+        for (const i in datas) {
+            if (i >= maxItems) {
+                break;
+            }
             const event = datas[i];
 
             // イベント種類のラベルカラー
@@ -97,12 +92,12 @@ function fetchRecentEvents(param, isInit) {
                 </tr>`
             );
         }
-        $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
+        $('#tech-message > p').text(`情報取得完了: ${datas.length}件`);
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
 
         // 一覧表示完了イベント
-        return datasJson.length;
+        return datas.length;
     });
 }
 
