@@ -45,14 +45,6 @@ $(function () {
         fetchEventsWithFilter();
     });
 
-    // $("#filter-nav > label").on('click', function () {
-    //     var activeTag = $('input[name=filter-radio]:checked').val();
-    //     let count = 0;
-    //     $(`.${activeTag}`).each(function () {
-    //         count++;
-    //     });
-    //     $('#tech-message > p').text(`情報取得完了: ${count}件`);
-    // })
 });
 
 function resetTechMessage() {
@@ -82,44 +74,81 @@ function fetchEventsWithFilter() {
     fetchEvents(param, false);
 }
 
+function isEqualsPrefectureCodeAndName(code, name) {
+    if (code == '00') {
+        return ture;
+    }
+    if (code.slice(0, 1) == 'A') {
+        var areaList = {
+            'A1': ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島'],
+            'A2': ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京都', '神奈川', '山梨'],
+            'A4': ['新潟', '富山', '石川', '福井', '長野'],
+            'A3': ['岐阜', '静岡', '愛知', '三重'],
+            'A5': ['滋賀', '京都府', '大阪府', '兵庫', '奈良', '和歌山'],
+            'A6': ['鳥取', '島根', '岡山', '広島', '山口'],
+            'A7': ['徳島', '香川', '愛媛', '高知'],
+            'A8': ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄'],
+            'A0': ['海外']
+        };
+        return areaList[code].includes(name);
+    }
+    var prefectureList = {
+        '01': '北海道', '02': '青森', '03': '岩手', '04': '宮城', '05': '秋田', '06': '山形', '07': '福島',
+        '08': '茨城', '09': '栃木', '10': '群馬', '11': '埼玉', '12': '千葉', '13': '東京都', '14': '神奈川',
+        '15': '新潟', '16': '富山', '17': '石川', '18': '福井', '19': '山梨', '20': '長野',
+        '21': '岐阜', '22': '静岡', '23': '愛知',
+        '24': '三重', '25': '滋賀', '26': '京都府', '27': '大阪府', '28': '兵庫', '29': '奈良', '30': '和歌山',
+        '31': '鳥取', '32': '島根', '33': '岡山', '34': '広島', '35': '山口',
+        '36': '徳島', '37': '香川', '38': '愛媛', '39': '高知',
+        '40': '福岡', '41': '佐賀', '42': '長崎', '43': '熊本', '44': '大分', '45': '宮崎', '46': '鹿児島', '47': '沖縄'
+    };
+    return prefectureList[code] == name;
+}
+
 /**
  * イベント情報HTMLを作成してHTMLに追加する。
  * @param {json} param パラメータ 
  * @param {boolean} isInit 初回動作か
  */
 function fetchEvents(param, isInit) {
-    /**
-     * イベント情報一覧読み込み・表示
-     */
-    var url = 'https://script.google.com/macros/s/AKfycbzXY_kRPq4HYPRTeWXZjX0YuHK_sYU6y0QYsXeoYU8A0fDqUt7JHhoorDzlqdo7MqaF/exec';
-    if (param) {
-        url = url + "?";
-    }
-    url = url + "api=" + "simple";
-    if (!param['prefecture']) {
-        url = url + "&prefecture=" + "00";
-    } else {
-        url = url + "&prefecture=" + param['prefecture'];
-    }
-    if (param['calendarFrom']) {
-        url = url + "&calendarFrom=" + param['calendarFrom'];
-    }
-    if (param['calendarTo']) {
-        url = url + "&calendarTo=" + param['calendarTo'];
-    }
-    console.log(url);
+
+    console.log('fetchEvents: ', param);
+
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
+    const maxItems = 300;
 
     $.ajax({
-        url: url,
+        url: publicUrl,
         type: 'GET',
         dataType: 'json',
     }).done(function (datas) {
-        var datasStringify = JSON.stringify(datas);
-        var datasJson = JSON.parse(datasStringify);
+        const filteredDatas = datas.filter((event) => {
+            // ソートキーのチェック
+            const isCorrectSk = isInit ? event.sk.slice(0, 1) == "0" : true;
+
+            // JST変換・0:00:00化
+            const dateObj = new Date(event.eventDate);
+            dateObj.setHours(dateObj.getHours() + 9);
+            const eventDateZero = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+
+            const fromDateObj = new Date(param['calendarFrom'] + "T00:00:00+09:00");
+            const toDateObj = new Date(param['calendarTo'] + "T23:59:59+09:00");
+
+            const isPrefectureMatch = param['prefecture'] === "00" || isEqualsPrefectureCodeAndName(param['prefecture'], event.prefecture);
+
+            return isCorrectSk
+                && eventDateZero >= fromDateObj
+                && eventDateZero <= toDateObj
+                && isPrefectureMatch;
+        });
 
         // 件数分イベントカードを生成して追加する
-        for (const i in datasJson) {
-            const event = datas[i];
+        for (const i in filteredDatas) {
+            if (i >= maxItems) {
+                console.log('over' + maxItems + 'items. stop rendering.');
+                break;
+            }
+            const event = filteredDatas[i];
 
             // イベント種類のラベルカラー
             const labelColor = {
@@ -177,11 +206,12 @@ function fetchEvents(param, isInit) {
                 </tr>`
             );
         }
-        $('#tech-message > p').text(`情報取得完了: ${datasJson.length}件`);
+        const counter = filteredDatas.length >= maxItems ? '多いため' + maxItems + '件まで表示' : filteredDatas.length + "件";
+        $('#tech-message > p').text(`情報取得完了: ${counter}`);
         $('#tech-message > p').addClass('bg-success');
         $('#tech-message > progress').remove();
 
-        if (isInit && datasJson.length > 0) {
+        if (isInit && filteredDatas.length > 0) {
             // 初回の場合開催日フィルタの日付を設定する
             var dateParam = fetchInitDateParam();
             $('#calendar-from').val(dateParam['from']);
@@ -189,7 +219,7 @@ function fetchEvents(param, isInit) {
         }
 
         // 一覧表示完了イベント
-        return datasJson.length;
+        return filteredDatas.length;
     });
 }
 

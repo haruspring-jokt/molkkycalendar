@@ -48,7 +48,7 @@
                 <div class="container grid-xl">
                     <div class="hero bg-gray hero-sm columns">
                         <div class="hero-body">
-                            <h2 id="events-title">きょうからのイベント</h2>
+                            <h2 id="events-title">モルックイベントを探そう</h2>
                             <p>現在日付以降の大会・練習会・体験会などが表示されます。くわしくはソースから主催者の発表をチェックしてください。</p>
                             <p class="bg-secondary text-large text-bold"><a href="./">リッチ表示へ</a> | <a
                                     href="./simple/">シンプル表示へ</a></p>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="container grid-xl column" id="cards">
                     <div class="form-group column">
-                        <span class="label label-dark col-12">都道府県でしぼりこむ:</span>
+                        <span class="label label-dark col-12">都道府県・エリアでしぼりこむ:</span>
                         <select class="form-select col-12 in-blk" id="select-prefecture">
                             <option value="00">すべて</option>
                             <option value="A1">北海道・東北エリア</option>
@@ -149,7 +149,7 @@
                         </select>
                     </div>
                     <div class="form-group column">
-                        <span class="label label-dark col-12">開催日でしぼりこむ: </span>
+                        <span class="label label-dark col-12">開催日でしぼりこむ（過去日付も2025/01/01から取得できます）: </span>
                         <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-from"></input>
                         <span class="col-1">～</span>
                         <input class="form-input col-5 in-blk" type="date" min="" max="" id="calendar-to"></input>
@@ -215,6 +215,7 @@
                         <div class="column" id="recent-updates">
                             <p class="text-small">
                                 最近の更新:<br>
+                                2025-9-26: イベント取得方法を見直し、表示速度が改善されました。また、2025/1/1以降の過去イベントも表示できるようになりました。「最近追加したイベント」はまだ対応中です。<br>
                                 2025-3-6: 都道府県をエリア単位で絞り込めるようになりました。<br>
                                 2025-1-8: <a href="./simple/">シンプル表示ページ</a>を追加しました。<br>
                                 2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
