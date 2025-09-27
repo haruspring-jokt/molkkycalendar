@@ -186,18 +186,27 @@ function fetchEvents(param, isInit) {
             // 記事リンクボタン
             var articleLink = createArticleLink(event['article']);
             // カード幅
-            var cardCol = filteredDatas.length === 1 ? '' : 'col-6';
+            var cardCol = filteredDatas.length === 1 ? 'col-6 col-lg-6 col-xl-6' : 'col-6 col-lg-6 col-xl-6';
+            // シリーズ
+            var seriesName = event['seriesName'] ? `<small class="text-tiny">${event['seriesName']}</small><br/>` : '';
+            // ルール
+            var rule = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>` : '';
+            // 定員
+            var teamNum = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">定員(チーム/人)</small> ${event['teamNum']}</li>` : '';
+            // エントリー開始
+            var entryStart = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>` : '';
 
             // イベントカード要素の追加
             $('#event-columns').append(
                 `<div name="outer-card-upper-${i}" class="column ${cardCol} col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
                     <div name="card-${i}" class="card ${cardClass}">
                         <div name ="card-header-${i}" class="card-header text-large">
-                            <div name="card-title-${i}" class="card-title h3">${eventTitle}</div>
+                            ${seriesName}
+                            <div name="card-title-${i}" class="card-title h3"><small class="label label-rounded text-bold">${event['prefecture']} </small> ${eventTitle}</div>
                             <div name="card-subtitle-${i} class="card-subtitle text-gray">
-                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
                                 <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
                                 ${detailLabel}
+                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
                             </div>
                             ${imageArea}
                         </div>
@@ -206,11 +215,10 @@ function fetchEvents(param, isInit) {
                                 <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
                                 ${articleLink}
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
-                                <li class="menu-item"> <small class="label text-bold">シリーズ</small> ${event['seriesName']}</li>
-                                <li class="menu-item"> <small class="label text-bold">場所</small> <span class="label label-rounded">${event['prefecture']} </span> ${event['place']}</li>
-                                <li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>
-                                <li class="menu-item"> <small class="label text-bold">チーム/人</small> ${event['teamNum']}</li>
-                                <li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>
+                                <li class="menu-item"> <small class="label text-bold">場所</small> ${event['place']}</li>
+                                ${rule}
+                                ${teamNum}
+                                ${entryStart}
                                 <li class="menu-item"> <small class="label text-bold">参加費</small> ${event['entryFee']}</li>
                             </ul>
                         </div>
@@ -297,8 +305,8 @@ function createRemarksDiv(event, i) {
     }
     // 備考・メモ
     var remarks = '';
-    if (!(event['remarks'] + event['memo'])) { } else {
-        remarks = `${event['remarks']} ${event['memo']}`;
+    if (!(event['remarks'])) { } else {
+        remarks = `${event['remarks']}`;
         isThereRemark = true;
     }
     if (isThereRemark) {
@@ -311,6 +319,15 @@ function createRemarksDiv(event, i) {
     } else {
         return '';
     }
+}
+
+/**
+ * 大会であるかの検証
+ * @param {} category 
+ * @returns 
+ */
+function isCompetition(category) {
+    return ['大会', '大会（長期）'].includes(category);
 }
 
 /**

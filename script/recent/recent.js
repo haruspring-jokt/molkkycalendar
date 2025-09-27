@@ -72,23 +72,21 @@ function fetchRecentEvents(param, isInit) {
             const updateDate = new Date(event['updateDate']).toLocaleDateString();
 
             // イベント名称
-            var eventTitle = createTitle(event);
+            var link = event['article'] != "" ? event['article'] : event['source'];
+            var eventTitle = `<a class="btn btn-link text-left" href="${link}" target="_blank">${event['eventName']}</a>`;
             // カードCSSクラス
             var bgClass = createBgColor(event['article']);
-            // 記事リンクボタン
-            var articleLink = createArticleLink(event['article']);
 
             // イベントカード要素の追加
             $('#recent-body').append(
                 `<tr class="${bgClass}">
                     <td style="font-size: .6rem;">${eventDate}${youbi}<br/>${eventTime}</td>
-                    <td>${eventTitle}</td>
-                    <td style="font-size: .4rem;"><span class="label label-rounded label-${labelColor}">${category}</span></td>
-                    <td style="font-size: .4rem;"><span class="label label-rounded">${event['prefecture']} </span></td>
-                    <td style="font-size: .6rem;">${event['place']}</td>
-                    <td style="font-size: .6rem;">${event['org']}</td>
-                    <td style="font-size: .8rem;"><a href="${event['source']}" target="_blank"><i class="icon icon-link"></i></a></td>
-                    <td style="font-size: .4rem;">${articleLink}</td>
+                    <td>
+                        <span class="label label-rounded">${event['prefecture']}</span>
+                        <span class="label label-rounded label-${labelColor}">${category}</span>
+                        ${eventTitle}
+                    </td>
+                    <td style="font-size: .6rem;">${event['org']}｜${event['place']}</td>
                 </tr>`
             );
         }
