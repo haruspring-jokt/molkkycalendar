@@ -73,20 +73,26 @@ function fetchRecentEvents(param, isInit) {
 
             // イベント名称
             var link = event['article'] != "" ? event['article'] : event['source'];
-            var eventTitle = `<a class="btn btn-link text-left" href="${link}" target="_blank">${event['eventName']}</a>`;
+            var eventName = event['eventName'].length > 30 ? event['eventName'].substring(0, 30) + '...' : event['eventName'];
+            var eventTitle = `<a class="btn btn-link text-left" href="${link}" target="_blank">${eventName}</a>`;
             // カードCSSクラス
             var bgClass = createBgColor(event['article']);
 
             // イベントカード要素の追加
             $('#recent-body').append(
                 `<tr class="${bgClass}">
-                    <td style="font-size: .6rem;">${eventDate}${youbi}<br/>${eventTime}</td>
-                    <td>
-                        <span class="label label-rounded">${event['prefecture']}</span>
-                        <span class="label label-rounded label-${labelColor}">${category}</span>
-                        ${eventTitle}
+                    <td style="font-size: .8rem;">
+                        <span class="text-small">${eventDate}${youbi}</span><br/>
+                        <span class="text-small">${eventTime}</span><br/>
+                        <span class="label label-rounded text-small">${event['prefecture']}</span>
+                        <span class="label label-rounded label-${labelColor} text-small">${category}</span><br/>
                     </td>
-                    <td style="font-size: .6rem;">${event['org']}｜${event['place']}</td>
+                    <td>
+                        <span>${eventTitle}</span><br/>
+                        <span class="label label-rounded text-small">主催</span> <span class="text-small">${event['org']}</span><br/>
+                        <span class="label label-rounded text-small">会場</span> <span class="text-small">${event['place']}</span>
+                    </td>
+                    <td style="font-size: .6rem;"></td>
                 </tr>`
             );
         }
