@@ -30,6 +30,14 @@ $(function () {
      */
     $("#calendar-from").change(function () {
         console.log("日付FROMイベント: " + $(this).val());
+        const calendarFrom = $("#calendar-from").val();
+        // 開催日TOにFROMの1ヶ月後を設定する
+        var date = new Date(calendarFrom);
+        date.setMonth(date.getMonth() + 1);
+        var y = date.getFullYear();
+        var m = ("00" + (date.getMonth() + 1)).slice(-2);
+        var d = ("00" + date.getDate()).slice(-2);
+        $("#calendar-to").val(y + "-" + m + "-" + d);
         removeEvents();
         resetTechMessage();
         fetchEventsWithFilter();
@@ -180,6 +188,9 @@ function fetchEvents(param, isInit) {
             // 記事
             var eventTitle = createTitle(event);
 
+            // Googleカレンダー登録リンクを作成する
+            const gCalLink = createGoogleCalendarLink(event);
+
             // 詳細ありラベル
             var detailLabel = createDetailLabel(event['article']);
             // 個人・チーム構成
@@ -187,6 +198,9 @@ function fetchEvents(param, isInit) {
                 event['composition'], event['maxMember'], event['minMember'], event['rule']);
             // 長期大会・シリーズ
             var longEventOrSeries = createLongEventOrSeries(event);
+            // googleマップ検索リンク
+            var placeLink = event['place'] ?
+                `<a class="btn btn-link text-left" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank"><i class="icon icon-location"></i></a>` : '';
 
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
@@ -196,10 +210,11 @@ function fetchEvents(param, isInit) {
                 `<tr class="${dateBgClass} filter-item ${dataTag}" data-tag="${dataTag}">
                     <td>
                         ${eventDate}${youbi}<br/>
-                        <small>${eventTime}</small>
+                        <span>${eventTime}</span><br/>
+                        ${gCalLink} ${placeLink}
                     </td>
                     <td>
-                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span>${detailLabel} ${eventTitle}<br/>
+                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span>${detailLabel} <strong>${eventTitle}</strong><br/>
                         ${composition} ${longEventOrSeries}<br/>
                         <small>${org}</small>
                     </td>
@@ -338,6 +353,39 @@ function createDataTag(event) {
         tag = tag + ' tag-9';
     }
     return tag;
+}
+
+/**
+ * Googleカレンダー登録リンクを作成する
+*  @param {json} event イベントJSON 
+ * @returns Googleカレンダー登録用URLリンク
+ */
+function createGoogleCalendarLink(event) {
+    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
+    const calEventDate = event['eventDate'];
+    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
+        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
+        + ("00" + new Date(calEventDate).getDate()).slice(-2);
+    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
+    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
+    // イベント開始・終了時刻がともにある場合
+    var gCalLink = event['eventStart'] && event['eventEnd'] ?
+        gCalUrl
+        + '&text=' + encodeURIComponent(event['eventName'])
+        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
+        + '&details=' + encodeURIComponent(gCalDetails)
+        // イベント開始時刻のみある場合、0分のイベントとして登録する
+        : event['eventStart'] ?
+            gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
+            + '&details=' + encodeURIComponent(gCalDetails)
+            // 開始時刻がない場合は、終日として登録する
+            : gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + '/' + calendarDate
+            + '&details=' + encodeURIComponent(gCalDetails);
+    return '<a class="btn btn-primary text-left" href="' + gCalLink + '" target="_blank"><i class="icon icon-plus"></i></a>';
 }
 
 /**

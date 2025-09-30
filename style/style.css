@@ -77,6 +77,15 @@ ins {
     width: 100%;
 }
 
+/* 大会イベントカード */
+.event-card-compe {
+    border-color: #a5a4da;
+}
+
+.event-card-tour {
+    border-color: #a4daad;
+}
+
 .bg-temporary {
     background: #d3ff0f;
 }

@@ -30,6 +30,14 @@ $(function () {
      */
     $("#calendar-from").change(function () {
         console.log("日付FROMイベント: " + $(this).val());
+        const calendarFrom = $("#calendar-from").val();
+        // 開催日TOにFROMの1ヶ月後を設定する
+        var date = new Date(calendarFrom);
+        date.setMonth(date.getMonth() + 1);
+        var y = date.getFullYear();
+        var m = ("00" + (date.getMonth() + 1)).slice(-2);
+        var d = ("00" + date.getDate()).slice(-2);
+        $("#calendar-to").val(y + "-" + m + "-" + d);
         removeEvents();
         resetTechMessage();
         fetchEventsWithFilter();
@@ -166,6 +174,9 @@ function fetchEvents(param, isInit) {
                 eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
             }
 
+            // Googleカレンダー登録リンクを作成する
+            const gCalLink = createGoogleCalendarLink(event);
+
             // 更新日時の日付フォーマット変更
             const updateDate = new Date(event['updateDate']).toLocaleDateString();
             // 個人・チーム構成
@@ -180,7 +191,7 @@ function fetchEvents(param, isInit) {
             // 詳細ありラベル
             var detailLabel = createDetailLabel(event['article']);
             // カードCSSクラス
-            var cardClass = createCardClass(event['article']);
+            var cardClass = createCardClass(event['article'], event['category']);
             // イベント種類フィルタ用data-tag値
             var dataTag = createDataTag(event);
             // 記事リンクボタン
@@ -189,6 +200,8 @@ function fetchEvents(param, isInit) {
             var cardCol = filteredDatas.length === 1 ? 'col-6 col-lg-6 col-xl-6' : 'col-6 col-lg-6 col-xl-6';
             // シリーズ
             var seriesName = event['seriesName'] ? `<small class="text-tiny">${event['seriesName']}</small><br/>` : '';
+            // googleマップ検索リンク
+            var placeLink = event['place'] ? `<a class="text-primary" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank"><small class="label text-bold">場所</small> ${event['place']}</a>` : '';
             // ルール
             var rule = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>` : '';
             // 定員
@@ -212,10 +225,10 @@ function fetchEvents(param, isInit) {
                         </div>
                         <div name="card-body-${i}" class="card-body">
                             <ul class="menu">
-                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース（情報取得元）</a></li>
-                                ${articleLink}
+                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース</a></li>
+                                ${articleLink} ${gCalLink}
                                 <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
-                                <li class="menu-item"> <small class="label text-bold">場所</small> ${event['place']}</li>
+                                <li class="menu-item"> ${placeLink}</li> 
                                 ${rule}
                                 ${teamNum}
                                 ${entryStart}
@@ -224,7 +237,7 @@ function fetchEvents(param, isInit) {
                         </div>
                         ${remarks}
                         <div name="card-footer-${i}" class="card-footer"></div>
-                        <small class="text-gray text-small p-2">更新日: ${updateDate}</small>
+                        <span class="text-gray p-2">更新日: ${updateDate}</span>
                     </div>
                     <div name="outer-card-lower-${i}" class=""></div>
                 </div>`
@@ -399,12 +412,18 @@ function createDetailLabel(article) {
  * @param {json} event イベントJSON
  * @returns 詳細記事がある場合カードの背景CSSクラスを返す
  */
-function createCardClass(article) {
+function createCardClass(article, calendar) {
+    var className = '';
     if (article) {
-        return 'bg-secondary';
-    } else {
-        return '';
+        className = className + ' bg-secondary ';
     }
+    if (calendar == '大会') {
+        className = className + ' event-card-compe ';
+    }
+    if (calendar == '大会（長期）') {
+        className = className + ' event-card-tour ';
+    }
+    return className;
 }
 
 /**
@@ -414,7 +433,7 @@ function createCardClass(article) {
  */
 function createArticleLink(article) {
     if (article) {
-        return `<a class="btn btn-link text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 記事をみる</a>`;
+        return `<a class="btn btn-success text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 特集記事</a>`;
     } else {
         return '';
     }
@@ -441,6 +460,39 @@ function createDataTag(event) {
         tag = tag + ' tag-9';
     }
     return tag;
+}
+
+/**
+ * Googleカレンダー登録リンクを作成する
+*  @param {json} event イベントJSON 
+ * @returns Googleカレンダー登録用URLリンク
+ */
+function createGoogleCalendarLink(event) {
+    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
+    const calEventDate = event['eventDate'];
+    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
+        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
+        + ("00" + new Date(calEventDate).getDate()).slice(-2);
+    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
+    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
+    // イベント開始・終了時刻がともにある場合
+    var gCalLink = event['eventStart'] && event['eventEnd'] ?
+        gCalUrl
+        + '&text=' + encodeURIComponent(event['eventName'])
+        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
+        + '&details=' + encodeURIComponent(gCalDetails)
+        // イベント開始時刻のみある場合、0分のイベントとして登録する
+        : event['eventStart'] ?
+            gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
+            + '&details=' + encodeURIComponent(gCalDetails)
+            // 開始時刻がない場合は、終日として登録する
+            : gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + '/' + calendarDate
+            + '&details=' + encodeURIComponent(gCalDetails);
+    return '<a class="btn btn-primary text-left" href="' + gCalLink + '" target="_blank"><i class="icon icon-plus"></i> Googleカレンダー</a>';
 }
 
 /**
