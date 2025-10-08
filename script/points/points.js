@@ -27,12 +27,26 @@ function fetchPointsStandings(isInit) {
         dataType: 'json',
     }).done(function (datas) {
 
+        var rank = 1;
+        var tienum = 0;
+
         // 件数分イベントカードを生成して追加する
         for (const i in datas) {
             if (i >= maxItems) {
                 break;
             }
             const record = datas[i];
+
+            // 順位計算
+            if (i == 0) {
+                rank = 1;
+                tienum = 0;
+            } else if (record['points'] < datas[i - 1]['points']) {
+                rank = parseInt(i) + 1 + tienum;
+                tienum = 0;
+            } else if (record['points'] == datas[i - 1]['points']) {
+                tienum++;
+            }
 
             // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
             const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
@@ -66,10 +80,10 @@ function fetchPointsStandings(isInit) {
             // イベントカード要素の追加
             $('#standings-table-body').append(
                 `<tr>
-                    <td style="text-align: right;">${record['rank']}</td>
-                    <td style="text-align: right;">${record['points']}</td>
-                    <td>${record['player_name']}${xAccount}${instagram}${tiktok}${youtube}</td>
+                    <td style="text-align: right;">${rank}</td>
+                    <td class="text-large"><span class="text-bold">${record['player_name']}</span> ${xAccount}${instagram}${tiktok}${youtube}</td>
                     <td>${teamTag}</td>
+                    <td class="text-large" style="text-align: right;">${record['points']}</td>
                     <td style="text-align: right;">${record['rankin_count']}</td>
                 </tr>`
             );
