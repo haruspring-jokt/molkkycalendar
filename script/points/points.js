@@ -8,7 +8,92 @@ $(function () {
      * init event
      */
     fetchPointsStandings(true);
+
+    // player-recordクリックイベント
+    $(document).on('click', '.player-record', function () {
+        const playerId = $(this).data('player-id');
+        if (playerId) {
+            createPlayerDetail(playerId);
+        }
+    });
 });
+
+/**
+ * 順位表の上に選手詳細を表示する。
+ * @param {*} playerId 
+ */
+function createPlayerDetail(playerId) {
+    // 既に表示されている場合は中身を空にする
+    $('#player-detail-table').empty();
+    // タップしたセルの背景色を変更
+    $('.player-record').removeClass('bg-primary');
+    $(`.player-record[data-player-id='${playerId}']`).addClass('bg-primary');
+
+    // タップしたtrタグのplayer-name-tagクラスの中身を取得して選手名とする
+    const playerName = $(`.player-record[data-player-id='${playerId}'] .player-name-tag`).text().trim();
+
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
+    $.ajax({
+        url: publicUrl,
+        type: 'GET',
+        dataType: 'json',
+    }).done(function (datas) {
+        // プレイヤーIDに該当するデータのみにフィルタ
+        const playerData = datas.filter(record => record['player_id'] === playerId);
+        // 日付の降順でソート
+        playerData.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
+        if (playerData.length == 0) {
+            return;
+        }
+        var tableCell = "";
+        for (const record of playerData) {
+            // （個人戦orチーム戦）（開催地）大会日付・大会名
+            const eventTeamRule = record['event_team_rule'] == "個人戦" ? "<label class='label label-rounded'>個人</label>" : "<label class='label label-rounded'>チーム</label>";
+            // 大会日付（日付型をyyyy/m/d形式に変換）
+            const eventDate = record['event_date'] != "" ? `<span class="text-small">${new Date(record['event_date']).toLocaleDateString()}</span>` : "";
+            // エリア
+            const eventArea = record['event_area'] != "" ? `<label class="label label-rounded">${record['event_area']}</label>` : "";
+            // 大会名
+            const eventName = record['event_name'] != "" ? `<span class="text">${record['event_name']}</span>` : "";
+            // エントリー名
+            const entryName = record['entry_team_name'] != "" ? `<span class="text-small">as ${record['entry_team_name']}</span>` : "";
+            // 順位/参加数
+            const eventRank = record['rank'] != "" ? `<span class="text-large"><strong>${record['rank']}</strong>位 / ${record['entry_num']}</span>` : "";
+            // ポイント
+            const eventPoints = record['points'] != "" ? `<span class="text-large text-primary">(<strong>${record['points']}Pts</strong>)</span>` : "";
+
+            // イベントカード要素の追加
+            tableCell +=
+                `<tr>
+                    <td>${eventDate}</td>
+                    <td>${eventName} ${entryName}<br/>
+                        ${eventTeamRule} ${eventArea}
+                    </td>
+                    <td>${eventRank} ${eventPoints}</td>
+                </tr>`;
+        }
+        $('#player-detail-area').show();
+        $('#player-detail-table').append(
+            `<table class="table column col-xs-12 table-hover">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>大会</th>
+                        <th>順位・Pts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableCell}
+                </tbody>
+            </table>`
+        );
+        // player-detail-pnameに選手名をセット
+        $('#player-detail-pname').text(playerName);
+    });
+    // 選手詳細エリアまでスクロール
+    const detailTop = $('#player-detail-area').offset().top;
+    $('html, body').animate({ scrollTop: detailTop }, 'fast');
+}
 
 /**
  * イベント情報HTMLを作成してHTMLに追加する。
@@ -42,11 +127,16 @@ function fetchPointsStandings(isInit) {
                 rank = 1;
                 tienum = 0;
             } else if (record['points'] < datas[i - 1]['points']) {
-                rank = parseInt(i) + 1 + tienum;
-                tienum = 0;
+                rank++;
+                if (tienum > 0) {
+                    rank += tienum;
+                    tienum = 0;
+                }
             } else if (record['points'] == datas[i - 1]['points']) {
                 tienum++;
             }
+
+            const area = record['area'] != "" ? `<label class="label label-rounded">${record['area']}</label>` : "";
 
             // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
             const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
@@ -79,10 +169,10 @@ function fetchPointsStandings(isInit) {
 
             // イベントカード要素の追加
             $('#standings-table-body').append(
-                `<tr>
+                `<tr class="player-record" data-player-id="${record['player_id']}">
                     <td style="text-align: right;">${rank}</td>
-                    <td class="text-large"><span class="text-bold">${record['player_name']}</span> ${xAccount}${instagram}${tiktok}${youtube}</td>
-                    <td>${teamTag}</td>
+                    <td><span class="text-large player-name-tag"><strong>${record['player_name']}</strong> ${xAccount}${instagram}${tiktok}${youtube}</span><br/>
+                        ${area} <span class="text-small">${teamTag}</span></td>
                     <td class="text-large" style="text-align: right;">${record['points']}</td>
                     <td style="text-align: right;">${record['rankin_count']}</td>
                 </tr>`

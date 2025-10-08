@@ -57,7 +57,7 @@
                     <div class="container grid-md p-2">
                         <h2>現在のランキング</h2>
                         <p>シーズン2025-26は、2025/9/1～2026/8/31を対象としています。</p>
-                        <p class="text-bold text-error">今後、獲得したポイントの内訳や、詳細な選手情報についても閲覧できるようにしていきます。</p>
+                        <p class="text-bold text-error">選手名をタップすると獲得ポイントの内訳が表示されるようになりました。</p>
                     </div>
                     <div class="column p-2">
                         <div class="col-12">
@@ -74,17 +74,24 @@
                         </div>
                     </div>
                 </div>
+                <!-- 選手詳細 -->
+                <div class="container grid-md column p-2" id="player-detail-area" style="display: none;">
+                    <h2 class="text-bold" id="player-detail-pname"></h2>
+                    <div id="player-detail-table" class="columns">
+                    </div>
+                </div>
+
                 <!-- 集計表 -->
                 <div class="container grid-md column p-2" id="standings">
+                    <h2 class="text-bold">集計表 <span class="text-tiny">- Standings</span></h2>
                     <div id="standings-table" class="columns">
-                        <table class="table column col-xs-12">
+                        <table class="table column col-xs-12 table-hover">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>選手</th>
-                                    <th>チーム</th>
+                                    <th>選手（タップで詳細表示）</th>
                                     <th>Pts</th>
-                                    <th>入賞数</th>
+                                    <th>入賞</th>
                                 </tr>
                             </thead>
                             <tbody id="standings-table-body">
@@ -108,8 +115,8 @@
                                 <li class="text-error">事前に告知されている大会でない</li>
                                 <li class="text-error">一般的なモルックの試合ルールにない特別ルールが設定されている</li>
                             </ul>
-                            <p><a href="https://blog.jajapatatas.com/entry/announce/pointsystem"
-                                    target="_blank"><strong class="">詳しくはこちらのブログ記事を参照してください</strong></a></p>
+                            <p><a href="https://blog.jajapatatas.com/entry/announce/pointsystem" target="_blank"><strong
+                                        class="">詳しくはこちらのブログ記事を参照してください</strong></a></p>
                             <a class="btn btn-success text-left col-12" href="https://forms.gle/Kx1eHh6WjE5MMCJL9"><i
                                     class="icon icon-share" target="_blank"></i>大会結果申請フォームはこちら</a>
                         </div>
