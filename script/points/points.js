@@ -26,11 +26,23 @@ function createPlayerDetail(playerId) {
     // 既に表示されている場合は中身を空にする
     $('#player-detail-table').empty();
     // タップしたセルの背景色を変更
-    $('.player-record').removeClass('bg-primary');
-    $(`.player-record[data-player-id='${playerId}']`).addClass('bg-primary');
+    $('.player-record').removeClass('bg-success');
+    $(`.player-record[data-player-id='${playerId}']`).addClass('bg-success');
 
-    // タップしたtrタグのplayer-name-tagクラスの中身を取得して選手名とする
-    const playerName = $(`.player-record[data-player-id='${playerId}'] .player-name-tag`).text().trim();
+    // タップしたtrタグのdata-player-name属性から選手名を取得
+    const playerDispName = $(`.player-record[data-player-id='${playerId}']`).data('player-name');
+    const playerTeamTag = $(`.player-record[data-player-id='${playerId}']`).data('player-team-tag');
+    const playerX = $(`.player-record[data-player-id='${playerId}']`).data('player-x');
+    const playerInstagram = $(`.player-record[data-player-id='${playerId}']`).data('player-instagram');
+    const playerTiktok = $(`.player-record[data-player-id='${playerId}']`).data('player-tiktok');
+    const playerYoutube = $(`.player-record[data-player-id='${playerId}']`).data('player-youtube');
+    const playerOther = $(`.player-record[data-player-id='${playerId}']`).data('player-other');
+
+    const xAccount = createXLink(playerX);
+    const instagram = createInstagramLink(playerInstagram);
+    const tiktok = createTiktokLink(playerTiktok);
+    const youtube = createYoutubeLink(playerYoutube);
+    const otherLink = createOtherLink(playerOther);
 
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
     $.ajax({
@@ -58,13 +70,14 @@ function createPlayerDetail(playerId) {
             // エントリー名
             const entryName = record['entry_team_name'] != "" ? `<span class="text-small">as ${record['entry_team_name']}</span>` : "";
             // 順位/参加数
-            const eventRank = record['rank'] != "" ? `<span class="text-large"><strong>${record['rank']}</strong>位 / ${record['entry_num']}</span>` : "";
+            const rankClass = record['rank'] == 1 ? "text-error text-bold" : record['rank'] == 2 ? "text-primary text-bold" : record['rank'] == 3 ? "text-success text-bold" : "";
+            const eventRank = record['rank'] != "" ? `<span class="text-large ${rankClass}">${record['rank']}位 / ${record['entry_num']}</span>` : "";
             // ポイント
-            const eventPoints = record['points'] != "" ? `<span class="text-large text-primary">(<strong>${record['points']}Pts</strong>)</span>` : "";
+            const eventPoints = record['points'] != "" ? `<span class="text-large ${rankClass}">(${record['points']})</span>` : "";
 
             // イベントカード要素の追加
             tableCell +=
-                `<tr>
+                `<tr class="">
                     <td>${eventDate}</td>
                     <td>${eventName} ${entryName}<br/>
                         ${eventTeamRule} ${eventArea}
@@ -73,10 +86,11 @@ function createPlayerDetail(playerId) {
                 </tr>`;
         }
         $('#player-detail-area').show();
-        $('#player-detail-table').append(
+        $('.player-detail-table').empty();
+        $('.player-detail-table').append(
             `<table class="table column col-xs-12 table-hover">
                 <thead>
-                    <tr>
+                    <tr class="bg-dark">
                         <th>日付</th>
                         <th>大会</th>
                         <th>順位・Pts</th>
@@ -88,7 +102,12 @@ function createPlayerDetail(playerId) {
             </table>`
         );
         // player-detail-pnameに選手名をセット
-        $('#player-detail-pname').text(playerName);
+        $('.player-detail-pname-title').empty();
+        $('.player-detail-pname-title').append(`
+            <span class="text-bold">${playerDispName}</span> ${xAccount} ${instagram} ${tiktok} ${youtube} ${otherLink}
+        `);
+        $('.player-detail-team-tag').empty();
+        $('.player-detail-team-tag').text(playerTeamTag);
     });
     // 選手詳細エリアまでスクロール
     const detailTop = $('#player-detail-area').offset().top;
@@ -142,25 +161,11 @@ function fetchPointsStandings(isInit) {
             const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
                 .filter(Boolean).join('｜');
 
-            const xAccount = record['x_account'] != "" ?
-                ` <span class="text-large">
-                    <a href="https://x.com/${record['x_account']}" target="_blank">
-                        <i class="lab la-twitter"></i></a></span>` : '';
-
-            const instagram = record['instagram_account'] != "" ?
-                ` <span class="text-large"> 
-                    <a href="https://www.instagram.com/${record['instagram_account']}" target="_blank">
-                        <i class="lab la-instagram"></i></a></span>` : '';
-
-            const tiktok = record['tiktok_account'] != "" ?
-                ` <span class="text"> 
-                    <a href="https://www.tiktok.com/@${record['tiktok_account']}" target="_blank">
-                        Ti</a></span>` : '';
-
-            const youtube = record['youtube_account'] != "" ?
-                ` <span class="text-large">
-                    <a href="https://www.youtube.com/@${record['youtube_account']}" target="_blank">
-                        <i class="lab la-youtube"></i></a></span>` : '';
+            const xAccount = createXLink(record['x_account']);
+            const instagram = createInstagramLink(record['instagram_account']);
+            const tiktok = createTiktokLink(record['tiktok_account']);
+            const youtube = createYoutubeLink(record['youtube_account']);
+            const otherLink = createOtherLink(record['other_sns']);
 
             // const discord = record['discord_account'] != "" ?
             //     ` <span class="text-large">
@@ -169,9 +174,13 @@ function fetchPointsStandings(isInit) {
 
             // イベントカード要素の追加
             $('#standings-table-body').append(
-                `<tr class="player-record" data-player-id="${record['player_id']}">
+                `<tr class="player-record" data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
+                    data-player-name="${record['player_name']}" data-player-x="${record['x_account']}"
+                    data-player-instagram="${record['instagram_account']}" data-player-tiktok="${record['tiktok_account']}"
+                    data-player-youtube="${record['youtube_account']}" data-player-other="${record['other_sns']}">
                     <td style="text-align: right;">${rank}</td>
-                    <td><span class="text-large player-name-tag"><strong>${record['player_name']}</strong> ${xAccount}${instagram}${tiktok}${youtube}</span><br/>
+                    <td><span class="text-large player-name-tag"><strong>${record['player_name']}</strong>
+                        ${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span><br/>
                         ${area} <span class="text-small">${teamTag}</span></td>
                     <td class="text-large" style="text-align: right;">${record['points']}</td>
                     <td style="text-align: right;">${record['rankin_count']}</td>
@@ -181,6 +190,41 @@ function fetchPointsStandings(isInit) {
         // 一覧表示完了イベント
         return datas.length;
     });
+}
+
+function createXLink(account) {
+    return account != "" ?
+        ` <span class="text-large">
+                    <a href="https://x.com/${account}" target="_blank">
+                        <i class="lab la-twitter"></i></a></span>` : '';
+}
+
+function createInstagramLink(account) {
+    return account != "" ?
+        ` <span class="text-large"> 
+                    <a href="https://www.instagram.com/${account}" target="_blank">
+                        <i class="lab la-instagram"></i></a></span>` : '';
+}
+
+function createTiktokLink(account) {
+    return account != "" ?
+        ` <span class="text"> 
+                    <a href="https://www.tiktok.com/@${account}" target="_blank">
+                        Ti</a></span>` : '';
+}
+
+function createYoutubeLink(account) {
+    return account != "" ?
+        ` <span class="text-large">
+                    <a href="https://www.youtube.com/@${account}" target="_blank">
+                        <i class="lab la-youtube"></i></a></span>` : '';
+}
+
+function createOtherLink(url) {
+    return url != "" ?
+        ` <span class="text-large">
+                    <a href="${url}" target="_blank">
+                        <i class="las la-link"></i></a></span>` : '';
 }
 
 /**
