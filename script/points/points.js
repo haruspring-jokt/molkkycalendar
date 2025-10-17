@@ -37,6 +37,8 @@ function createPlayerDetail(playerId) {
     const playerTiktok = $(`.player-record[data-player-id='${playerId}']`).data('player-tiktok');
     const playerYoutube = $(`.player-record[data-player-id='${playerId}']`).data('player-youtube');
     const playerOther = $(`.player-record[data-player-id='${playerId}']`).data('player-other');
+    const playerPoints = $(`.player-record[data-player-id='${playerId}']`).data('player-points');
+    const rank = $(`.player-record[data-player-id='${playerId}']`).data('player-rank');
 
     const xAccount = createXLink(playerX);
     const instagram = createInstagramLink(playerInstagram);
@@ -93,7 +95,7 @@ function createPlayerDetail(playerId) {
                     <tr class="bg-dark">
                         <th>日付</th>
                         <th>大会</th>
-                        <th>順位・Pts</th>
+                        <th>順位・Pt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,6 +108,13 @@ function createPlayerDetail(playerId) {
         $('.player-detail-pname-title').append(`
             <span class="text-bold">${playerDispName}</span> ${xAccount} ${instagram} ${tiktok} ${youtube} ${otherLink}
         `);
+
+        $('.player-detail-rank').empty();
+        $('.player-detail-rank').append(`
+            <span class="text-bold text-large">シーズン順位: ${rank}位 (${playerPoints}pt)</span></br>
+            <span>入賞: ${playerData.length}回</span>
+        `);
+
         $('.player-detail-team-tag').empty();
         $('.player-detail-team-tag').text(playerTeamTag);
     });
@@ -172,18 +181,23 @@ function fetchPointsStandings(isInit) {
             //         <a href="https://www.discordapp.com/users/${record['discord_account']}" target="_blank">
             //             <i class="lab la-discord"></i></a></span>` : '';
 
+            const playerData = `
+                data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
+                data-player-name="${record['player_name']}" data-player-x="${record['x_account']}"
+                data-player-instagram="${record['instagram_account']}" data-player-tiktok="${record['tiktok_account']}"
+                data-player-youtube="${record['youtube_account']}" data-player-other="${record['other_sns']}"
+                data-player-points="${record['points']}" data-player-rank="${rank}"
+            `;
+
             // イベントカード要素の追加
             $('#standings-table-body').append(
-                `<tr class="player-record" data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
-                    data-player-name="${record['player_name']}" data-player-x="${record['x_account']}"
-                    data-player-instagram="${record['instagram_account']}" data-player-tiktok="${record['tiktok_account']}"
-                    data-player-youtube="${record['youtube_account']}" data-player-other="${record['other_sns']}">
-                    <td style="text-align: right;">${rank}</td>
+                `<tr class="player-record" ${playerData}>
+                    <td class="text-right">${rank}</td>
                     <td><span class="text-large player-name-tag"><strong>${record['player_name']}</strong>
                         ${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span><br/>
                         ${area} <span class="text-small">${teamTag}</span></td>
-                    <td class="text-large" style="text-align: right;">${record['points']}</td>
-                    <td style="text-align: right;">${record['rankin_count']}</td>
+                    <td class="text-large text-right">${record['points']}</td>
+                    <td class="text-right">${record['rankin_count']}</td>
                 </tr>`
             );
         }
