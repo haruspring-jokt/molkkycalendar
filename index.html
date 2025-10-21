@@ -46,17 +46,35 @@
                     <p></p>
                 </div>
                 <div class="container grid-md">
-                    <div class="hero bg-gray hero-sm columns">
+                    <div class="hero bg-gray hero-sm columns p-2">
                         <div class="hero-body">
                             <h2 id="events-title">モルックイベントを探そう</h2>
                             <p>現在日付以降の大会・練習会・体験会などが表示されます。くわしくはソースから主催者の発表をチェックしてください。</p>
-                            <p class="bg-secondary text-large text-bold"><a href="./">リッチ表示へ</a> | <a
-                                    href="./simple/">シンプル表示へ</a></p>
-                            <p><a href="./recent/">最近追加したイベント一覧へ</a></p>
+                            <p class="bg-secondary text-large text-bold">
+                                <a href="./">リッチ表示へ</a>
+                                | <a href="./simple/">シンプル表示へ</a>
+                                | <a href="./recent/">最近追加したイベント一覧へ</a>
+                            </p>
                             <a href="#info">そのほかのおしらせへ</a>
+                        </div>
+                        <div class="hero-body">
+                            <h3 class="col-12">
+                                主催者向け: 情報提供のおねがい
+                            </h3>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（項目別）</a></li>
+                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（フリーフォーム）</a></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="column p-2">
+                        <h4 class="col-12">リンク</h4>
                         <ul class="menu col-12">
                             <li class="menu-item btn col-12"><a class="btn btn-primary text-light text-left text-bold"
                                     href="./points"><span class="text-large"><i class="las la-award"></i></span>
@@ -74,6 +92,7 @@
                                     モルック用スコアシートPDF</a></li>
                         </ul>
                     </div>
+
                     <div class="column p-2">
                         <div class="col-12">
                             <script async
@@ -94,14 +113,14 @@
                         <span class="label label-dark col-12">都道府県・エリアでしぼりこむ:</span>
                         <select class="form-select col-12 in-blk" id="select-prefecture">
                             <option value="00">すべて</option>
-                            <option value="A1">北海道・東北エリア</option>
-                            <option value="A2">首都圏エリア</option>
-                            <option value="A3">東海エリア</option>
-                            <option value="A4">中部・北陸エリア</option>
-                            <option value="A5">近畿エリア</option>
-                            <option value="A6">中国エリア</option>
-                            <option value="A7">四国エリア</option>
-                            <option value="A8">九州・沖縄エリア</option>
+                            <option value="A1">【北海道・東北エリア】</option>
+                            <option value="A2">【首都圏エリア】</option>
+                            <option value="A3">【東海エリア】</option>
+                            <option value="A4">【中部・北陸エリア】</option>
+                            <option value="A5">【近畿エリア】</option>
+                            <option value="A6">【中国エリア】</option>
+                            <option value="A7">【四国エリア】</option>
+                            <option value="A8">【九州・沖縄エリア】</option>
                             <option value="01">北海道</option>
                             <option value="02">青森県</option>
                             <option value="03">岩手県</option>
@@ -222,13 +241,7 @@
                                 2025-9-29:
                                 場所をタップするとGoogleマップの検索結果を表示するよう改善しました。中身は「都道府県＋場所名」で検索しているだけなので、正確な情報はソースを確認してください。<br>
                                 2025-9-26: イベント取得方法を見直し、表示速度が改善されました。また、2025/1/1以降の過去イベントも表示できるようになりました。<br>
-                                2025-3-6: 都道府県をエリア単位で絞り込めるようになりました。<br>
                                 2025-1-8: <a href="./simple/">シンプル表示ページ</a>を追加しました。<br>
-                                2023-3-3: 開催日付で絞り込めるフィルタを追加しました。<br>
-                                2023-3-1: イベント種類で絞り込めるフィルタを追加しました。<br>
-                                2023-2-29: ニュースブログ記事へのリンクを追加しました。大会詳細情報などが記載されている記事がある場合、リンクが設定されています。<br>
-                                2023-2-25: スコアシートPDFファイルへのリンクを追加しました。<br>
-                                2023-2-24: 都道府県絞り込みフィルターを追加しました。
                             </p>
                         </div>
                         <div class="column p-2">
@@ -264,9 +277,26 @@
                         </div>
                         <div class="hero-body">
                             <h3 class="col-12">
-                                リンク
+                                主催者向け: 情報提供のおねがい
                             </h3>
                             <ul class="menu col-12">
+                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（項目別）</a></li>
+                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
+                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
+                                        target="_blank"><i class="icon icon-share"></i>
+                                        情報提供フォーム（フリーフォーム）</a></li>
+                            </ul>
+                        </div>
+                        <div class="hero-body">
+                            <h4 class="col-12">リンク</h4>
+                            <ul class="menu col-12">
+                                <li class="menu-item btn col-12"><a
+                                        class="btn btn-primary text-light text-left text-bold" href="./points"><span
+                                            class="text-large"><i class="las la-award"></i></span>
+                                        モルックオープン大会独自ポイントランキング</a></li>
                                 <li class="menu-item btn col-12"><a class="btn btn-link text-left"
                                         href="https://blog.jajapatatas.com/" target="_blank"><i
                                             class="icon icon-share"></i>
@@ -279,21 +309,6 @@
                                         href="https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm?usp=sharing"
                                         target="_blank"><i class="icon icon-share"></i>
                                         モルック用スコアシートPDF</a></li>
-                            </ul>
-                        </div>
-                        <div class="hero-body">
-                            <h3 class="col-12">
-                                情報提供のおねがい
-                            </h3>
-                            <ul class="menu col-12">
-                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
-                                        href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
-                                        target="_blank"><i class="icon icon-share"></i>
-                                        情報提供フォーム（項目別）</a></li>
-                                <li class="menu-item btn col-12"><a class="btn btn-link text-left"
-                                        href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
-                                        target="_blank"><i class="icon icon-share"></i>
-                                        情報提供フォーム（フリーフォーム）</a></li>
                             </ul>
                         </div>
                     </div>
