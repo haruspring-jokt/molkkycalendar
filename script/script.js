@@ -1,85 +1,201 @@
-/**
- * ページ読み込み時実行
- */
+const TEXT_SIZE = "is-size-6";
+
 $(function () {
-    /**
-     * init event
-     */
-    console.log('start getting events.')
-    resetTechMessage();
-    var dateParam = fetchInitDateParam();
-    var param = {
-        'prefecture': '00',
-        'calendarFrom': dateParam['from'],
-        'calendarTo': dateParam['to'],
-    };
-    fetchEvents(param, true);
 
-    /**
-     * 都道府県選択イベント
-     */
-    $("#select-prefecture").change(function () {
-        console.log("都道府県イベント: " + $(this).val());
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
+    commonPageSetting();
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function () {
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $(".navbar-burger").toggleClass("is-active");
+        $(".navbar-menu").toggleClass("is-active");
     });
-
-    /**
-     * 開催日FROMフィルタイベント
-     */
-    $("#calendar-from").change(function () {
-        console.log("日付FROMイベント: " + $(this).val());
-        const calendarFrom = $("#calendar-from").val();
-        // 開催日TOにFROMの1ヶ月後を設定する
-        var date = new Date(calendarFrom);
-        date.setMonth(date.getMonth() + 1);
-        var y = date.getFullYear();
-        var m = ("00" + (date.getMonth() + 1)).slice(-2);
-        var d = ("00" + date.getDate()).slice(-2);
-        $("#calendar-to").val(y + "-" + m + "-" + d);
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
-    });
-
-    /**
-     * 開催日TOフィルタイベント
-     */
-    $("#calendar-to").change(function () {
-        console.log("日付TOイベント: " + $(this).val());
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
-    });
-
 });
 
-function resetTechMessage() {
-    $("#tech-message").empty();
-    $('#tech-message').append(
-        `<p>情報取得中...</p>
-        <progress class="progress" max="100"></progress>`
-    );
+function commonPageSetting() {
+
+    appendHeader();
+    appendFooter();
+
 }
 
 /**
- * イベント一覧削除
+ * ヘッダー追加
  */
-function removeEvents() {
-    $("#event-columns").empty();
-}
-
-/**
- * イベント情報一覧読み込み・表示（画面フィルター適用時）
- */
-function fetchEventsWithFilter() {
-    var param = {
-        'prefecture': $("#select-prefecture").val(),
-        'calendarFrom': $("#calendar-from").val(),
-        'calendarTo': $("#calendar-to").val(),
+function appendHeader() {
+    // リンク設定をオブジェクトに統一
+    const links = {
+        top: "./",
+        logo: "./asset/logo.png",
+        recent: "./recent/",
+        simple: "./simple/",
+        points: "./points/",
+        jajablog: JajaConstants.blog,
+        twitter: JajaConstants.twitter,
+        youtube: JajaConstants.youtube,
+        suzuri: JajaConstants.suzuri,
+        archive2024: JajaConstants.archive2024,
+        archive2023: JajaConstants.archive2023,
+        formFormat: JajaConstants.formFormat,
+        formFree: JajaConstants.formFree,
+        scoresheet: JajaConstants.scoresheet,
     };
-    fetchEvents(param, false);
+
+    // 階層調整処理
+    const depth = location.pathname.split("/").length - 1;
+    if (location.pathname !== "/") {
+        const addPath = depth === 2 ? "." : depth === 3 ? "../." : "";
+        Object.keys(links).forEach((key) => {
+            if (!links[key].startsWith("http")) {
+                links[key] = addPath + links[key];
+            }
+        });
+    }
+
+    // ヘッダーHTMLをテンプレートリテラルで定義
+    const headerHtml = `
+        <nav class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="${links.top}">
+                    <img src="${links.logo}" alt="jajapatatas logo" />
+                </a>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item has-text-light" href="${links.recent}">新規イベント</a>
+                    <a class="navbar-item has-text-light" href="${links.simple}">シンプル版</a>
+                    <a class="navbar-item has-text-light" href="${links.points}">ポイントランキング</a>
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link has-text-light">More</a>
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item has-text-primary-50" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.formFormat}" target="_blank">掲載申請フォーム</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons columns">
+                            <a class="column button is-info" target="_blank" href="${links.twitter}">Twitter(X)</a>
+                            <a class="column button is-danger" target="_blank" href="${links.youtube}">YouTube</a>
+                            <a class="column button is-dark" target="_blank" href="${links.suzuri}">SUZURI</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    `;
+
+    // ヘッダーを追加
+    $("#jaja-header").append(headerHtml);
+}
+
+/**
+ * フッター追加
+ */
+function appendFooter() {
+    // 基本リンク設定
+    const links = {
+        top: "./",
+        logo: "./asset/logo.png",
+        recent: "./recent/",
+        simple: "./simple/",
+        points: "./points/",
+        jajablog: JajaConstants.blog,
+        twitter: JajaConstants.twitter,
+        youtube: JajaConstants.youtube,
+        suzuri: JajaConstants.suzuri,
+        archive2024: JajaConstants.archive2024,
+        archive2023: JajaConstants.archive2023,
+        formFormat: JajaConstants.formFormat,
+        formFree: JajaConstants.formFree,
+        scoresheet: JajaConstants.scoresheet,
+    };
+
+    // 階層によるパス調整
+    const depth = location.pathname.split("/").length - 1;
+    if (location.pathname !== "/") {
+        const addPath = depth === 2 ? "." : depth === 3 ? "../." : "";
+        Object.keys(links).forEach((key) => {
+            if (!links[key].startsWith("http")) {
+                links[key] = addPath + links[key];
+            }
+        });
+    }
+
+    // フッターHTMLを一括生成
+    const footerHtml = `
+        <div class="columns has-background-primary" id="site-map">
+            <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">全国モルックカレンダー</strong>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.top}">トップ</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.recent}">新規イベント</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.simple}">シンプル版</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.points}">独自ポイントランキング</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a></li>
+            </ul>
+            <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">主催者向けイベント掲載申請</strong>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.formFormat}" target="_blank">掲載申請フォーム</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a></li>
+            </ul>
+            <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">リンク</strong>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.youtube}" target="_blank">YouTube</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.twitter}" target="_blank">Twitter(X)</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.suzuri}" target="_blank">SUZURI</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.scoresheet}" target="_blank">モルック用スコアシートPDF</a></li>
+            </ul>
+        </div>
+    `;
+
+    // フッターに追加
+    $("#jaja-footer").append(footerHtml);
+}
+
+async function fetchNewEvents(isInit, param) {
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
+    const maxItems = 300;
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        })
+            .done(function (datas) {
+                const filteredDatas = datas.filter((event) => {
+                    // ソートキーのチェック
+                    const isCorrectSk = isInit ? event.sk.slice(0, 1) == "0" : true;
+
+                    // JST変換・0:00:00化
+                    const dateObj = new Date(event.eventDate);
+                    dateObj.setHours(dateObj.getHours() + 9);
+                    const eventDateZero = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+
+                    const fromDateObj = new Date(param['calendarFrom'] + "T00:00:00+09:00");
+                    const toDateObj = new Date(param['calendarTo'] + "T23:59:59+09:00");
+
+                    const isPrefectureMatch = param['prefecture'] === "00" || isEqualsPrefectureCodeAndName(param['prefecture'], event.prefecture);
+
+                    return isCorrectSk
+                        && eventDateZero >= fromDateObj
+                        && eventDateZero <= toDateObj
+                        && isPrefectureMatch;
+                });
+                resolve(filteredDatas);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
 }
 
 function isEqualsPrefectureCodeAndName(code, name) {
@@ -113,158 +229,7 @@ function isEqualsPrefectureCodeAndName(code, name) {
     return prefectureList[code] == name;
 }
 
-/**
- * イベント情報HTMLを作成してHTMLに追加する。
- * @param {json} param パラメータ 
- * @param {boolean} isInit 初回動作か
- */
-function fetchEvents(param, isInit) {
-
-    console.log('fetchEvents: ', param);
-
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
-    const maxItems = 300;
-
-    $.ajax({
-        url: publicUrl,
-        type: 'GET',
-        dataType: 'json',
-    }).done(function (datas) {
-        const filteredDatas = datas.filter((event) => {
-            // ソートキーのチェック
-            const isCorrectSk = isInit ? event.sk.slice(0, 1) == "0" : true;
-
-            // JST変換・0:00:00化
-            const dateObj = new Date(event.eventDate);
-            dateObj.setHours(dateObj.getHours() + 9);
-            const eventDateZero = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-
-            const fromDateObj = new Date(param['calendarFrom'] + "T00:00:00+09:00");
-            const toDateObj = new Date(param['calendarTo'] + "T23:59:59+09:00");
-
-            const isPrefectureMatch = param['prefecture'] === "00" || isEqualsPrefectureCodeAndName(param['prefecture'], event.prefecture);
-
-            return isCorrectSk
-                && eventDateZero >= fromDateObj
-                && eventDateZero <= toDateObj
-                && isPrefectureMatch;
-        });
-
-        // 件数分イベントカードを生成して追加する
-        for (const i in filteredDatas) {
-            if (i >= maxItems) {
-                console.log('over' + maxItems + 'items. stop rendering.');
-                break;
-            }
-            const event = filteredDatas[i];
-
-            // イベント種類のラベルカラー
-            const labelColor = {
-                '大会': 'primary', '大会（長期）': 'success',
-                '体験会': 'default', '練習会': 'default',
-                'ブース': 'default', 'その他': 'default'
-            }[event['category']];
-
-            // 開催日の日付フォーマット変更
-            const eventDate = new Date(event['eventDate']).toLocaleDateString();
-            var week = ['日', '月', '火', '水', '木', '金', '土'];
-            const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
-            var eventTime = '';
-            if (!(event['eventStart'] + event['eventEnd'])) { } else {
-                eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
-            }
-
-            // Googleカレンダー登録リンクを作成する
-            const gCalLink = createGoogleCalendarLink(event);
-
-            // 更新日時の日付フォーマット変更
-            const updateDate = new Date(event['updateDate']).toLocaleDateString();
-            // 個人・チーム構成
-            var composition = createComposition(
-                event['composition'], event['maxMember'], event['minMember'], event['rule']);
-            // 備考
-            var remarks = createRemarksDiv(event, i);
-            // 画像
-            var imageArea = createImageDiv(event, i);
-            // 記事
-            var eventTitle = createTitle(event);
-            // 詳細ありラベル
-            var detailLabel = createDetailLabel(event['article']);
-            // カードCSSクラス
-            var cardClass = createCardClass(event['article'], event['category']);
-            // イベント種類フィルタ用data-tag値
-            var dataTag = createDataTag(event);
-            // 記事リンクボタン
-            var articleLink = createArticleLink(event['article']);
-            // カード幅
-            var cardCol = filteredDatas.length === 1 ? 'col-6 col-lg-6 col-xl-6' : 'col-6 col-lg-6 col-xl-6';
-            // シリーズ
-            var seriesName = event['seriesName'] ? `<small class="text-tiny">${event['seriesName']}</small><br/>` : '';
-            // googleマップ検索リンク
-            var placeLink = event['place'] ? `<a class="text-primary" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank"><small class="label text-bold">場所</small> ${event['place']}</a>` : '';
-            // ルール
-            var rule = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">ルール</small> ${composition}</li>` : '';
-            // 定員
-            var teamNum = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">定員(チーム/人)</small> ${event['teamNum']}</li>` : '';
-            // エントリー開始
-            var entryStart = isCompetition(event['category']) ? `<li class="menu-item"> <small class="label text-bold">エントリー開始</small> ${event['entryStart']}</li>` : '';
-
-            // イベントカード要素の追加
-            $('#event-columns').append(
-                `<div name="outer-card-upper-${i}" class="column ${cardCol} col-xs-12 p-2 filter-item ${dataTag}" data-tag="${dataTag}">
-                    <div name="card-${i}" class="card ${cardClass}">
-                        <div name ="card-header-${i}" class="card-header text-large">
-                            ${seriesName}
-                            <div name="card-title-${i}" class="card-title h3"><small class="label label-rounded text-bold">${event['prefecture']} </small> ${eventTitle}</div>
-                            <div name="card-subtitle-${i} class="card-subtitle text-gray">
-                                <span class="label label-rounded label-${labelColor}"> ${event['category']}</span>
-                                ${detailLabel}
-                                <i class="lar la-calendar"></i> ${eventDate} ${youbi} ${eventTime}
-                            </div>
-                            ${imageArea}
-                        </div>
-                        <div name="card-body-${i}" class="card-body">
-                            <ul class="menu">
-                                <li class="menu-item btn"><a class="btn btn-link text-left" href="${event['source']}" target="_blank"> <i class="icon icon-link"></i> ソース</a></li>
-                                ${articleLink} ${gCalLink}
-                                <li class="menu-item"> <small class="label text-bold">主催</small> ${event['org']}</li>
-                                <li class="menu-item"> ${placeLink}</li> 
-                                ${rule}
-                                ${teamNum}
-                                ${entryStart}
-                                <li class="menu-item"> <small class="label text-bold">参加費</small> ${event['entryFee']}</li>
-                            </ul>
-                        </div>
-                        ${remarks}
-                        <div name="card-footer-${i}" class="card-footer"></div>
-                        <span class="text-gray p-2">更新日: ${updateDate}</span>
-                    </div>
-                    <div name="outer-card-lower-${i}" class=""></div>
-                </div>`
-            );
-        }
-        const counter = filteredDatas.length >= maxItems ? '多いため' + maxItems + '件まで表示' : filteredDatas.length + "件";
-        $('#tech-message > p').text(`情報取得完了: ${counter}`);
-        $('#tech-message > p').addClass('bg-success');
-        $('#tech-message > progress').remove();
-
-        if (isInit && filteredDatas.length > 0) {
-            // 初回の場合開催日フィルタの日付を設定する
-            var dateParam = fetchInitDateParam();
-            $('#calendar-from').val(dateParam['from']);
-            $('#calendar-to').val(dateParam['to']);
-        }
-
-        // 一覧表示完了イベント
-        return filteredDatas.length;
-    });
-}
-
-/**
- * 
- * @returns 初期の日付パラメータ
- */
-function fetchInitDateParam() {
+function fetchDefaultDateParam() {
     var date = new Date();
     var y = date.getFullYear();
     var m = ("00" + (date.getMonth() + 1)).slice(-2);
@@ -282,11 +247,28 @@ function fetchInitDateParam() {
     };
 }
 
-/**
- * 
- * @param {json} event イベントJSON 
- * @returns チーム構成Div要素
- */
+function createDataTag(event) {
+    if (!event['category']) {
+        return 'event-tag-99';
+    }
+    if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
+        return 'event-tag-99';
+    }
+    var tag = 'event-tag-0 ' + {
+        '大会': 'event-tag-1 event-tag-7', '大会（長期）': 'event-tag-2 event-tag-7',
+        '体験会': 'event-tag-3', '練習会': 'event-tag-3',
+        'ブース': 'event-tag-5', 'その他': 'event-tag-6'
+    }[event['category']];
+    if (event['article']) {
+        tag = tag + ' event-tag-9';
+    }
+    return tag;
+}
+
+function isCompetition(category) {
+    return ['大会', '大会（長期）'].includes(category);
+}
+
 function createComposition(composition, maxMember, minMember, rule) {
     if (composition == 'チーム') {
         if (maxMember) {
@@ -304,204 +286,12 @@ function createComposition(composition, maxMember, minMember, rule) {
 }
 
 /**
- * 
- * @param {json} event イベントJSON
- * @param {int} i
- * @returns 備考Div要素
- */
-function createRemarksDiv(event, i) {
-    var isThereRemark = false;
-    var entryRemarks = '';
-    if (!event['entryRemarks']) { } else {
-        entryRemarks = event['entryRemarks'] + '<br>';
-        isThereRemark = true;
-    }
-    // 備考・メモ
-    var remarks = '';
-    if (!(event['remarks'])) { } else {
-        remarks = `${event['remarks']}`;
-        isThereRemark = true;
-    }
-    if (isThereRemark) {
-        return `
-            <div name="card-remarks-${i}" class="card-body">
-                <div class="toast text-small">
-                    ${entryRemarks + remarks}
-                </div>
-            </div>`;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 大会であるかの検証
- * @param {} category 
- * @returns 
- */
-function isCompetition(category) {
-    return ['大会', '大会（長期）'].includes(category);
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @param {int} i
- * @returns 画像URLが含まれている場合画像エリアDivを返す
- */
-function createImageDiv(event, i) {
-    if (event['image']) {
-        if (event['article']) {
-            return `
-                <div name="card-image-${i}" class="card-image">
-                    <a class="" href="${event['article']}" target="_blank">
-                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
-                </div>
-            `;
-        } else {
-            return `
-                <div name="card-image-${i}" class="card-image">
-                    <a class="" href="${event['source']}" target="_blank">
-                    <img class="event-img" src="${event['image']}" alt="image of ${event['eventName']}"></a>
-                </div>
-            `;
-        }
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns イベントタイトルを返す
- */
-function createTitle(event) {
-    if (event['article']) {
-        // 詳細記事URLがある場合リンクとして返す
-        return `
-            <a class="text-primary" href="${event['article']}" target="_blank"> ${event['eventName']}</a>
-        `;
-    } else {
-        return `
-            <a class="text-primary" href="${event['source']}" target="_blank"> ${event['eventName']}</a>
-        `;
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 詳細記事がある場合追加のラベルを返す
- * 
- */
-function createDetailLabel(article) {
-    if (article) {
-        return `
-            <a class="text-primary" href="${article}" target="_blank">
-                <span class="label label-rounded label-warning">注目</span>
-            </a>
-        `;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 詳細記事がある場合カードの背景CSSクラスを返す
- */
-function createCardClass(article, calendar) {
-    var className = '';
-    if (article) {
-        className = className + ' bg-secondary ';
-    }
-    if (calendar == '大会') {
-        className = className + ' event-card-compe ';
-    }
-    if (calendar == '大会（長期）') {
-        className = className + ' event-card-tour ';
-    }
-    return className;
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 記事リンクがある場合btn要素を返す
- */
-function createArticleLink(article) {
-    if (article) {
-        return `<a class="btn btn-success text-left" href="${article}" target="_blank"> <i class="icon icon-link"></i> 特集記事</a>`;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 種類フィルタ用のdeta-tagを返す
- */
-function createDataTag(event) {
-    if (!event['category']) {
-        return 'tag-0';
-    }
-    if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
-        return 'tag-0';
-    }
-    var tag = {
-        '大会': 'tag-1 tag-7', '大会（長期）': 'tag-2 tag-7',
-        '体験会': 'tag-3 tag-8', '練習会': 'tag-4 tag-8',
-        'ブース': 'tag-5', 'その他': 'tag-6'
-    }[event['category']];
-    if (event['article']) {
-        tag = tag + ' tag-9';
-    }
-    return tag;
-}
-
-/**
- * Googleカレンダー登録リンクを作成する
-*  @param {json} event イベントJSON 
- * @returns Googleカレンダー登録用URLリンク
- */
-function createGoogleCalendarLink(event) {
-    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
-    const calEventDate = event['eventDate'];
-    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
-        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
-        + ("00" + new Date(calEventDate).getDate()).slice(-2);
-    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
-    // イベント開始・終了時刻がともにある場合
-    var gCalLink = event['eventStart'] && event['eventEnd'] ?
-        gCalUrl
-        + '&text=' + encodeURIComponent(event['eventName'])
-        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
-        + '&details=' + encodeURIComponent(gCalDetails)
-        // イベント開始時刻のみある場合、0分のイベントとして登録する
-        : event['eventStart'] ?
-            gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
-            + '&details=' + encodeURIComponent(gCalDetails)
-            // 開始時刻がない場合は、終日として登録する
-            : gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + '/' + calendarDate
-            + '&details=' + encodeURIComponent(gCalDetails);
-    return '<a class="btn btn-primary text-left" href="' + gCalLink + '" target="_blank"><i class="icon icon-plus"></i> Googleカレンダー</a>';
-}
-
-/**
  * トップスクロール
  */
 var vGoTop = {};
 function goTop() {
 
-    vGoTop["coef"] = 50;  // ←滑らか係数（大きいほど滑らか）
+    vGoTop["coef"] = 10;  // ←滑らか係数（大きいほど滑らか）
     vGoTop["cnt"] = 0;
 
     // --- 現在のスクロール位置取得 -----

@@ -11,6 +11,32 @@ body {
     display: inline-block;
 }
 
+.label.label-calendar {
+    background: #dea38b;
+    color: #f8f8f1
+}
+
+.text-calendar {
+    color: #916a5b !important
+}
+
+a.text-calendar:focus,
+a.text-calendar:hover {
+    color: #f4e6d0
+}
+
+a.text-calendar:visited {
+    color: #fefdfa
+}
+
+.bg-calendar {
+    background: #dea38b !important
+}
+
+.bg-calendar-secondary {
+    background: #f7ebe6 !important
+}
+
 ins {
     border-bottom: 0 !important;
 }
@@ -73,7 +99,7 @@ ins {
     position: absolute;
     top: 0;
     left: 0;
-    height:100%;
+    height: 100%;
     width: 100%;
 }
 
