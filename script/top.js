@@ -32,10 +32,20 @@ function initCategoryFilter() {
         if (categoryNum === '0') {
             // 「すべて」が選択された場合
             $('.filter-item').show();
+            // すべての日付インデックスを表示
+            $('[id^="date-"]').show();
         } else {
             // 特定のカテゴリーが選択された場合
             $('.filter-item').hide();
             $(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).show();
+            // 各日付インデックスについて、表示すべきイベントがあるかチェック
+            $('[id^="date-"]').each(function () {
+                const dateId = $(this).attr('id');
+                // この日付インデックス内の表示されているイベント数をカウント
+                const visibleEvents = $(this).find(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).length;
+                // イベントの有無に応じて日付インデックスの表示/非表示を切り替え
+                $(this).toggle(visibleEvents > 0);
+            });
         }
     });
 }
@@ -114,7 +124,8 @@ function appendEvents(events) {
 
     // 最初に日付のリストを作成
     events.forEach(event => {
-        const date = new Date(event.eventDate).toLocaleDateString();
+        const eventDate = new Date(event.eventDate);
+        const date = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
         if (!dateList.includes(date)) {
             dateList.push(date);
         }
@@ -123,44 +134,50 @@ function appendEvents(events) {
     for (i in events) {
         const event = events[i];
         const eventDate = new Date(event['eventDate']);
-        const formattedDate = eventDate.toLocaleDateString();
+        const formattedDate = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
         const week = ['日', '月', '火', '水', '木', '金', '土'];
         const youbi = '(' + week[eventDate.getDay()] + ')';
 
         // 日付が変わった場合に見出しを挿入
         if (currentDate !== formattedDate) {
+            // 前の日付セクションを閉じる（最初以外）
+            if (currentDate !== null) {
+                $("#events").append("</div></div>");
+            }
             // 現在の日付のインデックスを取得
             const currentIndex = dateList.indexOf(formattedDate);
-            
+
             // 前の日付と次の日付のリンクを作成
-            const prevLink = currentIndex > 0 ? 
-                `<a href="javascript:void(0)" class="has-text-primary" onclick="smoothScroll('${dateList[currentIndex - 1]}')">
+            const prevLink = currentIndex > 0 ?
+                `<a href="javascript:void(0)" class="has-text-primary is-size-65" onclick="smoothScroll('${"date-" + dateList[currentIndex - 1]}')">
                     <i class="las la-angle-left"></i>前の日
                 </a>` : '';
-            
-            const nextLink = currentIndex < dateList.length - 1 ? 
-                `<a href="javascript:void(0)" class="has-text-primary" onclick="smoothScroll('${dateList[currentIndex + 1]}')">
+
+            const nextLink = currentIndex < dateList.length - 1 ?
+                `<a href="javascript:void(0)" class="has-text-primary is-size-65" onclick="smoothScroll('${"date-" + dateList[currentIndex + 1]}')">
                     次の日<i class="las la-angle-right"></i>
                 </a>` : '';
 
             $("#events").append(`
-                <div class="notification is-primary is-light p-0 my-3" id="${formattedDate}">
-                    <div class="p-2">
-                        <div class="level is-mobile mb-0">
-                            <div class="level-left">
-                                ${prevLink}
-                            </div>
-                            <div class="level-item">
-                                <p class="is-size-6 mb-0">
-                                    <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
-                                </p>
-                            </div>
-                            <div class="level-right">
-                                ${nextLink}
+                <div id="date-${formattedDate}" class="">
+                    <div class="notification is-primary is-light p-0 my-3">
+                        <div class="p-2">
+                            <div class="level is-mobile mb-0">
+                                <div class="level-left" style="min-width: 80px;">
+                                    ${prevLink}
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <p class="is-size-65 mb-0">
+                                        <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                                    </p>
+                                </div>
+                                <div class="level-right" style="min-width: 80px;">
+                                    ${nextLink}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                <div class="date-events p-0">
             `);
             lastDate = currentDate;
             currentDate = formattedDate;
@@ -185,7 +202,9 @@ function appendEvents(events) {
         // 画像 
         var imageArea = createImageDiv(event, i);
         // シリーズ
-        var seriesName = event['seriesName'] ? `<small class="text-tiny">${event['seriesName']}</small>／` : '';
+        var seriesName = event['seriesName'] ? `<span class="">${event['seriesName']}</span>／` : '';
+        // 主催
+        var org = event['org'] ? "by: " + event['org'] : "";
         // 記事
         var eventTitle = createTitle(event);
         // 記事リンクボタン
@@ -193,7 +212,7 @@ function appendEvents(events) {
         // Googleカレンダー登録リンクを作成する
         const gCalLink = createGoogleCalendarLink(event);
         // googleマップ検索リンク
-        var placeLink = event['place'] ? `<a class="" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank">${event['place']}</a>` : '';
+        var placeLink = event['place'] ? `<a class="has-text-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank">${event['place']}</a>` : '';
         // 個人・チーム構成
         var composition = createComposition(
             event['composition'], event['maxMember'], event['minMember'], event['rule']);
@@ -212,8 +231,8 @@ function appendEvents(events) {
         // 更新日時の日付フォーマット変更
         const updateDate = new Date(event['updateDate']).toLocaleDateString();
 
-        $("#events").append(`
-            <div class="card filter-item ${dataTag}" data-tag="${dataTag}">
+        $(`#date-${formattedDate} .date-events`).append(`
+            <div class="card filter-item ${dataTag} mb-3" data-tag="${dataTag}">
                 <div class="card-image">
                     <div class="tag-overlay jaja-tags">
                         <span class="tag m-1 is-primary is-light">${event['prefecture']}</span>
@@ -225,10 +244,10 @@ function appendEvents(events) {
                 </div>
                 <div class="card-content p-3">
                     <div class="content">
-                        <span class="subtitle is-size-6 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
-                        <p class="title is-5 my-2">${eventTitle}</p>
-                        <p class="subtitle is-size-7 has-text-grey">${seriesName}${event['org']}</p>
-                        <p>
+                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
+                        <p class="title is-5 mb-0 mt-2 has-text-link">${eventTitle}</p>
+                        <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
+                        <p class="mb-2">
                             <a class="" href="${event['source']}" target="_blank"><button
                                     class="button m-1 is-link is-outlined is-small"><i
                                         class="las la-link"></i>ソース</button></a>
@@ -243,11 +262,15 @@ function appendEvents(events) {
                             <p class="is-size-7 m-1"><span class="tag mx-1 is-light">参加費</span>${event['entryFee']}</p>
                             ${remarks}
                         </div>
-                        <p class="is-size-7 has-text-grey">更新日: ${updateDate}</p>
+                        <p class="is-size-8 has-text-grey mt-2">更新日: ${updateDate}</p>
                     </div>
                 </div>
             </div>
         `);
+    }
+    // 最後の日付セクションを閉じる
+    if (currentDate !== null) {
+        $("#events").append("</div></div>");
     }
 }
 
@@ -371,8 +394,8 @@ function createDetailLabel(article) {
 }
 
 // smoothScroll関数をグローバルスコープで定義
-window.smoothScroll = function(targetId) {
-    const SCROLL_OFFSET = 80;
+window.smoothScroll = function (targetId) {
+    const SCROLL_OFFSET = 72;
     const element = document.getElementById(targetId);
     if (element) {
         const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;

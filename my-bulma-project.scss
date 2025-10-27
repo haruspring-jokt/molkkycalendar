@@ -7,6 +7,13 @@ $jaja-orange: #dea38b;
   $content-table-cell-padding: 0.25em 0.25em,
 );
 
+.jaja-bg-cover {
+  background-image: url(./asset/cover.png);
+  background-color: transparent;
+  background-size: cover;
+  background-position: center;
+}
+
 table {
   th {
     vertical-align: top;
@@ -36,11 +43,81 @@ table {
 }
 
 .card-image .tag-overlay {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    display: flex;
-    gap: 6px;
-    z-index: 10;
-    pointer-events: auto; /* 必要ならクリック可能に */
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+  pointer-events: auto;
+  /* 必要ならクリック可能に */
+}
+
+.is-size-65 {
+  font-size: 0.85rem !important;
+}
+
+.is-size-8 {
+  font-size: 0.65rem !important;
+}
+
+@media screen and (max-width: 768px) {
+  .is-size-65-mobile {
+    font-size: 0.85rem !important;
+  }
+
+  .is-size-8-mobile {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media screen and (min-width: 769px),
+print {
+  .is-size-65-tablet {
+    font-size: 0.85rem !important;
+  }
+
+  .is-size-8-tablet {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .is-size-65-touch {
+    font-size: 0.75rem !important;
+  }
+
+  .is-size-8-touch {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .is-size-65-desktop {
+    font-size: 0.85rem !important;
+  }
+
+  .is-size-8-desktop {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media screen and (min-width: 1216px) {
+  .is-size-65-widescreen {
+    font-size: 0.85rem !important;
+  }
+
+  .is-size-8-widescreen {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media screen and (min-width: 1408px) {
+  .is-size-65-fullhd {
+    font-size: 0.85rem !important;
+  }
+
+  .is-size-8-fullhd {
+    font-size: 0.65rem !important;
+  }
 }
