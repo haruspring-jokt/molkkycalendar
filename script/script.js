@@ -1,4 +1,4 @@
-const TEXT_SIZE = "is-size-6";
+const TEXT_SIZE = "is-size-65";
 
 $(function () {
 
@@ -38,6 +38,7 @@ function appendHeader() {
         formFormat: JajaConstants.formFormat,
         formFree: JajaConstants.formFree,
         scoresheet: JajaConstants.scoresheet,
+        molkkyprime: JajaConstants.molkkyprime,
     };
 
     // 階層調整処理
@@ -118,6 +119,7 @@ function appendFooter() {
         formFormat: JajaConstants.formFormat,
         formFree: JajaConstants.formFree,
         scoresheet: JajaConstants.scoresheet,
+        molkkyprime: JajaConstants.molkkyprime,
     };
 
     // 階層によるパス調整
@@ -152,6 +154,7 @@ function appendFooter() {
                 <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.suzuri}" target="_blank">SUZURI</a></li>
                 <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a></li>
                 <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.scoresheet}" target="_blank">モルック用スコアシートPDF</a></li>
+                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.molkkyprime}" target="_blank">モルック関東プライムリーグ</a></li>
             </ul>
         </div>
     `;

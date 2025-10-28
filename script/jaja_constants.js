@@ -26,6 +26,9 @@ class JajaConstants {
     static get scoresheet() {
         return "https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm?usp=sharing";
     }
+    static get molkkyprime() {
+        return "https://www.molkkyprime.com";
+    }
     static get areaSelects() {
         return [
             { "key": "00", "text": "すべて" },
