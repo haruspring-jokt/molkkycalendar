@@ -15,7 +15,6 @@ function commonPageSetting() {
 
     appendHeader();
     appendFooter();
-
 }
 
 /**
@@ -195,6 +194,48 @@ async function fetchNewEvents(isInit, param) {
                 });
                 resolve(filteredDatas);
             })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+/**
+ * ポイントランキングページの順位表データを返す
+ * @returns 順位表データ
+ */
+async function fetchStandings() {
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_current_season.json";
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((event) => {
+                return true;
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+async function fetchPlayerDetail(playerId) {
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((record) => {
+                return record['player_id'] === playerId;
+            });
+            resolve(filteredDatas);
+        })
             .fail(function (jqXHR, textStatus, errorThrown) {
                 reject(new Error(`Failed to fetch events: ${textStatus}`));
             });

@@ -23,7 +23,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./my-bulma-project.css">
-    <link rel="stylesheet" href="./style/style.css">
     <link rel="stylesheet"
         href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
 
@@ -62,9 +61,11 @@
             <div class="content">
                 <div class="content">
                     <p class="">
-                        <a href="./">リッチ表示</a>
-                        | <a href="./simple/">シンプル表示</a>
-                        | <a href="./recent/">最近追加したイベント</a>
+                        <div class="buttons has-addons">
+                            <button class="button is-size-65"><a href="./">トップ</a></button>
+                            <button class="button is-size-65"><a href="./simple/">シンプル</a></button>
+                            <button class="button is-size-65"><a href="./recent/">新しいイベント</a></button>
+                        </div>
                     </p>
                     <p>
                         <a href="#info">そのほかのおしらせへ</a>
@@ -185,18 +186,24 @@
                 <div class="block is-size-65">
                     日本国内のモルック大会・体験会・練習会などのイベント情報を収集しています。インターネット上に公開されている情報もしくは主催者からの情報提供があったイベントを公開しています。
                 </div>
-                <p class="is-size-6">最近の更新</p>
-                <ul class="is-size-7">
-                    <li>2025-10-26: デザインの変更を行いました。トップページ以外も、順次変更していきます。</li>
-                    <li>2025-10-26: <a
-                            href="./points/">全国モルックカレンダーによるオープン大会独自ポイントシステム（ベータ版）</a>の運用を開始しました。オープン大会に出場している選手であればだれでも申請可能です。
-                    </li>
-                    <li>2025-9-29: Googleカレンダーへの登録ボタンを追加しました。</li>
-                    <li>2025-9-29: 場所をタップするとGoogleマップの検索結果を表示するよう改善しました。中身は「都道府県＋場所名」で検索しているだけなので、正確な情報はソースを確認してください。
-                    </li>
-                    <li>2025-9-26: イベント取得方法を見直し、表示速度が改善されました。また、2025/1/1以降の過去イベントも表示できるようになりました。</li>
-                    <li>2025-1-8: <a href="./simple/">シンプル表示ページ</a>を追加しました。</li>
-                </ul>
+                <article class="message is-dark">
+                    <div class="message-header">
+                        <p class="is-size-6">最近の更新</p>
+                    </div>
+                    <div class="message-body">
+                        <p class="is-size-7 block">
+                            2025-10-26: デザインの変更を行いました。トップページ以外も、順次変更していきます。
+                            <br />2025-10-26: <a class="has-text-link"
+                                href="./points/">全国モルックカレンダーによるオープン大会独自ポイントシステム（ベータ版）</a>
+                            の運用を開始しました。オープン大会に出場している選手であればだれでも申請可能です。
+                            <br />2025-9-29: Googleカレンダーへの登録ボタンを追加しました。
+                            <br />2025-9-29: 場所をタップするとGoogleマップの検索結果を表示するよう改善しました。
+                            中身は「都道府県＋場所名」で検索しているだけなので、正確な情報はソースを確認してください。
+                            <br />2025-9-26: イベント取得方法を見直し、表示速度が改善されました。また、2025/1/1以降の過去イベントも表示できるようになりました。
+                            <br />2025-1-8: <a class="has-text-link" href="./simple/">シンプル表示ページ</a>を追加しました。
+                        </p>
+                    </div>
+                </article>
             </div>
         </section>
     </div>
@@ -209,3 +216,5 @@
 
     <div id="topScroll" class="topIcon" onclick="goTop()">⬆</div>
 </body>
+
+</html>

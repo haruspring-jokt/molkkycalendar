@@ -7,6 +7,15 @@ $jaja-orange: #dea38b;
   $content-table-cell-padding: 0.25em 0.25em,
 );
 
+html {
+  font-size: 18px;
+}
+
+body {
+  font-family: "Noto Sans JP", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-optical-sizing: auto;
+}
+
 .jaja-bg-cover {
   background-image: url(./asset/cover.png);
   background-color: transparent;
@@ -38,8 +47,12 @@ table {
   filter: brightness(0.8);
 }
 
+.jaja-tags .tag.shadow {
+  box-shadow: rgba(9, 10, 12, 0.1) 0px 9px 18px -2.25px, rgba(9, 10, 12, 0.02) 0px 0px 0px 1px;
+}
+
 .is-middle {
-  vertical-align: middle;
+  vertical-align: middle !important;
 }
 
 .card-image .tag-overlay {

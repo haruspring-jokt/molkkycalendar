@@ -1,33 +1,44 @@
-/**
- * ページ読み込み時実行
- */
-$(function () {
-    //処理を書く部分
-
-    /**
-     * init event
-     */
-    fetchPointsStandings(true);
-
-    // player-recordクリックイベント
-    $(document).on('click', '.player-record', function () {
-        const playerId = $(this).data('player-id');
-        if (playerId) {
-            createPlayerDetail(playerId);
-        }
-    });
+$(async function () {
+    await initSetting();
+    initPlayerDetailEvent();
 });
 
+async function initSetting() {
+    await fetchPointsPageStandings();
+}
+
+async function fetchPointsPageStandings() {
+    try {
+        const datas = await fetchStandings();
+        appendStandings(datas);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+    }
+}
+
 /**
- * 順位表の上に選手詳細を表示する。
- * @param {*} playerId 
+ * player-recordクリックイベント
  */
-function createPlayerDetail(playerId) {
+async function initPlayerDetailEvent() {
+    $('.player-record').click(async function () {
+        const playerId = $(this).data('player-id');
+        if (playerId) {
+            const datas = await fetchPlayerDetail(playerId);
+            appendPlayerDetail(datas, playerId);
+        }
+    });
+}
+
+function appendPlayerDetail(datas, playerId) {
+    console.log(datas);
+    console.log(playerId);
+    datas.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
+
     // 既に表示されている場合は中身を空にする
-    $('#player-detail-table').empty();
+    $('#player-detail-content').empty();
     // タップしたセルの背景色を変更
-    $('.player-record').removeClass('bg-success');
-    $(`.player-record[data-player-id='${playerId}']`).addClass('bg-success');
+    $('.player-record').removeClass('has-background-primary-90');
+    $(`.player-record[data-player-id='${playerId}']`).addClass('has-background-primary-90');
 
     // タップしたtrタグのdata-player-name属性から選手名を取得
     const playerDispName = $(`.player-record[data-player-id='${playerId}']`).data('player-name');
@@ -38,265 +49,225 @@ function createPlayerDetail(playerId) {
     const playerYoutube = $(`.player-record[data-player-id='${playerId}']`).data('player-youtube');
     const playerOther = $(`.player-record[data-player-id='${playerId}']`).data('player-other');
     const playerPoints = $(`.player-record[data-player-id='${playerId}']`).data('player-points');
-    const rank = $(`.player-record[data-player-id='${playerId}']`).data('player-rank');
+    var rank = $(`.player-record[data-player-id='${playerId}']`).data('player-rank').toString();
+    if (rank.slice(-1) === "1") {
+        rank += "st";
+    } else if (rank.slice(-1) === "2") {
+        rank += "nd";
+    } else if (rank.slice(-1) === "3") {
+        rank += "rd";
+    } else {
+        rank += "th";
+    }
+    const area = $(`.player-record[data-player-id='${playerId}']`).data('player-area');
 
     const xAccount = createXLink(playerX);
     const instagram = createInstagramLink(playerInstagram);
     const tiktok = createTiktokLink(playerTiktok);
     const youtube = createYoutubeLink(playerYoutube);
     const otherLink = createOtherLink(playerOther);
+    const links = `${xAccount}${instagram}${tiktok}${youtube}${otherLink}`;
 
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
-    $.ajax({
-        url: publicUrl,
-        type: 'GET',
-        dataType: 'json',
-    }).done(function (datas) {
-        // プレイヤーIDに該当するデータのみにフィルタ
-        const playerData = datas.filter(record => record['player_id'] === playerId);
-        // 日付の降順でソート
-        playerData.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
-        if (playerData.length == 0) {
-            return;
-        }
-        var tableCell = "";
-        for (const record of playerData) {
-            // （個人戦orチーム戦）（開催地）大会日付・大会名
-            const eventTeamRule = record['event_team_rule'] == "個人戦" ? "<label class='label label-rounded'>個人</label>" : "<label class='label label-rounded'>チーム</label>";
-            // 大会日付（日付型をyyyy/m/d形式に変換）
-            const eventDate = record['event_date'] != "" ? `<span class="text-small">${new Date(record['event_date']).toLocaleDateString()}</span>` : "";
-            // エリア
-            const eventArea = record['event_area'] != "" ? `<label class="label label-rounded">${record['event_area']}</label>` : "";
-            // 大会名
-            const eventName = record['event_name'] != "" ? `<span class="text">${record['event_name']}</span>` : "";
-            // エントリー名
-            const entryName = record['entry_team_name'] != "" ? `<span class="text-small">as ${record['entry_team_name']}</span>` : "";
-            // 順位/参加数
-            const rankClass = record['rank'] == 1 ? "text-error text-bold" : record['rank'] == 2 ? "text-primary text-bold" : record['rank'] == 3 ? "text-success text-bold" : "";
-            const eventRank = record['rank'] != "" ? `<span class="text-large ${rankClass}">${record['rank']}位 / ${record['entry_num']}</span>` : "";
-            // ポイント
-            const eventPoints = record['points'] != "" ? `<span class="text-large ${rankClass}">(${record['points']})</span>` : "";
+    var results = "";
+    for (const record of datas) {
+        // 最近のイベントかの判定
+        const now = new Date();
+        const updateDateObj = new Date(record['event_date']);
+        const isUpdated = isRecentPlayer(now, updateDateObj);
+        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-light ml-2 is-size-6"></i> ` : "";
 
-            // イベントカード要素の追加
-            tableCell +=
-                `<tr class="">
-                    <td>${eventDate}</td>
-                    <td>${eventName} ${entryName}<br/>
-                        ${eventTeamRule} ${eventArea}
-                    </td>
-                    <td>${eventRank} ${eventPoints}</td>
-                </tr>`;
-        }
-        $('#player-detail-area').show();
-        $('.player-detail-table').empty();
-        $('.player-detail-table').append(
-            `<table class="table column col-xs-12 table-hover">
-                <thead>
-                    <tr class="bg-dark">
-                        <th>日付</th>
-                        <th>大会</th>
-                        <th>順位・Pt</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableCell}
-                </tbody>
-            </table>`
-        );
-        // player-detail-pnameに選手名をセット
-        $('.player-detail-pname-title').empty();
-        $('.player-detail-pname-title').append(`
-            <span class="text-bold">${playerDispName}</span> ${xAccount} ${instagram} ${tiktok} ${youtube} ${otherLink}
-        `);
+        // （個人戦orチーム戦）（開催地）大会日付・大会名
+        const eventTeamRule = record['event_team_rule'] == "個人戦" ?
+            "個人" : "チーム (" + record['event_team_num'] + ")";
+        const teamTagClass = eventTeamRule == "個人" ? "is-link has-text-weight-bold" : "is-success has-text-weight-bold";
+        // エリア
+        const eventArea = record['event_area'] != "" ? record['event_area'] : "";
+        // 大会日付（日付型をyyyy/m/d形式に変換）
+        const eventDate = record['event_date'] != "" ?
+            `<span class="is-size-7">${new Date(record['event_date']).toLocaleDateString()}</span>` : "";
+        // 大会名
+        const eventName = record['event_name'] != "" ?
+            `<span class="is-size-65">${record['event_name']}</span>` : "";
+        // エントリー名
+        const entryName = record['entry_team_name'] != "" ?
+            `<span class="is-size-7 subtitle">as ${record['entry_team_name']}</span>` : "";
+        const cateTag = `
+                <p class="tags has-addons py-0 mb-1">
+                    <span class="tag ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                    <span class="tag is-light">${eventArea}</span>
+                    <span class="tag is-dark">${eventDate} ${updateIcon}</span>
+                </p>`;
+        // 順位/参加数
+        const rankClass = record['rank'] == 1 ? "has-text-danger-on-scheme has-text-weight-bold"
+            : record['rank'] == 2 ? "has-text-link-on-scheme has-text-weight-bold"
+                : record['rank'] == 3 ? "has-text-success-on-scheme has-text-weight-bold" : "";
+        const eventRank = record['rank'] != "" ?
+            `<span class="is-size-6 ${rankClass}">${record['rank']}位</span><span class="is-size-7"> / ${record['entry_num']}</span>` : "";
+        // ポイント
+        const eventPoints = record['points'] != "" ?
+            `<span class="has-text-weight-bold ${rankClass}">(${record['points']})</span>` : "";
 
-        $('.player-detail-rank').empty();
-        $('.player-detail-rank').append(`
-            <span class="text-bold text-large">シーズン順位: ${rank}位 (${playerPoints}pt)</span></br>
-            <span>入賞: ${playerData.length}回</span>
-        `);
+        results += `
+            <tr class="is-size-65">
+                <td class="py-2 px-1">
+                    ${cateTag}
+                    ${eventName}<br/>
+                    ${entryName}
+                </td>
+                <td class="has-text-right is-middle py-2 px-1">
+                    ${eventRank} ${eventPoints}
+                </td>
+            </tr>
+        `;
+    }
 
-        $('.player-detail-team-tag').empty();
-        $('.player-detail-team-tag').text(playerTeamTag);
-    });
+    $("#player-detail-content").append(`
+        <div class="card mb-3">
+            <header class="card-header has-background-primary-95">
+                <p class="card-header-title is-size-5">${playerDispName}</p>
+                <p class="pt-3 mx-2">
+                    <span class="is-size-5 has-text-weight-bold">${rank}</span><br/>
+                    <span class="is-size-65">(${playerPoints} Pts)</span>
+                </p>
+            </header>
+            <div class="card-content p-3">
+                <div class="content">
+                    <p class="card-header-subtitle is-size-7">${playerTeamTag}<br/>${links}</p>
+                    <table class="table is-fullwidth">
+                        <thead>
+                            <tr class="is-size-65">
+                                <th class="is-middle">大会</th>
+                                <th class="has-text-right is-middle is-size-7">位(Pts)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results}
+                        </tbody>
+                    </table>
+                    <p class="pt-3 mx-2 is-size-5"></p>
+                </div>
+            </div>
+        </div>
+    `);
+
+
     // 選手詳細エリアまでスクロール
-    const detailTop = $('#player-detail-area').offset().top;
+    const detailTop = $('#player-detail').offset().top;
     $('html, body').animate({ scrollTop: detailTop }, 'fast');
 }
 
-/**
- * イベント情報HTMLを作成してHTMLに追加する。
- * @param {boolean} isInit 初回動作か
- */
-function fetchPointsStandings(isInit) {
-    /**
-     * イベント情報一覧読み込み・表示
-     */
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_current_season.json";
+function appendStandings(datas) {
+    var rank = 1;
+    var tienum = 0;
     const maxItems = 100;
 
-    $.ajax({
-        url: publicUrl,
-        type: 'GET',
-        dataType: 'json',
-    }).done(function (datas) {
 
-        var rank = 1;
-        var tienum = 0;
+    for (const i in datas) {
+        if (i >= maxItems) {
+            break;
+        }
+        const record = datas[i];
 
-        // 件数分イベントカードを生成して追加する
-        for (const i in datas) {
-            if (i >= maxItems) {
-                break;
-            }
-            const record = datas[i];
-
-            // 順位計算
-            if (i == 0) {
-                rank = 1;
+        // 順位計算
+        if (i == 0) {
+            rank = 1;
+            tienum = 0;
+        } else if (record['points'] < datas[i - 1]['points']) {
+            rank++;
+            if (tienum > 0) {
+                rank += tienum;
                 tienum = 0;
-            } else if (record['points'] < datas[i - 1]['points']) {
-                rank++;
-                if (tienum > 0) {
-                    rank += tienum;
-                    tienum = 0;
-                }
-            } else if (record['points'] == datas[i - 1]['points']) {
-                tienum++;
             }
+        } else if (record['points'] == datas[i - 1]['points']) {
+            tienum++;
+        }
 
-            const area = record['area'] != "" ? `<label class="label label-rounded">${record['area']}</label>` : "";
+        // 新規・最近のイベントかの判定
+        const now = new Date();
+        const updateDateObj = new Date(record['update_date']);
+        const isNew = isNewPlayer(record, now);
+        const isUpdated = isRecentPlayer(now, updateDateObj);
+        const newPlayerIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i> ` : "";
+        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-info"></i> ` : "";
 
-            // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
-            const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
-                .filter(Boolean).join('｜');
+        const area = record['area'] != "" ? `<span class="tag has-text-weight-bold p-1">${record['area']}</span>` : "";
+        // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
+        const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
+            .filter(Boolean).join('｜');
 
-            const xAccount = createXLink(record['x_account']);
-            const instagram = createInstagramLink(record['instagram_account']);
-            const tiktok = createTiktokLink(record['tiktok_account']);
-            const youtube = createYoutubeLink(record['youtube_account']);
-            const otherLink = createOtherLink(record['other_sns']);
+        const xAccount = createXLink(record['x_account']);
+        const instagram = createInstagramLink(record['instagram_account']);
+        const tiktok = createTiktokLink(record['tiktok_account']);
+        const youtube = createYoutubeLink(record['youtube_account']);
+        const otherLink = createOtherLink(record['other_sns']);
+        const links = `${xAccount}${instagram}${tiktok}${youtube}${otherLink}`;
 
-            // const discord = record['discord_account'] != "" ?
-            //     ` <span class="text-large">
-            //         <a href="https://www.discordapp.com/users/${record['discord_account']}" target="_blank">
-            //             <i class="lab la-discord"></i></a></span>` : '';
-
-            const playerData = `
+        const playerData = `
                 data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
                 data-player-name="${record['player_name']}" data-player-x="${record['x_account']}"
                 data-player-instagram="${record['instagram_account']}" data-player-tiktok="${record['tiktok_account']}"
                 data-player-youtube="${record['youtube_account']}" data-player-other="${record['other_sns']}"
-                data-player-points="${record['points']}" data-player-rank="${rank}"
+                data-player-points="${record['points']}" data-player-rank="${rank}" data-player-area="${record['area']}"
             `;
 
-            // イベントカード要素の追加
-            $('#standings-table-body').append(
-                `<tr class="player-record" ${playerData}>
-                    <td class="text-right">${rank}</td>
-                    <td><span class="text-large player-name-tag"><strong>${record['player_name']}</strong>
-                        ${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span><br/>
-                        ${area} <span class="text-small">${teamTag}</span></td>
-                    <td class="text-large text-right">${record['points']}</td>
-                    <td class="text-right">${record['rankin_count']}</td>
-                </tr>`
-            );
-        }
-        // 一覧表示完了イベント
-        return datas.length;
-    });
+        // イベントカード要素の追加
+        $('#standings-content tbody').append(
+            `<tr class="player-record" ${playerData}>
+                <td class="has-text-right has-text-weight-bold is-middle">${rank}</td>
+                <td>
+                    <p class="is-size-6 player-name-tag my-1">
+                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold">${record['player_name']}</span>${links}
+                    </p>
+                    <p class="is-size-6 my-1">
+                        ${area} <span class="is-size-65 has-text-grey">${teamTag}</span></td>
+                    </p>
+                <td class="is-middle has-text-right has-text-weight-bold">${record['points']}</td>
+                <td class="is-middle has-text-right">${record['rankin_count']}</td>
+            </tr>`
+        );
+    }
 }
 
 function createXLink(account) {
     return account != "" ?
-        ` <span class="text-large">
-                    <a href="https://x.com/${account}" target="_blank">
+        ` <span class="is-size-6">
+                    <a class="has-text-primary" href="https://x.com/${account}" target="_blank">
                         <i class="lab la-twitter"></i></a></span>` : '';
 }
 
 function createInstagramLink(account) {
     return account != "" ?
-        ` <span class="text-large"> 
-                    <a href="https://www.instagram.com/${account}" target="_blank">
+        ` <span class="is-size-6"> 
+                    <a class="has-text-primary" href="https://www.instagram.com/${account}" target="_blank">
                         <i class="lab la-instagram"></i></a></span>` : '';
 }
 
 function createTiktokLink(account) {
     return account != "" ?
-        ` <span class="text"> 
-                    <a href="https://www.tiktok.com/@${account}" target="_blank">
+        ` <span class="is-size-6"> 
+                    <a class="has-text-primary" href="https://www.tiktok.com/@${account}" target="_blank">
                         Ti</a></span>` : '';
 }
 
 function createYoutubeLink(account) {
     return account != "" ?
-        ` <span class="text-large">
-                    <a href="https://www.youtube.com/@${account}" target="_blank">
+        ` <span class="is-size-6">
+                    <a class="has-text-primary" href="https://www.youtube.com/@${account}" target="_blank">
                         <i class="lab la-youtube"></i></a></span>` : '';
 }
 
 function createOtherLink(url) {
     return url != "" ?
-        ` <span class="text-large">
-                    <a href="${url}" target="_blank">
+        ` <span class="is-size-6">
+                    <a class="has-text-primary" href="${url}" target="_blank">
                         <i class="las la-link"></i></a></span>` : '';
 }
 
-/**
- * トップスクロール
- */
-var vGoTop = {};
-function goTop() {
-
-    vGoTop["coef"] = 50;  // ←滑らか係数（大きいほど滑らか）
-    vGoTop["cnt"] = 0;
-
-    // --- 現在のスクロール位置取得 -----
-    var startX = document.body.scrollLeft || document.documentElement.scrollLeft;
-    var startY = document.body.scrollTop || document.documentElement.scrollTop;
-
-    // --- スクロールの単位計算 ---------
-    var moveSplitCnt = 0;
-    for (var i = 1; i <= vGoTop["coef"]; i++) {
-        moveSplitCnt += i * i;
-    }
-    vGoTop["unitH"] = startY / (moveSplitCnt * 2);
-
-    vGoTop["nextX"] = startX;
-    vGoTop["nextY"] = startY;
-
-    // --- スクロール開始 ---------------
-    goTopLoop();
+function isNewPlayer(record, now) {
+    const registerDateObj = new Date(record['create_date']);
+    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
 }
 
-/**
- * トップスクロース制御
- */
-function goTopLoop() {
-    // ============================================================================
-    //  スクロール実行
-    // ============================================================================
-
-    vGoTop["cnt"]++;
-
-    // --- 次のスクロール位置計算 -------
-    var Coef = 0;
-    if (vGoTop["cnt"] <= vGoTop["coef"]) {
-        Coef = vGoTop["cnt"];
-    } else {
-        Coef = ((vGoTop["coef"] * 2) + 1) - vGoTop["cnt"];
-    }
-    vGoTop["nextY"] = vGoTop["nextY"] - Math.round(vGoTop["unitH"] * (Coef * Coef));
-    if ((vGoTop["cnt"] >= (vGoTop["coef"] * 2)) || (vGoTop["nextY"] <= 0)) {
-        vGoTop["nextY"] = 0;
-    }
-
-    // --- スクロール実行 ---------------
-    window.scrollTo(vGoTop["nextX"], vGoTop["nextY"]);
-
-    // --- 次のスクロールを設定 ---------
-    if (vGoTop["nextY"] <= 0) {
-        clearTimeout(vGoTop["timer"]);                   // 終了：タイマクリア
-    } else {
-        vGoTop["timer"] = setTimeout("goTopLoop()", 10);  // 次のループ
-    }
+function isRecentPlayer(now, updateDateObj) {
+    return (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
 }
