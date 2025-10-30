@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://127.0.0.1:3000", "http://localhost:3000", "http://127.0.0.1:8080", "http://localhost:8080", "https://www.jajapatatas.com", "https://jajapatatas.com", "http://192.168.50.145:8080"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

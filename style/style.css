@@ -11,6 +11,32 @@ body {
     display: inline-block;
 }
 
+.label.label-calendar {
+    background: #dea38b;
+    color: #f8f8f1
+}
+
+.text-calendar {
+    color: #916a5b !important
+}
+
+a.text-calendar:focus,
+a.text-calendar:hover {
+    color: #f4e6d0
+}
+
+a.text-calendar:visited {
+    color: #fefdfa
+}
+
+.bg-calendar {
+    background: #dea38b !important
+}
+
+.bg-calendar-secondary {
+    background: #f7ebe6 !important
+}
+
 ins {
     border-bottom: 0 !important;
 }
@@ -46,10 +72,48 @@ ins {
     width: 100%;
 }
 
+.event-simple-img {
+    object-fit: cover;
+    height: 90px;
+}
+
+.bg-sunday {
+    background-color: #fcf1f8;
+}
+
+.bg-saturday {
+    background-color: #f1f1fc;
+}
+
 .chip {
     font-size: 110%;
     height: 2.0em;
     padding: 0.5em;
+}
+
+.linkbox {
+    position: relative;
+}
+
+.linkbox a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/* 大会イベントカード */
+.event-card-compe {
+    border-color: #a5a4da;
+}
+
+.event-card-tour {
+    border-color: #a4daad;
+}
+
+.bg-temporary {
+    background: #d3ff0f;
 }
 
 /* フィルターのオーバーライド */

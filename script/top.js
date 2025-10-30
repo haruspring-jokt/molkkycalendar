@@ -1,0 +1,465 @@
+$(async function () {
+    await initSetting();
+    initCategoryFilter();
+});
+
+async function initSetting() {
+    createAreaFilter();
+    initDateFilter();
+    var dateParam = fetchDefaultDateParam();
+    var param = {
+        'prefecture': '00',
+        'calendarFrom': dateParam['from'],
+        'calendarTo': dateParam['to'],
+    };
+    await fetchTopPageEvents(true, param);
+}
+
+/**
+ * カテゴリフィルターボタンの設定
+ */
+function initCategoryFilter() {
+    // 初期状態ですべてのイベントを表示
+    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
+
+    // カテゴリーフィルターボタンのクリックイベント
+    $('.filter-category').click(function () {
+        $('.filter-category').addClass('is-light').removeClass('is-primary');
+        $(this).addClass('is-primary').removeClass('is-light');
+
+        // カテゴリー番号に応じてイベントカードをフィルタリング
+        const categoryNum = $(this).attr('class').match(/filter-category-(\d+)/)[1];
+        if (categoryNum === '0') {
+            // 「すべて」が選択された場合
+            $('.filter-item').show();
+            // すべての日付インデックスを表示
+            $('[id^="date-"]').show();
+        } else {
+            // 特定のカテゴリーが選択された場合
+            $('.filter-item').hide();
+            $(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).show();
+            // 各日付インデックスについて、表示すべきイベントがあるかチェック
+            $('[id^="date-"]').each(function () {
+                const dateId = $(this).attr('id');
+                // この日付インデックス内の表示されているイベント数をカウント
+                const visibleEvents = $(this).find(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).length;
+                // イベントの有無に応じて日付インデックスの表示/非表示を切り替え
+                $(this).toggle(visibleEvents > 0);
+            });
+        }
+    });
+}
+
+/**
+ * 日付フィルタの設定
+ */
+function initDateFilter() {
+    var dateParam = fetchDefaultDateParam();
+    $('.filter-calendar-from').val(dateParam['from']);
+    $('.filter-calendar-to').val(dateParam['to']);
+
+    // fromの日付が変更された時のイベントハンドラ
+    $('.filter-calendar-from').on('change', async function () {
+        const fromDate = new Date($(this).val());
+        // fromの1ヶ月後の日付を計算
+        const toDate = new Date(fromDate);
+        toDate.setMonth(toDate.getMonth() + 1);
+        // toの日付を更新
+        const toDateString = toDate.toISOString().split('T')[0];
+        $('.filter-calendar-to').val(toDateString);
+        // イベントを再取得
+        await updateEvents();
+    });
+
+    // toの日付が変更された時のイベントハンドラ
+    $('.filter-calendar-to').on('change', async function () {
+        await updateEvents();
+    });
+}
+
+/**
+ * イベント一覧を取得し設定する
+ * @param {boolean} isInit 
+ * @param {json} param 
+ */
+async function fetchTopPageEvents(isInit, param) {
+    try {
+        const events = await fetchNewEvents(isInit, param);
+        appendEvents(events);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+    }
+}
+
+/**
+ * 都道府県フィルタの設定
+ */
+function createAreaFilter() {
+    areaOptions = JajaConstants.areaSelects;
+    for (i in areaOptions) {
+        opt = areaOptions[i];
+        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
+    }
+
+    // エリア選択時のイベントハンドラを追加
+    $('.filter-area').on('change', async function () {
+        await updateEvents();
+    });
+}
+
+
+/**
+ * イベントの再取得・表示
+ */
+async function updateEvents() {
+    // カテゴリフィルターを「すべて」に戻す
+    $('.filter-category').addClass('is-light').removeClass('is-primary');
+    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
+
+    const param = {
+        'prefecture': $('.filter-area').val() || '00',
+        'calendarFrom': $('.filter-calendar-from').val(),
+        'calendarTo': $('.filter-calendar-to').val(),
+    };
+
+    // イベント一覧をクリア
+    $('#events').empty();
+
+    // 新しいイベントを取得して表示
+    await fetchTopPageEvents(false, param);
+}
+
+/**
+ * イベント一覧を設定する
+ * @param {json} events 
+ */
+function appendEvents(events) {
+    let currentDate = null;
+    let dateList = [];
+
+    // 最初に日付のリストを作成
+    events.forEach(event => {
+        const eventDate = new Date(event.eventDate);
+        const date = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
+        if (!dateList.includes(date)) {
+            dateList.push(date);
+        }
+    });
+
+    for (i in events) {
+        const event = events[i];
+        const eventDate = new Date(event['eventDate']);
+        const formattedDate = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
+        const week = ['日', '月', '火', '水', '木', '金', '土'];
+        const youbi = '(' + week[eventDate.getDay()] + ')';
+
+        // 日付が変わった場合に見出しを挿入
+        if (currentDate !== formattedDate) {
+            // 前の日付セクションを閉じる（最初以外）
+            if (currentDate !== null) {
+                $("#events").append("</div></div>");
+            }
+            // 現在の日付のインデックスを取得
+            const currentIndex = dateList.indexOf(formattedDate);
+
+            // 前の日付と次の日付のリンクを作成
+            const prevLink = currentIndex > 0 ?
+                `<a href="javascript:void(0)" class="has-text-primary-50 is-size-65" onclick="smoothScroll('${"date-" + dateList[currentIndex - 1]}')">
+                    <i class="las la-angle-left"></i>前の日
+                </a>` : '';
+
+            const nextLink = currentIndex < dateList.length - 1 ?
+                `<a href="javascript:void(0)" class="has-text-primary-50 is-size-65" onclick="smoothScroll('${"date-" + dateList[currentIndex + 1]}')">
+                    次の日<i class="las la-angle-right"></i>
+                </a>` : '';
+            const minWidth = "style='min-width: 80px;'";
+
+            $("#events").append(`
+                <div id="date-${formattedDate}" class="">
+                    <div class="notification is-primary is-light p-0 my-3">
+                        <div class="p-2">
+                            <div class="level is-mobile mb-0">
+                                <div class="level-left" ${minWidth}>
+                                    ${prevLink}
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <p class="is-size-65 mb-0 has-text-weight-semibold">
+                                        <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                                    </p>
+                                </div>
+                                <div class="level-right" ${minWidth}>
+                                    ${nextLink}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="date-events p-0">
+            `);
+            lastDate = currentDate;
+            currentDate = formattedDate;
+        }
+
+        // 開催日の日付フォーマット変更
+        var eventTime = '';
+        if (!(event['eventStart'] + event['eventEnd'])) { } else {
+            eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
+        }
+
+        // イベントラベルカラー
+        const labelColor = {
+            '大会': 'is-link', '大会（長期）': 'is-success',
+            '体験会': 'is-light', '練習会': 'is-light',
+            'ブース': 'is-light', 'その他': 'is-light'
+        }[event['category']];
+        // 新規・最近のイベントかの判定
+        const now = new Date();
+        const updateDateObj = new Date(event['updateDate']);
+        const isNew = isNewEvent(event, now);
+        const isUpdated = isRecentEvent(isNew, now, updateDateObj);
+        const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
+        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
+        // イベント種類フィルタ用data-tag値
+        const dataTag = createDataTag(event);
+        
+        // 都道府県ラベル
+        const prefecture = `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${event['prefecture']}</span>`;
+        // カテゴリーラベル
+        const category = `<span class="tag m-1 ${labelColor} shadow has-text-weight-bold">${event['category']}</span>`;
+        // 大会ルールラベル
+        const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
+            `<span class="tag m-1 is-light shadow has-text-weight-bold">${event['composition']}</span>` : '';
+        // 詳細ありラベル
+        const detailLabel = createDetailLabel(event['article']);
+
+        // イベント画像
+        const imageArea = createImageDiv(event, i);
+
+        // イベントタイトル
+        const eventTitle = createTitle(event);
+        // イベントシリーズ
+        const seriesName = event['seriesName'] ? `<span class="">${event['seriesName']}</span>／` : '';
+        // 主催
+        const org = event['org'] ? "by: " + event['org'] : "";
+        
+        
+        // 個人・チーム構成
+        const composition = createComposition(
+            event['composition'], event['maxMember'], event['minMember'], event['rule']);
+
+        // 会場
+        const gMapLink = event['place'] ?
+            `<a class="has-text-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank">${event['place']}</a>` : '';
+        const placeLink = `<p class="is-size-7 m-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
+        // ルール
+        const rule = isCompetition(event['category']) ?
+            `<p class="is-size-7 m-1">${createDefaultTagClass("ルール")}${composition}</p>` : '';
+        // 定員
+        const teamNum = isCompetition(event['category']) ?
+            `<p class="is-size-7 m-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
+        // エントリー開始
+        const entryStart = isCompetition(event['category']) ?
+            `<p class="is-size-7 m-1">${createDefaultTagClass("エントリー開始")}${event['entryStart']}</p>` : '';
+        // 参加費
+        const entryFee = `<p class="is-size-7 m-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
+        // 備考
+        const remarks = createRemarksDiv(event, i);
+
+        // 更新日時の日付フォーマット
+        const updateDate = `${updateDateObj.getFullYear()}-${updateDateObj.getMonth() + 1}-${updateDateObj.getDate()}`;
+
+        // ソースボタン
+        const source = `<a href="${event['source']}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold">
+            <i class="las la-link"></i>ソース</a>`;
+        // Googleカレンダー登録ボタン
+        const gCalLink = createGoogleCalendarLink(event);
+        // 記事リンクボタン
+        const articleLink = createArticleLink(event['article']);
+
+        $(`#date-${formattedDate} .date-events`).append(`
+            <div class="card filter-item ${dataTag} mb-3" data-tag="${dataTag}">
+                <div class="card-image">
+                    <div class="tag-overlay jaja-tags">
+                        ${prefecture}
+                        ${category}
+                        ${compCate}
+                        ${detailLabel}
+                    </div>
+                    ${imageArea}
+                </div>
+                <div class="card-content p-3">
+                    <div class="content">
+                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
+                        <p class="title is-5 mb-0 mt-2 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
+                        <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
+                        <div class="jaja-event-card-detail py-2">
+                            ${placeLink}
+                            ${rule}
+                            ${teamNum}
+                            ${entryStart}
+                            ${entryFee}
+                            ${remarks}
+                        </div>
+                        <p class="is-size-8 has-text-grey mt-2">更新日: ${updateDate}</p>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    ${source}
+                    ${gCalLink}
+                    ${articleLink}
+                </footer>
+            </div>
+        `);
+    }
+    // 最後の日付セクションを閉じる
+    if (currentDate !== null) {
+        $("#events").append("</div></div>");
+    }
+}
+
+
+
+function createTitle(event) {
+    if (event['article']) {
+        // 詳細記事URLがある場合リンクとして返す
+        return `
+            <a class="text-" href="${event['article']}" target="_blank">${event['eventName']}</a>
+        `;
+    } else {
+        return `
+            <a class="text-" href="${event['source']}" target="_blank">${event['eventName']}</a>
+        `;
+    }
+}
+
+function createImageDiv(event, i) {
+    if (event['image']) {
+        if (event['article']) {
+            return `
+                <figure class="image is-fullwidth jaja-card-image">
+                    <a class="" href="${event['article']}" target="_blank">
+                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
+                    </a>
+                </figure>
+            `;
+        } else {
+            return `
+                <figure class="image is-fullwidth jaja-card-image">
+                    <a class="" href="${event['source']}" target="_blank">
+                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
+                    </a>
+                </figure>
+            `;
+        }
+    } else {
+        return `
+            <figure class="image is-fullwidth jaja-card-image-default">
+                <img src="https://bulma.io/assets/images/placeholders/1280x960.png"
+                    alt="Placeholder image" />
+            </figure>
+        `;
+    }
+}
+
+function createArticleLink(article) {
+    if (article) {
+        return `<a href="${article}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
+                                        class="las la-link"></i>特集</a>`;
+    } else {
+        return '';
+    }
+}
+
+function createGoogleCalendarLink(event) {
+    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
+    const calEventDate = event['eventDate'];
+    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
+        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
+        + ("00" + new Date(calEventDate).getDate()).slice(-2);
+    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
+    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
+    // イベント開始・終了時刻がともにある場合
+    var gCalLink = event['eventStart'] && event['eventEnd'] ?
+        gCalUrl
+        + '&text=' + encodeURIComponent(event['eventName'])
+        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
+        + '&details=' + encodeURIComponent(gCalDetails)
+        // イベント開始時刻のみある場合、0分のイベントとして登録する
+        : event['eventStart'] ?
+            gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
+            + '&details=' + encodeURIComponent(gCalDetails)
+            // 開始時刻がない場合は、終日として登録する
+            : gCalUrl
+            + '&text=' + encodeURIComponent(event['eventName'])
+            + '&dates=' + calendarDate + '/' + calendarDate
+            + '&details=' + encodeURIComponent(gCalDetails);
+    return `<a href="${gCalLink}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
+                        class="las la-plus-circle"></i>カレンダー</a>`
+}
+
+function createRemarksDiv(event, i) {
+    var isThereRemark = false;
+    var entryRemarks = '';
+    if (!event['entryRemarks']) { } else {
+        entryRemarks = event['entryRemarks'] + '<br>';
+        isThereRemark = true;
+    }
+    // 備考・メモ
+    var remarks = '';
+    if (!(event['remarks'])) { } else {
+        remarks = `${event['remarks']}`;
+        isThereRemark = true;
+    }
+    if (isThereRemark) {
+        return `
+            <div class="notification p-0 m-2 is-size-7 has-background-white-ter">
+                <p class="p-2">${entryRemarks + remarks}</p>
+            </div>`;
+    } else {
+        return '';
+    }
+}
+
+function createDetailLabel(article) {
+    if (article) {
+        return `
+            <span class="tag m-1 is-warning shadow has-text-weight-bold">注目</span>
+        `;
+    } else {
+        return '';
+    }
+}
+
+function createGoogleMapLink(event) {
+    return event['place'] ?
+        `<a class="has-text-link"
+            href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}"
+            target="_blank"> ${event['place']}</a>` : '';
+}
+
+function isNewEvent(event, now) {
+    const registerDateObj = new Date(event['registerDate']);
+    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+function isRecentEvent(isNewEvent, now, updateDateObj) {
+    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+function createDefaultTagClass(name) {
+    return `<span class="tag mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
+}
+
+// smoothScroll関数をグローバルスコープで定義
+window.smoothScroll = function (targetId) {
+    const SCROLL_OFFSET = 72;
+    const element = document.getElementById(targetId);
+    if (element) {
+        const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'instant'
+        });
+    }
+};
