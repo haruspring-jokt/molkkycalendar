@@ -41,7 +41,7 @@ function appendPlayerDetail(datas, playerId) {
     $(`.player-record[data-player-id='${playerId}']`).addClass('has-background-primary-90');
 
     // タップしたtrタグのdata-player-name属性から選手名を取得
-    const playerDispName = $(`.player-record[data-player-id='${playerId}']`).data('player-name');
+    const playerName = $(`.player-record[data-player-id='${playerId}']`).data('player-name');
     const playerTeamTag = $(`.player-record[data-player-id='${playerId}']`).data('player-team-tag');
     const playerX = $(`.player-record[data-player-id='${playerId}']`).data('player-x');
     const playerInstagram = $(`.player-record[data-player-id='${playerId}']`).data('player-instagram');
@@ -66,7 +66,13 @@ function appendPlayerDetail(datas, playerId) {
     const tiktok = createTiktokLink(playerTiktok);
     const youtube = createYoutubeLink(playerYoutube);
     const otherLink = createOtherLink(playerOther);
-    const links = `${xAccount}${instagram}${tiktok}${youtube}${otherLink}`;
+    const links = `<span class="is-size-5 is-pulled-right">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
+    const areaTag = area != "" ? `<span class="tag has-text-weight-bold p-1 mr-2">${area}</span>` : "";
+    const playerDispName = playerName.split('｜').map((name, index) => {
+        return index === 0 ?
+            name :
+            `<span class="has-text-grey is-size-6">${name}</span>`;
+    }).join('<span class="has-text-grey is-size-6">｜</span>');
 
     var results = "";
     for (const record of datas) {
@@ -115,7 +121,8 @@ function appendPlayerDetail(datas, playerId) {
                     ${entryName}
                 </td>
                 <td class="has-text-right is-middle py-2 px-1">
-                    ${eventRank} ${eventPoints}
+                    ${eventRank}
+                    ${eventPoints}
                 </td>
             </tr>
         `;
@@ -132,7 +139,7 @@ function appendPlayerDetail(datas, playerId) {
             </header>
             <div class="card-content p-3">
                 <div class="content">
-                    <p class="card-header-subtitle is-size-7">${playerTeamTag}<br/>${links}</p>
+                    <p class="card-header-subtitle is-size-7 is-middle">${areaTag}${playerTeamTag}${links}</p>
                     <table class="table is-fullwidth">
                         <thead>
                             <tr class="is-size-65">
@@ -190,6 +197,11 @@ function appendStandings(datas) {
         const newPlayerIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i> ` : "";
         const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-info"></i> ` : "";
 
+        const playerDispName = record['player_name'].split('｜').map((name, index) => {
+            return index === 0 ?
+                name :
+                `<span class="has-text-grey is-size-65">${name}</span>`;
+        }).join('<span class="has-text-grey is-size-65">｜</span>');
         const area = record['area'] != "" ? `<span class="tag has-text-weight-bold p-1">${record['area']}</span>` : "";
         // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
         const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
@@ -200,7 +212,7 @@ function appendStandings(datas) {
         const tiktok = createTiktokLink(record['tiktok_account']);
         const youtube = createYoutubeLink(record['youtube_account']);
         const otherLink = createOtherLink(record['other_sns']);
-        const links = `${xAccount}${instagram}${tiktok}${youtube}${otherLink}`;
+        const links = `<span class="is-size-6">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
 
         const playerData = `
                 data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
@@ -216,10 +228,10 @@ function appendStandings(datas) {
                 <td class="has-text-right has-text-weight-bold is-middle">${rank}</td>
                 <td>
                     <p class="is-size-6 player-name-tag my-1">
-                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold">${record['player_name']}</span>${links}
+                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold">${playerDispName}</span>${links}
                     </p>
                     <p class="is-size-6 my-1">
-                        ${area} <span class="is-size-65 has-text-grey">${teamTag}</span></td>
+                        ${area} <span class="is-size-7 has-text-grey">${teamTag}</span></td>
                     </p>
                 <td class="is-middle has-text-right has-text-weight-bold">${record['points']}</td>
                 <td class="is-middle has-text-right">${record['rankin_count']}</td>
@@ -230,37 +242,32 @@ function appendStandings(datas) {
 
 function createXLink(account) {
     return account != "" ?
-        ` <span class="is-size-6">
-                    <a class="has-text-primary" href="https://x.com/${account}" target="_blank">
-                        <i class="lab la-twitter"></i></a></span>` : '';
+        ` <a class="has-text-primary" href="https://x.com/${account}" target="_blank">
+                        <i class="lab la-twitter"></i></a>` : '';
 }
 
 function createInstagramLink(account) {
     return account != "" ?
-        ` <span class="is-size-6"> 
-                    <a class="has-text-primary" href="https://www.instagram.com/${account}" target="_blank">
-                        <i class="lab la-instagram"></i></a></span>` : '';
+        ` <a class="has-text-primary" href="https://www.instagram.com/${account}" target="_blank">
+                        <i class="lab la-instagram"></i></a>` : '';
 }
 
 function createTiktokLink(account) {
     return account != "" ?
-        ` <span class="is-size-6"> 
-                    <a class="has-text-primary" href="https://www.tiktok.com/@${account}" target="_blank">
-                        Ti</a></span>` : '';
+        ` <a class="has-text-primary" href="https://www.tiktok.com/@${account}" target="_blank">
+                        Ti</a>` : '';
 }
 
 function createYoutubeLink(account) {
     return account != "" ?
-        ` <span class="is-size-6">
-                    <a class="has-text-primary" href="https://www.youtube.com/@${account}" target="_blank">
-                        <i class="lab la-youtube"></i></a></span>` : '';
+        ` <a class="has-text-primary" href="https://www.youtube.com/@${account}" target="_blank">
+                        <i class="lab la-youtube"></i></a>` : '';
 }
 
 function createOtherLink(url) {
     return url != "" ?
-        ` <span class="is-size-6">
-                    <a class="has-text-primary" href="${url}" target="_blank">
-                        <i class="las la-link"></i></a></span>` : '';
+        ` <a class="has-text-primary" href="${url}" target="_blank">
+                        <i class="las la-link"></i></a>` : '';
 }
 
 function isNewPlayer(record, now) {
