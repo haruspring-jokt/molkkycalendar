@@ -156,6 +156,7 @@ function appendFooter() {
                 <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.molkkyprime}" target="_blank">モルック関東プライムリーグ</a></li>
             </ul>
         </div>
+        <p class="content is-size-7 has-text-primary is-pulled-right">2024 全国モルックカレンダー Mölkky clan jaja patatas</p>
     `;
 
     // フッターに追加
@@ -242,6 +243,86 @@ async function fetchPlayerDetail(playerId) {
     });
 }
 
+function createCommonAreaFilter() {
+    areaOptions = JajaConstants.areaSelects;
+    for (i in areaOptions) {
+        opt = areaOptions[i];
+        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
+    }
+    // エリア選択時のイベントハンドラを追加
+    $('.filter-area').on('change', async function () {
+        await updateEvents();
+    });
+}
+
+/**
+ * カテゴリフィルターボタンの設定
+ */
+function initCommonCategoryFilter() {
+    // 初期状態ですべてのイベントを表示
+    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
+
+    // カテゴリーフィルターボタンのクリックイベント
+    $('.filter-category').click(function () {
+        $('.filter-category').addClass('is-light').removeClass('is-primary');
+        $(this).addClass('is-primary').removeClass('is-light');
+
+        // カテゴリー番号に応じてイベントカードをフィルタリング
+        const categoryNum = $(this).attr('class').match(/filter-category-(\d+)/)[1];
+        if (categoryNum === '0') {
+            // 「すべて」が選択された場合
+            $('.filter-item').show();
+            // すべての日付インデックスを表示
+            $('[id^="date-"]').show();
+        } else {
+            // 特定のカテゴリーが選択された場合
+            $('.filter-item').hide();
+            $(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).show();
+            // 各日付インデックスについて、表示すべきイベントがあるかチェック
+            $('[id^="date-"]').each(function () {
+                const dateId = $(this).attr('id');
+                // この日付インデックス内の表示されているイベント数をカウント
+                const visibleEvents = $(this).find(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).length;
+                // イベントの有無に応じて日付インデックスの表示/非表示を切り替え
+                $(this).toggle(visibleEvents > 0);
+            });
+        }
+    });
+}
+
+function initCommonDateFilter() {
+    var dateParam = fetchDefaultDateParam();
+    $('.filter-calendar-from').val(dateParam['from']);
+    $('.filter-calendar-to').val(dateParam['to']);
+
+    // fromの日付が変更された時のイベントハンドラ
+    $('.filter-calendar-from').on('change', async function () {
+        const fromDate = new Date($(this).val());
+        // fromの1ヶ月後の日付を計算
+        const toDate = new Date(fromDate);
+        toDate.setMonth(toDate.getMonth() + 1);
+        // toの日付を更新
+        const toDateString = toDate.toISOString().split('T')[0];
+        $('.filter-calendar-to').val(toDateString);
+        // イベントを再取得
+        await updateEvents();
+    });
+
+    // toの日付が変更された時のイベントハンドラ
+    $('.filter-calendar-to').on('change', async function () {
+        await updateEvents();
+    });
+}
+
+function isNewCommonEvent(event, now) {
+    const registerDateObj = new Date(event['registerDate']);
+    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+function isRecentCommonEvent(isNewEvent, now, updateDateObj) {
+    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
 function isEqualsPrefectureCodeAndName(code, name) {
     if (code == '00') {
         return ture;
@@ -315,6 +396,9 @@ function isCompetition(category) {
 
 function createComposition(composition, maxMember, minMember, rule) {
     if (composition == 'チーム') {
+        if (maxMember == "" && minMember == "") {
+            return composition + ' ' + rule;
+        }
         if (maxMember) {
             return composition
                 + '（' + minMember + '～' + maxMember + '）'

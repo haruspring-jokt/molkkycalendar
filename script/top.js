@@ -19,62 +19,21 @@ async function initSetting() {
  * カテゴリフィルターボタンの設定
  */
 function initCategoryFilter() {
-    // 初期状態ですべてのイベントを表示
-    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
-
-    // カテゴリーフィルターボタンのクリックイベント
-    $('.filter-category').click(function () {
-        $('.filter-category').addClass('is-light').removeClass('is-primary');
-        $(this).addClass('is-primary').removeClass('is-light');
-
-        // カテゴリー番号に応じてイベントカードをフィルタリング
-        const categoryNum = $(this).attr('class').match(/filter-category-(\d+)/)[1];
-        if (categoryNum === '0') {
-            // 「すべて」が選択された場合
-            $('.filter-item').show();
-            // すべての日付インデックスを表示
-            $('[id^="date-"]').show();
-        } else {
-            // 特定のカテゴリーが選択された場合
-            $('.filter-item').hide();
-            $(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).show();
-            // 各日付インデックスについて、表示すべきイベントがあるかチェック
-            $('[id^="date-"]').each(function () {
-                const dateId = $(this).attr('id');
-                // この日付インデックス内の表示されているイベント数をカウント
-                const visibleEvents = $(this).find(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).length;
-                // イベントの有無に応じて日付インデックスの表示/非表示を切り替え
-                $(this).toggle(visibleEvents > 0);
-            });
-        }
-    });
+    initCommonCategoryFilter();
 }
 
 /**
  * 日付フィルタの設定
  */
 function initDateFilter() {
-    var dateParam = fetchDefaultDateParam();
-    $('.filter-calendar-from').val(dateParam['from']);
-    $('.filter-calendar-to').val(dateParam['to']);
+    initCommonDateFilter();
+}
 
-    // fromの日付が変更された時のイベントハンドラ
-    $('.filter-calendar-from').on('change', async function () {
-        const fromDate = new Date($(this).val());
-        // fromの1ヶ月後の日付を計算
-        const toDate = new Date(fromDate);
-        toDate.setMonth(toDate.getMonth() + 1);
-        // toの日付を更新
-        const toDateString = toDate.toISOString().split('T')[0];
-        $('.filter-calendar-to').val(toDateString);
-        // イベントを再取得
-        await updateEvents();
-    });
-
-    // toの日付が変更された時のイベントハンドラ
-    $('.filter-calendar-to').on('change', async function () {
-        await updateEvents();
-    });
+/**
+ * 都道府県フィルタの設定
+ */
+function createAreaFilter() {
+    createCommonAreaFilter();
 }
 
 /**
@@ -90,23 +49,6 @@ async function fetchTopPageEvents(isInit, param) {
         console.error('Error fetching events:', error);
     }
 }
-
-/**
- * 都道府県フィルタの設定
- */
-function createAreaFilter() {
-    areaOptions = JajaConstants.areaSelects;
-    for (i in areaOptions) {
-        opt = areaOptions[i];
-        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
-    }
-
-    // エリア選択時のイベントハンドラを追加
-    $('.filter-area').on('change', async function () {
-        await updateEvents();
-    });
-}
-
 
 /**
  * イベントの再取得・表示
@@ -137,6 +79,7 @@ function appendEvents(events) {
     let currentDate = null;
     let dateList = [];
 
+    events.sort((a, b) => a['sortKey'] - b['sortKey']);
     // 最初に日付のリストを作成
     events.forEach(event => {
         const eventDate = new Date(event.eventDate);
@@ -193,6 +136,7 @@ function appendEvents(events) {
                             </div>
                         </div>
                     </div>
+
                 <div class="date-events p-0">
             `);
             lastDate = currentDate;
@@ -214,13 +158,13 @@ function appendEvents(events) {
         // 新規・最近のイベントかの判定
         const now = new Date();
         const updateDateObj = new Date(event['updateDate']);
-        const isNew = isNewEvent(event, now);
-        const isUpdated = isRecentEvent(isNew, now, updateDateObj);
+        const isNew = isNewCommonEvent(event, now);
+        const isUpdated = isRecentCommonEvent(isNew, now, updateDateObj);
         const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
         const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
         // イベント種類フィルタ用data-tag値
         const dataTag = createDataTag(event);
-        
+
         // 都道府県ラベル
         const prefecture = `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${event['prefecture']}</span>`;
         // カテゴリーラベル
@@ -229,7 +173,7 @@ function appendEvents(events) {
         const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
             `<span class="tag m-1 is-light shadow has-text-weight-bold">${event['composition']}</span>` : '';
         // 詳細ありラベル
-        const detailLabel = createDetailLabel(event['article']);
+        const detailLabel = createDetailLabel(event['article'], event['pickupSerial']);
 
         // イベント画像
         const imageArea = createImageDiv(event, i);
@@ -237,11 +181,11 @@ function appendEvents(events) {
         // イベントタイトル
         const eventTitle = createTitle(event);
         // イベントシリーズ
-        const seriesName = event['seriesName'] ? `<span class="">${event['seriesName']}</span>／` : '';
+        const seriesName = event['seriesName'] ? `<span class=""><i class="las la-scroll"></i> ${event['seriesName']}</span>／` : '';
         // 主催
-        const org = event['org'] ? "by: " + event['org'] : "";
-        
-        
+        const org = event['org'] ? `<i class="las la-user"></i> ${event['org']}` : "";
+
+
         // 個人・チーム構成
         const composition = createComposition(
             event['composition'], event['maxMember'], event['minMember'], event['rule']);
@@ -421,8 +365,8 @@ function createRemarksDiv(event, i) {
     }
 }
 
-function createDetailLabel(article) {
-    if (article) {
+function createDetailLabel(article, pickupSerial) {
+    if (article || pickupSerial) {
         return `
             <span class="tag m-1 is-warning shadow has-text-weight-bold">注目</span>
         `;
@@ -438,14 +382,7 @@ function createGoogleMapLink(event) {
             target="_blank"> ${event['place']}</a>` : '';
 }
 
-function isNewEvent(event, now) {
-    const registerDateObj = new Date(event['registerDate']);
-    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
 
-function isRecentEvent(isNewEvent, now, updateDateObj) {
-    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
 
 function createDefaultTagClass(name) {
     return `<span class="tag mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;

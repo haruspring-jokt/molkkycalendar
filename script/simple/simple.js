@@ -1,449 +1,218 @@
-/**
- * ページ読み込み時実行
- */
-$(function () {
-    /**
-     * init event
-     */
-    console.log('start getting events.')
-    resetTechMessage();
-    var dateParam = fetchInitDateParam();
+$(async function () {
+    await initSettingSimplePage();
+    initCategoryFilter();
+});
+
+async function initSettingSimplePage() {
+    createAreaFilter();
+    initDateFilter();
+    var dateParam = fetchDefaultDateParam();
     var param = {
         'prefecture': '00',
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
     };
-    fetchEvents(param, true);
-
-    /**
-     * 都道府県選択イベント
-     */
-    $("#select-prefecture").change(function () {
-        console.log("都道府県イベント: " + $(this).val());
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
-    });
-
-    /**
-     * 開催日FROMフィルタイベント
-     */
-    $("#calendar-from").change(function () {
-        console.log("日付FROMイベント: " + $(this).val());
-        const calendarFrom = $("#calendar-from").val();
-        // 開催日TOにFROMの1ヶ月後を設定する
-        var date = new Date(calendarFrom);
-        date.setMonth(date.getMonth() + 1);
-        var y = date.getFullYear();
-        var m = ("00" + (date.getMonth() + 1)).slice(-2);
-        var d = ("00" + date.getDate()).slice(-2);
-        $("#calendar-to").val(y + "-" + m + "-" + d);
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
-    });
-
-    /**
-     * 開催日TOフィルタイベント
-     */
-    $("#calendar-to").change(function () {
-        console.log("日付TOイベント: " + $(this).val());
-        removeEvents();
-        resetTechMessage();
-        fetchEventsWithFilter();
-    });
-
-});
-
-function resetTechMessage() {
-    $("#tech-message").empty();
-    $('#tech-message').append(
-        `<p>情報取得中...</p>
-        <progress class="progress" max="100"></progress>`
-    );
+    await fetchSimplePageEvents(true, param);
 }
 
 /**
- * イベント一覧削除
+ * カテゴリフィルターボタンの設定
  */
-function removeEvents() {
-    $("#simple-body").empty();
+function initCategoryFilter() {
+    initCommonCategoryFilter();
 }
 
 /**
- * イベント情報一覧読み込み・表示（画面フィルター適用時）
+ * 日付フィルタの設定
  */
-function fetchEventsWithFilter() {
-    var param = {
-        'prefecture': $("#select-prefecture").val(),
-        'calendarFrom': $("#calendar-from").val(),
-        'calendarTo': $("#calendar-to").val(),
-    };
-    fetchEvents(param, false);
+function initDateFilter() {
+    initCommonDateFilter();
 }
 
-function isEqualsPrefectureCodeAndName(code, name) {
-    if (code == '00') {
-        return ture;
+/**
+ * 都道府県フィルタの設定
+ */
+function createAreaFilter() {
+    createCommonAreaFilter();
+}
+
+/**
+ * イベント一覧を取得し設定する
+ * @param {boolean} isInit 
+ * @param {json} param 
+ */
+async function fetchSimplePageEvents(isInit, param) {
+    try {
+        const events = await fetchNewEvents(isInit, param);
+        appendSimpleEvents(events);
+    } catch (error) {
+        console.error('Error fetching events:', error);
     }
-    if (code.slice(0, 1) == 'A') {
-        var areaList = {
-            'A1': ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島'],
-            'A2': ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川', '山梨'],
-            'A4': ['新潟', '富山', '石川', '福井', '長野'],
-            'A3': ['岐阜', '静岡', '愛知', '三重'],
-            'A5': ['滋賀', '京都', '大阪', '兵庫', '奈良', '和歌山'],
-            'A6': ['鳥取', '島根', '岡山', '広島', '山口'],
-            'A7': ['徳島', '香川', '愛媛', '高知'],
-            'A8': ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄'],
-            'A0': ['海外']
-        };
-        return areaList[code].includes(name);
-    }
-    var prefectureList = {
-        '01': '北海道', '02': '青森', '03': '岩手', '04': '宮城', '05': '秋田', '06': '山形',
-        '07': '福島', '08': '茨城', '09': '栃木', '10': '群馬', '11': '埼玉', '12': '千葉',
-        '13': '東京', '14': '神奈川', '15': '新潟', '16': '富山', '17': '石川', '18': '福井',
-        '19': '山梨', '20': '長野', '21': '岐阜', '22': '静岡', '23': '愛知', '24': '三重',
-        '25': '滋賀', '26': '京都', '27': '大阪', '28': '兵庫', '29': '奈良', '30': '和歌山',
-        '31': '鳥取', '32': '島根', '33': '岡山', '34': '広島', '35': '山口', '36': '徳島',
-        '37': '香川', '38': '愛媛', '39': '高知', '40': '福岡', '41': '佐賀', '42': '長崎',
-        '43': '熊本', '44': '大分', '45': '宮崎', '46': '鹿児島', '47': '沖縄'
-    };
-    return prefectureList[code] == name;
 }
 
 /**
- * イベント情報HTMLを作成してHTMLに追加する。
- * @param {json} param パラメータ 
- * @param {boolean} isInit 初回動作か
+ * イベントの再取得・表示
  */
-function fetchEvents(param, isInit) {
+async function updateEvents() {
+    // カテゴリフィルターを「すべて」に戻す
+    $('.filter-category').addClass('is-light').removeClass('is-primary');
+    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
 
-    console.log('fetchEvents: ', param);
+    const param = {
+        'prefecture': $('.filter-area').val() || '00',
+        'calendarFrom': $('.filter-calendar-from').val(),
+        'calendarTo': $('.filter-calendar-to').val(),
+    };
 
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
-    const maxItems = 300;
+    // イベント一覧をクリア
+    $('#simple-events').empty();
 
-    $.ajax({
-        url: publicUrl,
-        type: 'GET',
-        dataType: 'json',
-    }).done(function (datas) {
-        const filteredDatas = datas.filter((event) => {
-            // ソートキーのチェック
-            const isCorrectSk = isInit ? event.sk.slice(0, 1) == "0" : true;
+    // 新しいイベントを取得して表示
+    await fetchSimplePageEvents(false, param);
+}
 
-            // JST変換・0:00:00化
-            const dateObj = new Date(event.eventDate);
-            dateObj.setHours(dateObj.getHours() + 9);
-            const eventDateZero = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+function appendSimpleEvents(events) {
+    let currentDate = null;
+    let dateList = [];
 
-            const fromDateObj = new Date(param['calendarFrom'] + "T00:00:00+09:00");
-            const toDateObj = new Date(param['calendarTo'] + "T23:59:59+09:00");
-
-            const isPrefectureMatch = param['prefecture'] === "00" || isEqualsPrefectureCodeAndName(param['prefecture'], event.prefecture);
-
-            return isCorrectSk
-                && eventDateZero >= fromDateObj
-                && eventDateZero <= toDateObj
-                && isPrefectureMatch;
-        });
-
-        // 件数分イベントカードを生成して追加する
-        for (const i in filteredDatas) {
-            if (i >= maxItems) {
-                console.log('over' + maxItems + 'items. stop rendering.');
-                break;
-            }
-            const event = filteredDatas[i];
-
-            // イベント種類のラベルカラー
-            const labelColor = {
-                '大会': 'primary', '大会（長期）': 'success',
-                '体験会': 'default', '練習会': 'default',
-                'ブース': 'default', 'その他': 'default'
-            }[event['category']];
-            var category = event['category'];
-
-            // 開催日の日付フォーマット変更
-            const eventDate = new Date(event['eventDate']).toLocaleDateString();
-            var week = ['日', '月', '火', '水', '木', '金', '土'];
-            const youbi = '(' + week[new Date(event['eventDate']).getDay()] + ')';
-            var eventTime = '';
-            if (!(event['eventStart'] + event['eventEnd'])) { } else {
-                eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
-            }
-
-            // 土日の場合背景色変更
-            var dateBgClass = 'bg-gray';
-            if (youbi == '(日)') {
-                dateBgClass = 'bg-sunday';
-            } else if (youbi == '(土)') {
-                dateBgClass = 'bg-saturday';
-            }
-
-            // 主催
-            var org = event['org'];
-            // 記事
-            var eventTitle = createTitle(event);
-
-            // Googleカレンダー登録リンクを作成する
-            const gCalLink = createGoogleCalendarLink(event);
-
-            // 詳細ありラベル
-            var detailLabel = createDetailLabel(event['article']);
-            // 個人・チーム構成
-            var composition = createComposition(
-                event['composition'], event['maxMember'], event['minMember'], event['rule']);
-            // 長期大会・シリーズ
-            var longEventOrSeries = createLongEventOrSeries(event);
-            // googleマップ検索リンク
-            var placeLink = event['place'] ?
-                `<a class="btn btn-link text-left" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank"><i class="icon icon-location"></i></a>` : '';
-
-            // イベント種類フィルタ用data-tag値
-            var dataTag = createDataTag(event);
-
-            // イベントカード要素の追加
-            $('#simple-body').append(
-                `<tr class="${dateBgClass} filter-item ${dataTag}" data-tag="${dataTag}">
-                    <td>
-                        ${eventDate}${youbi}<br/>
-                        <span>${eventTime}</span><br/>
-                        ${gCalLink} ${placeLink}
-                    </td>
-                    <td>
-                        <span class="label label-rounded">${event['prefecture']}</span> <span class="label label-rounded label-${labelColor}">${category}</span>${detailLabel} <strong>${eventTitle}</strong><br/>
-                        ${composition} ${longEventOrSeries}<br/>
-                        <small>${org}</small>
-                    </td>
-                </tr>`
-            );
+    events.sort((a, b) => a['sortKey'] - b['sortKey']);
+    // 最初に日付のリストを作成
+    events.forEach(event => {
+        const eventDate = new Date(event.eventDate);
+        const date = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
+        if (!dateList.includes(date)) {
+            dateList.push(date);
         }
-        const counter = filteredDatas.length >= maxItems ? '多いため' + maxItems + '件まで表示' : filteredDatas.length + "件";
-        $('#tech-message > p').text(`情報取得完了: ${counter}`);
-        $('#tech-message > p').addClass('bg-success');
-        $('#tech-message > progress').remove();
+    });
 
-        if (isInit && filteredDatas.length > 0) {
-            // 初回の場合開催日フィルタの日付を設定する
-            var dateParam = fetchInitDateParam();
-            $('#calendar-from').val(dateParam['from']);
-            $('#calendar-to').val(dateParam['to']);
+    for (i in events) {
+        const event = events[i];
+        const eventDate = new Date(event['eventDate']);
+        const formattedDate = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
+        const week = ['日', '月', '火', '水', '木', '金', '土'];
+        const youbi = '(' + week[eventDate.getDay()] + ')';
+
+        // 日付が変わった場合にテーブルを変更
+        if (currentDate !== formattedDate) {
+            // 前の日付セクションを閉じる（最初以外）
+            if (currentDate !== null) {
+                $("#simple-events").append("</tbody></table>");
+            }
+            $("#simple-events").append(`
+                <div id="date-${formattedDate}">
+                    <section class="content mb-0 mt-6">
+                        <h3 class="title is-size-5 mb-3 px-2">
+                            <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                        </h3>
+                    </section>
+                    <table id="simple-table" class="table is-fullwidth is-narrow is-striped is-size-65">
+                        <thead id="simple-head">
+                            <tr class="is-selected has-text-light">
+                                <th style="width:120px;">時間</th>
+                                <th>イベント</th>
+                            </tr>
+                        </thead>
+                            <tbody id="simple-body-${formattedDate}">
+            `);
+            lastDate = currentDate;
+            currentDate = formattedDate;
         }
 
-        // 一覧表示完了イベント
-        return filteredDatas.length;
-    });
-}
-
-/**
- * 
- * @returns 初期の日付パラメータ
- */
-function fetchInitDateParam() {
-    var date = new Date();
-    var y = date.getFullYear();
-    var m = ("00" + (date.getMonth() + 1)).slice(-2);
-    var d = ("00" + date.getDate()).slice(-2);
-    var calendarFrom = y + "-" + m + "-" + d;
-    m = ("00" + (date.getMonth() + 2)).slice(-2);
-    if (m == "13") {
-        y = date.getFullYear() + 1;
-        m = "01";
-    }
-    var calendarTo = y + "-" + m + "-" + d;
-    return {
-        'from': calendarFrom,
-        'to': calendarTo
-    };
-}
-
-/**
- * 
- * @param {json} event イベントJSON 
- * @returns チーム構成Div要素
- */
-function createComposition(composition, maxMember, minMember) {
-    if (composition == 'チーム') {
-        if (maxMember) {
-            return '<span class="text-gray">' + composition
-                + '（' + minMember + '～' + maxMember + '）' + '</span>';
-        } else {
-            return '<span class="text-gray">' + composition
-                + '（' + minMember + '）' + '</span>';
+        // 開催日の日付フォーマット変更
+        var eventTime = '';
+        if (!(event['eventStart'] + event['eventEnd'])) { } else {
+            eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
         }
-    } else if (composition == '個人') {
-        return '<span class="text-gray">個人</span>';
-    } else {
-        return '';
+
+        // イベントラベルカラー
+        const labelColor = {
+            '大会': 'is-link', '大会（長期）': 'is-success',
+            '体験会': 'is-light', '練習会': 'is-light',
+            'ブース': 'is-light', 'その他': 'is-light'
+        }[event['category']];
+        // 新規・最近のイベントかの判定
+        const now = new Date();
+        const updateDateObj = new Date(event['updateDate']);
+        const isNew = isNewCommonEvent(event, now);
+        const isUpdated = isRecentCommonEvent(isNew, now, updateDateObj);
+        const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
+        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
+
+        // イベント種類フィルタ用data-tag値
+        const dataTag = createDataTag(event);
+        const eventTimeSpan = eventTime != "" ? `<span class="is-size-7">${eventTime}</span><br/>`
+            : ""
+        // 都道府県ラベル
+        const prefecture = `<span class="tag mb-1 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
+            <span class="has-text-primary-20">${event['prefecture']}</span></span><br/>`;
+        // カテゴリーラベル
+        const category = `<span class="tag mb-1 mr-1 px-1 is-size-7 has-text-weight-medium ${labelColor}">${event['category']}</span>`;
+        // 個人・チーム構成
+        const composition = createComposition(
+            event['composition'], "", "", "");
+        // 大会ルールラベル
+        const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
+            composition != "" ?
+                `<span class="tag mr-1 px-1 is-size-8 has-text-weight-medium">${composition}</span>` :
+                `<span class="tag mr-1 px-1 is-size-8 has-text-weight-medium">${event['composition']}</span>` :
+            "";
+
+        // イベントタイトル
+        const eventTitle = createTitle(event);
+        // 主催
+        const org = event['org'] ?
+            `</br><span class="is-size-7 has-text-grey">
+                <i class="las la-user"></i> ${event['org']}
+            </span>`
+            : "";
+        // イベントシリーズ
+        const seriesName = event['seriesName'] ?
+            `<br/><span class="is-size-7 has-text-grey">
+                <i class="las la-scroll"></i> ${event['seriesName']}
+            </span>`
+            : '';
+        // マップリンク
+        const gMapLink = event['place'] ?
+            `<br/><span class="is-size-7">
+                <i class="las la-map-marker"></i><a class="has-text-link"
+                    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}"
+                    target="_blank">${event['place']}</a></span>`
+            : '';
+
+        $(`#simple-body-${formattedDate}`).append(`
+            <tr class="${dataTag} filter-item" data-tag="${dataTag}">
+                <td class="is-middle">
+                    ${eventTimeSpan}
+                    ${prefecture}
+                    ${category} ${compCate}
+                </td>
+                <td>
+                    ${newEventIcon}${updateIcon}${eventTitle}
+                    ${org}
+                    ${seriesName}
+                    ${gMapLink}
+                </td>
+            </tr>
+        `);
+    }
+    // 最後の日付セクションを閉じる
+    if (currentDate !== null) {
+        $("#simple-events").append("</tbody></table></div>");
     }
 }
 
-/**
- * 長期大会またはシリーズ名を返す
- * @param {json} event イベントJSON 
- * @returns 長期大会名、空の場合はシリーズ名、いずれも空の場合は空文字
- */
-function createLongEventOrSeries(event) {
-    if (event['longEventName']) {
-        return '<span class="text-gray">[' + event['longEventName'] + ']</span>';
-    } else if (event['seriesName']) {
-        return '<span class="text-gray">[' + event['seriesName'] + ']</span>';
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns イベントタイトルを返す
- */
 function createTitle(event) {
     if (event['article']) {
         // 詳細記事URLがある場合リンクとして返す
         return `
-            <a class="text-primary" href="${event['article']}" target="_blank"> ${event['eventName']}</a>
+            <a class="" href="${event['article']}" target="_blank">
+                <span class="is-size-65">${event['eventName']}</span></a>
         `;
     } else {
         return `
-            <a class="text-primary" href="${event['source']}" target="_blank"> ${event['eventName']}</a>
+            <a class="" href="${event['source']}" target="_blank">
+                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
         `;
     }
 }
 
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 詳細記事がある場合追加のラベルを返す
- * 
- */
-function createDetailLabel(article) {
-    if (article) {
-        return `
-            <a class="text-primary" href="${article}" target="_blank">
-                <span class="label label-rounded label-warning">注目</span>
-            </a>
-        `;
-    } else {
-        return '';
-    }
-}
-
-/**
- * 
- * @param {json} event イベントJSON
- * @returns 種類フィルタ用のdeta-tagを返す
- */
-function createDataTag(event) {
-    if (!event['category']) {
-        return 'tag-0';
-    }
-    if (!['大会', '大会（長期）', '体験会', '練習会', 'ブース', 'その他'].includes(event['category'])) {
-        return 'tag-0';
-    }
-    var tag = {
-        '大会': 'tag-1 tag-7', '大会（長期）': 'tag-2 tag-7',
-        '体験会': 'tag-3 tag-8', '練習会': 'tag-4 tag-8',
-        'ブース': 'tag-5', 'その他': 'tag-6'
-    }[event['category']];
-    if (event['article']) {
-        tag = tag + ' tag-9';
-    }
-    return tag;
-}
-
-/**
- * Googleカレンダー登録リンクを作成する
-*  @param {json} event イベントJSON 
- * @returns Googleカレンダー登録用URLリンク
- */
-function createGoogleCalendarLink(event) {
-    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
-    const calEventDate = event['eventDate'];
-    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
-        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
-        + ("00" + new Date(calEventDate).getDate()).slice(-2);
-    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
-    // イベント開始・終了時刻がともにある場合
-    var gCalLink = event['eventStart'] && event['eventEnd'] ?
-        gCalUrl
-        + '&text=' + encodeURIComponent(event['eventName'])
-        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
-        + '&details=' + encodeURIComponent(gCalDetails)
-        // イベント開始時刻のみある場合、0分のイベントとして登録する
-        : event['eventStart'] ?
-            gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
-            + '&details=' + encodeURIComponent(gCalDetails)
-            // 開始時刻がない場合は、終日として登録する
-            : gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + '/' + calendarDate
-            + '&details=' + encodeURIComponent(gCalDetails);
-    return '<a class="btn btn-primary text-left" href="' + gCalLink + '" target="_blank"><i class="icon icon-plus"></i></a>';
-}
-
-/**
- * トップスクロール
- */
-var vGoTop = {};
-function goTop() {
-
-    vGoTop["coef"] = 50;  // ←滑らか係数（大きいほど滑らか）
-    vGoTop["cnt"] = 0;
-
-    // --- 現在のスクロール位置取得 -----
-    var startX = document.body.scrollLeft || document.documentElement.scrollLeft;
-    var startY = document.body.scrollTop || document.documentElement.scrollTop;
-
-    // --- スクロールの単位計算 ---------
-    var moveSplitCnt = 0;
-    for (var i = 1; i <= vGoTop["coef"]; i++) {
-        moveSplitCnt += i * i;
-    }
-    vGoTop["unitH"] = startY / (moveSplitCnt * 2);
-
-    vGoTop["nextX"] = startX;
-    vGoTop["nextY"] = startY;
-
-    // --- スクロール開始 ---------------
-    goTopLoop();
-}
-
-/**
- * トップスクロース制御
- */
-function goTopLoop() {
-    // ============================================================================
-    //  スクロール実行
-    // ============================================================================
-
-    vGoTop["cnt"]++;
-
-    // --- 次のスクロール位置計算 -------
-    var Coef = 0;
-    if (vGoTop["cnt"] <= vGoTop["coef"]) {
-        Coef = vGoTop["cnt"];
-    } else {
-        Coef = ((vGoTop["coef"] * 2) + 1) - vGoTop["cnt"];
-    }
-    vGoTop["nextY"] = vGoTop["nextY"] - Math.round(vGoTop["unitH"] * (Coef * Coef));
-    if ((vGoTop["cnt"] >= (vGoTop["coef"] * 2)) || (vGoTop["nextY"] <= 0)) {
-        vGoTop["nextY"] = 0;
-    }
-
-    // --- スクロール実行 ---------------
-    window.scrollTo(vGoTop["nextX"], vGoTop["nextY"]);
-
-    // --- 次のスクロールを設定 ---------
-    if (vGoTop["nextY"] <= 0) {
-        clearTimeout(vGoTop["timer"]);                   // 終了：タイマクリア
-    } else {
-        vGoTop["timer"] = setTimeout("goTopLoop()", 10);  // 次のループ
-    }
-}

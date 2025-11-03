@@ -225,7 +225,7 @@ function appendStandings(datas) {
         // イベントカード要素の追加
         $('#standings-content tbody').append(
             `<tr class="player-record" ${playerData}>
-                <td class="has-text-right has-text-weight-bold is-middle">${rank}</td>
+                <td class="has-text-right has-text-weight-bold is-middle has-text-primary">${rank}</td>
                 <td>
                     <p class="is-size-6 player-name-tag my-1">
                         ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold">${playerDispName}</span>${links}
