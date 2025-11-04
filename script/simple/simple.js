@@ -135,8 +135,8 @@ function appendSimpleEvents(events) {
         const updateDateObj = new Date(event['updateDate']);
         const isNew = isNewCommonEvent(event, now);
         const isUpdated = isRecentCommonEvent(isNew, now, updateDateObj);
-        const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
-        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
+        const newEventIcon = isNew ? `<i class="las la-leaf has-text-success"></i>` : "";
+        const updateIcon = isUpdated ? `<i class="las la-angle-double-up has-text-info"></i>` : "";
 
         // イベント種類フィルタ用data-tag値
         const dataTag = createDataTag(event);
@@ -206,7 +206,7 @@ function createTitle(event) {
         // 詳細記事URLがある場合リンクとして返す
         return `
             <a class="" href="${event['article']}" target="_blank">
-                <span class="is-size-65">${event['eventName']}</span></a>
+                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
         `;
     } else {
         return `

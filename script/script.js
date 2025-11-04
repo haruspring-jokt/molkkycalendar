@@ -59,10 +59,10 @@ function appendHeader() {
                     <img src="${links.logo}" alt="jajapatatas logo" />
                 </a>
                 <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true" class="has-text-light"></span>
+                    <span aria-hidden="true" class="has-text-light"></span>
+                    <span aria-hidden="true" class="has-text-light"></span>
+                    <span aria-hidden="true" class="has-text-light"></span>
                 </a>
             </div>
             <div id="navbarBasicExample" class="navbar-menu">
@@ -85,7 +85,7 @@ function appendHeader() {
                     <div class="navbar-item">
                         <div class="buttons columns">
                             <a class="column button is-info" target="_blank" href="${links.twitter}">Twitter(X)</a>
-                            <a class="column button is-danger" target="_blank" href="${links.youtube}">YouTube</a>
+                            <a class="column button is-danger" target="_blank" href="${links.youtube}"><span class="has-text-light">YouTube</span></a>
                             <a class="column button is-dark" target="_blank" href="${links.suzuri}">SUZURI</a>
                         </div>
                     </div>
@@ -161,6 +161,26 @@ function appendFooter() {
 
     // フッターに追加
     $("#jaja-footer").append(footerHtml);
+}
+
+async function fetchRecentEvents(isInit, param) {
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/recent.json";
+    const maxItems = 100;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((event) => {
+                return true;
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
 }
 
 async function fetchNewEvents(isInit, param) {

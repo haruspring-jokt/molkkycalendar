@@ -160,8 +160,8 @@ function appendEvents(events) {
         const updateDateObj = new Date(event['updateDate']);
         const isNew = isNewCommonEvent(event, now);
         const isUpdated = isRecentCommonEvent(isNew, now, updateDateObj);
-        const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
-        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
+        const newEventIcon = isNew ? `<i class="las la-leaf has-text-success"></i>` : "";
+        const updateIcon = isUpdated ? `<i class="las la-angle-double-up has-text-info"></i>` : "";
         // イベント種類フィルタ用data-tag値
         const dataTag = createDataTag(event);
 
@@ -193,18 +193,18 @@ function appendEvents(events) {
         // 会場
         const gMapLink = event['place'] ?
             `<a class="has-text-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank">${event['place']}</a>` : '';
-        const placeLink = `<p class="is-size-7 m-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
+        const placeLink = `<p class="is-size-7 my-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
         // ルール
         const rule = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("ルール")}${composition}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("ルール")}${composition}</p>` : '';
         // 定員
         const teamNum = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
         // エントリー開始
         const entryStart = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("エントリー開始")}${event['entryStart']}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("エントリー開始")}${event['entryStart']}</p>` : '';
         // 参加費
-        const entryFee = `<p class="is-size-7 m-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
+        const entryFee = `<p class="is-size-7 my-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
         // 備考
         const remarks = createRemarksDiv(event, i);
 
@@ -230,12 +230,12 @@ function appendEvents(events) {
                     </div>
                     ${imageArea}
                 </div>
-                <div class="card-content p-3">
+                <div class="card-content px-3 py-1">
                     <div class="content">
                         <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
-                        <p class="title is-5 mb-0 mt-2 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
-                        <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
-                        <div class="jaja-event-card-detail py-2">
+                        <p class="title is-5 mb-0 mt-1 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
+                        <p class="subtitle is-size-7 has-text-grey mb-1 mt-0">${seriesName}${org}</p>
+                        <div class="jaja-event-card-detail py-1">
                             ${placeLink}
                             ${rule}
                             ${teamNum}
@@ -243,7 +243,7 @@ function appendEvents(events) {
                             ${entryFee}
                             ${remarks}
                         </div>
-                        <p class="is-size-8 has-text-grey mt-2">更新日: ${updateDate}</p>
+                        <p class="is-size-8 has-text-grey mt-1">更新日: ${updateDate}</p>
                     </div>
                 </div>
                 <footer class="card-footer">
@@ -357,7 +357,7 @@ function createRemarksDiv(event, i) {
     }
     if (isThereRemark) {
         return `
-            <div class="notification p-0 m-2 is-size-7 has-background-white-ter">
+            <div class="notification p-0 my-3 mx-1 is-size-7 has-background-white-ter">
                 <p class="p-2">${entryRemarks + remarks}</p>
             </div>`;
     } else {

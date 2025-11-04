@@ -46,7 +46,7 @@
     <div class="container is-max-desktop">
 
         <!-- Title -->
-        <section class="hero is-primary pt-5">
+        <section class="hero is-danger pt-5">
             <div class="hero-body">
                 <h1 class="title is-size-2 has-text-light">モルックオープン大会ポイントランキング (β)
                     <p class="subtitle has-text-light">大会の参加記録を残そう</p>
@@ -77,36 +77,41 @@
                 <div class="">
                     <p class="m-2">
                         <a class="" href="https://forms.gle/Kx1eHh6WjE5MMCJL9" target="_blank"><button
-                                class="button is-link is-fullwidth is-small"><span
-                                    class="has-text-light">大会結果申請フォーム</span></button></a>
+                                class="button is-danger is-fullwidth is-small"><i
+                                    class="las la-file-upload mx-1 is-size-5 has-text-light"></i>
+                                <span class="has-text-light">大会結果申請フォーム</span></button></a>
                     </p>
                     <p class="m-2">
                         <a class="" href="https://blog.jajapatatas.com/entry/announce/pointsystem"
-                            target="_blank"><button
-                                class="button is-primary is-fullwidth is-small is-outlined">申請方法について</button></a>
+                            target="_blank"><button class="button is-danger is-fullwidth is-small is-outlined">
+                                <i class="las la-question mx-1 is-size-5"></i>申請方法について</button></a>
                     </p>
                 </div>
 
                 <h3 class="title is-size-6">リンク</h3>
                 <div class="">
                     <p class="m-2">
-                        <a class="" href="../"><button class="button is-primary is-fullwidth is-small"><span
-                                    class="has-text-light">全国モルックカレンダートップ</span></button></a>
+                        <a class="" href="../"><button class="button is-primary is-fullwidth is-small">
+                                <i class="las la-calendar-check mx-1 is-size-5 has-text-light"></i>
+                                <span class="has-text-light">全国モルックカレンダートップ</span></button></a>
                     </p>
                     <p class="m-2">
                         <a class="" href="https://blog.jajapatatas.com" target="_blank"><button
-                                class="button is-primary is-fullwidth is-small"><span
-                                    class="has-text-light">全国モルックカレンダーニュースブログ</span></button></a>
+                                class="button is-primary is-fullwidth is-small"><i
+                                    class="las la-newspaper mx-1 is-size-5 has-text-light"></i>
+                                <span class="has-text-light">全国モルックカレンダーニュースブログ</span></button></a>
                     </p>
                     <p class="m-2">
                         <a class="" href="https://x.com/molkkycalendar" target="_blank"><button
-                                class="button is-info is-fullwidth is-small"><span class="">X（Twitter）
-                                    @molkkycalendar</span></button></a>
+                                class="button is-info is-fullwidth is-small"><i
+                                    class="lab la-twitter mx-1 is-size-5"></i>
+                                <span class="">X（Twitter） @molkkycalendar</span></button></a>
                     </p>
                     <p class="m-2">
                         <a class="" href="https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm"
-                            target="_blank"><button class="button is-info is-fullwidth is-small"><span
-                                    class="">モルック用スコアシートPDF</span></button></a>
+                            target="_blank"><button class="button is-info is-fullwidth is-small"><i
+                                    class="las la-file-pdf mx-1 is-size-5"></i>
+                                <span class="">モルック用スコアシートPDF</span></button></a>
                     </p>
                 </div>
 
@@ -133,15 +138,19 @@
         <!-- ranking -->
         <section class="section" id="standings">
             <h3 class="title is-size-5">2025-26シーズン ランキング</h3>
-            <p class="subtitle is-size-65">2025/9/1 - 2026/8/31 タップで詳細表示</p>
+            <p class="subtitle is-size-65 mb-1">2025/9/1 - 2026/8/31 タップで詳細表示</p>
+            <p class="mb-2 is-size-65">
+                <i class="las la-leaf has-text-success mr-1 is-size-5"></i>: 新規登録プレーヤー<br />
+                <i class="las la-angle-double-up has-text-info mr-1 is-size-5"></i>: ポイントが追加されたプレーヤー
+            </p>
             <div class="content" id="">
-                <table class="table is-fullwidth is-narrow is-size-65" id="standings-content">
+                <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="standings-content">
                     <thead>
-                        <tr class="is-selected has-text-light">
-                            <th><abbr title="順位">位</abbr></th>
-                            <th><abbr title="プレーヤー">プレーヤー</abbr></th>
-                            <th><abbr title="ポイント">Pts</abbr></th>
-                            <th><abbr title="入賞回数">回</abbr></th>
+                        <tr class="has-background-danger">
+                            <th class="has-text-light"><abbr title="順位">位</abbr></th>
+                            <th class="has-text-light"><abbr title="プレーヤー">プレーヤー</abbr></th>
+                            <th class="has-text-light"><abbr title="ポイント">Pts</abbr></th>
+                            <th class="has-text-light"><abbr title="入賞回数">回</abbr></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -170,19 +179,21 @@
                     <p>以下のフォームを送信することにより、モルック選手であれば誰でも参加することが可能です。</p>
                     <p class="m-2">
                         <a class="" href="https://forms.gle/Kx1eHh6WjE5MMCJL9" target="_blank"><button
-                                class="button is-link is-fullwidth is-small"><span
-                                    class="has-text-light">大会結果申請フォーム</span></button></a>
+                                class="button is-danger is-fullwidth is-small"><i
+                                    class="las la-file-upload mx-1 is-size-5 has-text-light"></i>
+                                <span class="has-text-light">大会結果申請フォーム</span></button></a>
                     </p>
                     <p class="m-2">
                         <a class="" href="https://blog.jajapatatas.com/entry/announce/pointsystem"
-                            target="_blank"><button
-                                class="button is-primary is-fullwidth is-small is-outlined">申請方法について</button></a>
+                            target="_blank"><button class="button is-primary is-fullwidth is-small is-outlined"><i
+                                    class="las la-question mx-1 is-size-5"></i>
+                                申請方法について</button></a>
                     </p>
                 </div>
                 <div class="content block">
-                    <article class="message is-primary">
+                    <article class="message is-danger">
                         <div class="message-header">
-                            <p class="text-bold text-error">以下のような場合は本システムが定める「オープン大会」に該当しない・条件を満たしていないため、申請を受け付けません。
+                            <p class="">以下のような場合は本システムが定める「オープン大会」に該当しない・条件を満たしていないため、申請を受け付けません。
                             </p>
                         </div>
                         <div class="message-body is-size-7">

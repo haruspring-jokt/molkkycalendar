@@ -1,8 +1,11 @@
 // Set your brand colors
 $jaja-orange: #dea38b;
+$jaja-red: #de8c94;
 
 // Path to Bulma's sass folder
-@use "bulma/sass" with ($primary: $jaja-orange,
+@use "bulma/sass" with (
+  $primary: $jaja-orange,
+  $danger: $jaja-red,
   $section-padding: 3rem 0.8rem,
   $content-table-cell-padding: 0.25em 0.25em,
 );
