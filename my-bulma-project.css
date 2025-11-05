@@ -21580,11 +21580,18 @@ table th {
   vertical-align: top;
 }
 
-.jaja-card-image {
-  height: 200px;
-  overflow: hidden;
+@media screen and (max-width: 768px) {
+  .jaja-card-image {
+    height: 150px;
+    overflow: hidden;
+  }
 }
-
+@media screen and (min-width: 769px) {
+  .jaja-card-image {
+    height: 200px;
+    overflow: hidden;
+  }
+}
 .jaja-card-image-default {
   height: 50px;
   overflow: hidden;
@@ -21599,6 +21606,11 @@ table th {
 
 .jaja-tags .tag.shadow {
   box-shadow: rgba(9, 10, 12, 0.1) 0px 9px 18px -2.25px, rgba(9, 10, 12, 0.02) 0px 0px 0px 1px;
+}
+
+.jaja-tags .tag.narrow,
+.tag.narrow {
+  height: 1.75em;
 }
 
 .is-middle {

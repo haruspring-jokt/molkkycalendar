@@ -65,7 +65,7 @@ function appendPlayerDetail(datas, playerId) {
     const youtube = createYoutubeLink(playerYoutube);
     const otherLink = createOtherLink(playerOther);
     const links = `<span class="is-size-5 is-pulled-right">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
-    const areaTag = area != "" ? `<span class="tag has-text-weight-bold p-1 mr-2">${area}</span>` : "";
+    const areaTag = area != "" ? `<span class="tag narrow has-text-weight-bold p-1 mr-2">${area}</span>` : "";
     const teamTag = playerTeamTag != "" ? `<br/><span class="has-text-grey"><i class="las la-tags mr-1"></i>${playerTeamTag}</span>` : "";
     const playerDispName = playerName.split('｜').map((name, index) => {
         return index === 0 ?
@@ -101,10 +101,10 @@ function appendPlayerDetail(datas, playerId) {
         const entryName = record['entry_team_name'] != "" ?
             `<i class="las la-tshirt mr-1 has-text-grey"></i><span class="is-size-7 subtitle">${record['entry_team_name']}</span>` : "";
         const cateTag = `
-                <p class="tags has-addons py-0 mb-1">
-                    <span class="tag ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
-                    <span class="tag is-light">${eventArea}</span>
-                    <span class="tag is-dark">${eventDate} ${updateIcon}</span>
+                <p class="tags jaja-tags has-addons py-0 mb-1">
+                    <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                    <span class="tag narrow is-light">${eventArea}</span>
+                    <span class="tag narrow is-dark">${eventDate} ${updateIcon}</span>
                 </p>`;
         // 順位/参加数
         const rankClass = record['rank'] == 1 ? "has-text-danger-on-scheme has-text-weight-bold"
@@ -218,7 +218,7 @@ function appendStandings(datas) {
                 name :
                 `<span class="has-text-grey is-size-65">${name}</span>`;
         }).join('<span class="has-text-grey is-size-65">｜</span>');
-        const area = record['area'] != "" ? `<span class="tag has-text-weight-bold p-1">${record['area']}</span>` : "";
+        const area = record['area'] != "" ? `<span class="tag narrow has-text-weight-bold p-1">${record['area']}</span>` : "";
         // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
         const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
             .filter(Boolean).join('｜');

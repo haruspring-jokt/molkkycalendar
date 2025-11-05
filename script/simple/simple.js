@@ -143,18 +143,18 @@ function appendSimpleEvents(events) {
         const eventTimeSpan = eventTime != "" ? `<span class="is-size-7">${eventTime}</span><br/>`
             : ""
         // 都道府県ラベル
-        const prefecture = `<span class="tag mb-1 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
+        const prefecture = `<span class="tag narrow mb-1 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
             <span class="has-text-primary-20">${event['prefecture']}</span></span><br/>`;
         // カテゴリーラベル
-        const category = `<span class="tag mb-1 mr-1 px-1 is-size-7 has-text-weight-medium ${labelColor}">${event['category']}</span>`;
+        const category = `<span class="tag narrow mb-1 mr-1 px-1 is-size-7 has-text-weight-medium ${labelColor}">${event['category']}</span>`;
         // 個人・チーム構成
         const composition = createComposition(
             event['composition'], "", "", "");
         // 大会ルールラベル
         const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
             composition != "" ?
-                `<span class="tag mr-1 px-1 is-size-8 has-text-weight-medium">${composition}</span>` :
-                `<span class="tag mr-1 px-1 is-size-8 has-text-weight-medium">${event['composition']}</span>` :
+                `<span class="tag narrow mr-1 px-1 is-size-8 has-text-weight-medium">${composition}</span>` :
+                `<span class="tag narrow mr-1 px-1 is-size-8 has-text-weight-medium">${event['composition']}</span>` :
             "";
 
         // イベントタイトル

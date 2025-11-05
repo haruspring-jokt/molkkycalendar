@@ -385,7 +385,7 @@ function createGoogleMapLink(event) {
 
 
 function createDefaultTagClass(name) {
-    return `<span class="tag mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
+    return `<span class="tag narrow mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
 }
 
 // smoothScroll関数をグローバルスコープで定義
