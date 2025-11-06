@@ -9,6 +9,7 @@ $(function () {
         $(".navbar-burger").toggleClass("is-active");
         $(".navbar-menu").toggleClass("is-active");
     });
+    initAmazonBox();
 });
 
 function commonPageSetting() {
@@ -16,6 +17,7 @@ function commonPageSetting() {
     appendHeader();
     appendFooter();
 }
+
 
 /**
  * ヘッダー追加
@@ -161,6 +163,37 @@ function appendFooter() {
 
     // フッターに追加
     $("#jaja-footer").append(footerHtml);
+}
+
+function initAmazonBox() {
+    const amazons = JajaConstants.amazonBoxList;
+    if (!amazons || amazons.length === 0) {
+        return;
+    }
+    const randIndex = Math.floor(Math.random() * amazons.length);
+    const item = amazons[randIndex];
+    $(".amazon-box").append(`
+        <article class="media">
+            <div class="media-left">
+                <figure class="image is-96x96">
+                    <img src="${item.img}"
+                        alt="${item.title}"
+                        title="${item.title}" />
+                </figure>
+            </div>
+            <div class="media-content">
+                <div class="content">
+                    <p class="is-size-65">
+                        <a href="${item.link}"
+                            target="_blank" rel="sponsored noopener">${item.title}</a>
+                        <br /><span>${item.org}</span>
+                        <br /><span class="is-size-65 subtitle">
+                            <a href="${item.link}"
+                                target="_blank" rel="sponsored noopener">Amazon</a></span>
+                    </p>
+                </div>
+            </div>
+        </article>`);
 }
 
 async function fetchRecentEvents(isInit, param) {
@@ -432,6 +465,89 @@ function createComposition(composition, maxMember, minMember, rule) {
         return composition + ' ' + rule;
     }
 }
+
+/**
+ * Googleカレンダー登録URLを作成する
+ * @param {*} eventDate イベント日付
+ * @param {*} eventStart イベント開始時間
+ * @param {*} eventEnd イベント終了時間
+ * @param {*} eventName イベント名
+ * @param {*} source イベントソースURL
+ * @returns Googleカレンダー登録URL
+ */
+function createGoogleCalendarLink(eventDate, eventStart, eventEnd, eventName, source) {
+    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
+    const gCalDetails = '情報取得元: ' + (source) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
+
+    // 指定DateオブジェクトをUTC形式 YYYYMMDDTHHMMSSZ に変換
+    function formatUtc(dt) {
+        const Y = dt.getUTCFullYear();
+        const M = String(dt.getUTCMonth() + 1).padStart(2, '0');
+        const D = String(dt.getUTCDate()).padStart(2, '0');
+        const h = String(dt.getUTCHours()).padStart(2, '0');
+        const m = String(dt.getUTCMinutes()).padStart(2, '0');
+        const s = String(dt.getUTCSeconds()).padStart(2, '0');
+        return `${Y}${M}${D}T${h}${m}${s}Z`;
+    }
+
+    // 日付要素から YYYY,MM,DD をゼロ埋めで取得
+    const ed = new Date(eventDate);
+    const y = ed.getFullYear();
+    const M = String(ed.getMonth() + 1).padStart(2, '0');
+    const D = String(ed.getDate()).padStart(2, '0');
+    const calendarDate = `${y}${M}${D}`; // YYYYMMDD for all-day
+
+    // 時刻文字列を "HH:MM" 形式に正規化
+    function normalizeTime(t) {
+        if (!t) return null;
+        const parts = String(t).trim().split(':');
+        const hh = String(parseInt(parts[0] || 0, 10)).padStart(2, '0');
+        const mm = String(parseInt(parts[1] || 0, 10)).padStart(2, '0');
+        return `${hh}:${mm}`;
+    }
+
+    const startNorm = normalizeTime(eventStart);
+    const endNorm = normalizeTime(eventEnd);
+
+    // 時刻がある場合は JST(+09:00) として Date を作り、UTC 表記に変換する（結果として9時間引く処理相当）
+    let gCalLink;
+    if (startNorm || endNorm) {
+        // start がない場合は end を使い、end がない場合は start を使う（双方ないなら到達しない）
+        const sTime = startNorm || endNorm;
+        const eTime = endNorm || startNorm;
+
+        const startIso = `${y}-${M}-${D}T${sTime}:00+09:00`;
+        const endIso = `${y}-${M}-${D}T${eTime}:00+09:00`;
+
+        const startUtc = formatUtc(new Date(startIso));
+        const endUtc = formatUtc(new Date(endIso));
+
+        gCalLink = gCalUrl
+            + '&text=' + encodeURIComponent(eventName)
+            + '&dates=' + startUtc + '/' + endUtc
+            + '&details=' + encodeURIComponent(gCalDetails);
+    } else {
+        // 終日イベント
+        gCalLink = gCalUrl
+            + '&text=' + encodeURIComponent(eventName)
+            + '&dates=' + calendarDate + '/' + calendarDate
+            + '&details=' + encodeURIComponent(gCalDetails);
+    }
+    return gCalLink;
+}
+
+// smoothScroll関数をグローバルスコープで定義
+window.smoothScroll = function (targetId) {
+    const SCROLL_OFFSET = 72;
+    const element = document.getElementById(targetId);
+    if (element) {
+        const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'instant'
+        });
+    }
+};
 
 /**
  * トップスクロール

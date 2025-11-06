@@ -215,7 +215,10 @@ function appendEvents(events) {
         const source = `<a href="${event['source']}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold">
             <i class="las la-link"></i>ソース</a>`;
         // Googleカレンダー登録ボタン
-        const gCalLink = createGoogleCalendarLink(event);
+        const gCalUrl = createGoogleCalendarLink(event['eventDate'], event['eventStart'],
+            event['eventEnd'], event['eventName'], event['article'] ? event['article'] : event['source']);
+        const gCalLink = `<a href="${gCalUrl}" target="_blank"
+            class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i class="las la-plus-circle"></i>カレンダー</a>`;
         // 記事リンクボタン
         const articleLink = createArticleLink(event['article']);
 
@@ -259,8 +262,6 @@ function appendEvents(events) {
         $("#events").append("</div></div>");
     }
 }
-
-
 
 function createTitle(event) {
     if (event['article']) {
@@ -307,39 +308,10 @@ function createImageDiv(event, i) {
 function createArticleLink(article) {
     if (article) {
         return `<a href="${article}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
-                                        class="las la-link"></i>特集</a>`;
+                class="las la-link"></i>特集</a>`;
     } else {
         return '';
     }
-}
-
-function createGoogleCalendarLink(event) {
-    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
-    const calEventDate = event['eventDate'];
-    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
-        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
-        + ("00" + new Date(calEventDate).getDate()).slice(-2);
-    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
-    // イベント開始・終了時刻がともにある場合
-    var gCalLink = event['eventStart'] && event['eventEnd'] ?
-        gCalUrl
-        + '&text=' + encodeURIComponent(event['eventName'])
-        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
-        + '&details=' + encodeURIComponent(gCalDetails)
-        // イベント開始時刻のみある場合、0分のイベントとして登録する
-        : event['eventStart'] ?
-            gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
-            + '&details=' + encodeURIComponent(gCalDetails)
-            // 開始時刻がない場合は、終日として登録する
-            : gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + '/' + calendarDate
-            + '&details=' + encodeURIComponent(gCalDetails);
-    return `<a href="${gCalLink}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
-                        class="las la-plus-circle"></i>カレンダー</a>`
 }
 
 function createRemarksDiv(event, i) {
@@ -388,15 +360,4 @@ function createDefaultTagClass(name) {
     return `<span class="tag narrow mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
 }
 
-// smoothScroll関数をグローバルスコープで定義
-window.smoothScroll = function (targetId) {
-    const SCROLL_OFFSET = 72;
-    const element = document.getElementById(targetId);
-    if (element) {
-        const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'instant'
-        });
-    }
-};
+

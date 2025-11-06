@@ -36,28 +36,25 @@ function appendPlayerDetail(datas, playerId) {
     $('#player-detail-content').empty();
     // タップしたセルの背景色を変更
     $('.player-record').removeClass('has-background-danger-90');
-    $(`.player-record[data-player-id='${playerId}']`).addClass('has-background-danger-90');
+    const pidClass = `.player-record[data-player-id='${playerId}']`;
+    $(pidClass).addClass('has-background-danger-90');
 
     // タップしたtrタグのdata-player-name属性から選手名を取得
-    const playerName = $(`.player-record[data-player-id='${playerId}']`).data('player-name');
-    const playerTeamTag = $(`.player-record[data-player-id='${playerId}']`).data('player-team-tag');
-    const playerX = $(`.player-record[data-player-id='${playerId}']`).data('player-x');
-    const playerInstagram = $(`.player-record[data-player-id='${playerId}']`).data('player-instagram');
-    const playerTiktok = $(`.player-record[data-player-id='${playerId}']`).data('player-tiktok');
-    const playerYoutube = $(`.player-record[data-player-id='${playerId}']`).data('player-youtube');
-    const playerOther = $(`.player-record[data-player-id='${playerId}']`).data('player-other');
-    const playerPoints = $(`.player-record[data-player-id='${playerId}']`).data('player-points');
-    var rank = $(`.player-record[data-player-id='${playerId}']`).data('player-rank').toString();
-    if (rank.slice(-1) === "1") {
-        rank += "st";
-    } else if (rank.slice(-1) === "2") {
-        rank += "nd";
-    } else if (rank.slice(-1) === "3") {
-        rank += "rd";
-    } else {
-        rank += "th";
-    }
-    const area = $(`.player-record[data-player-id='${playerId}']`).data('player-area');
+    const playerName = $(pidClass).data('player-name');
+    const playerTeamTag = $(pidClass).data('player-team-tag');
+    const playerX = $(pidClass).data('player-x');
+    const playerInstagram = $(pidClass).data('player-instagram');
+    const playerTiktok = $(pidClass).data('player-tiktok');
+    const playerYoutube = $(pidClass).data('player-youtube');
+    const playerOther = $(pidClass).data('player-other');
+    const playerPoints = $(pidClass).data('player-points');
+    var rank = $(pidClass).data('player-rank').toString();
+    const suffix =
+        rank.slice(-1) === "1" ? "st" :
+            rank.slice(-1) === "2" ? "nd" :
+                rank.slice(-1) === "3" ? "rd" : "th";
+    rank += suffix;
+    const area = $(pidClass).data('player-area');
 
     const xAccount = createXLink(playerX);
     const instagram = createInstagramLink(playerInstagram);
@@ -66,7 +63,8 @@ function appendPlayerDetail(datas, playerId) {
     const otherLink = createOtherLink(playerOther);
     const links = `<span class="is-size-5 is-pulled-right">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
     const areaTag = area != "" ? `<span class="tag narrow has-text-weight-bold p-1 mr-2">${area}</span>` : "";
-    const teamTag = playerTeamTag != "" ? `<br/><span class="has-text-grey"><i class="las la-tags mr-1"></i>${playerTeamTag}</span>` : "";
+    const teamTag = playerTeamTag != "" ?
+        `<br/><span class="has-text-grey"><i class="las la-tags mr-1"></i>${playerTeamTag}</span>` : "";
     const playerDispName = playerName.split('｜').map((name, index) => {
         return index === 0 ?
             name :
@@ -101,11 +99,11 @@ function appendPlayerDetail(datas, playerId) {
         const entryName = record['entry_team_name'] != "" ?
             `<i class="las la-tshirt mr-1 has-text-grey"></i><span class="is-size-7 subtitle">${record['entry_team_name']}</span>` : "";
         const cateTag = `
-                <p class="tags jaja-tags has-addons py-0 mb-1">
-                    <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
-                    <span class="tag narrow is-light">${eventArea}</span>
-                    <span class="tag narrow is-dark">${eventDate} ${updateIcon}</span>
-                </p>`;
+            <p class="tags jaja-tags has-addons py-0 mb-1">
+                <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                <span class="tag narrow is-light">${eventArea}</span>
+                <span class="tag narrow is-dark">${eventDate} ${updateIcon}</span>
+            </p>`;
         // 順位/参加数
         const rankClass = record['rank'] == 1 ? "has-text-danger-on-scheme has-text-weight-bold"
             : record['rank'] == 2 ? "has-text-link-on-scheme has-text-weight-bold"
