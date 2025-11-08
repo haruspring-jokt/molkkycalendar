@@ -31,6 +31,20 @@ table {
   }
 }
 
+.jaja-display-none {
+  display: none;
+}
+
+ul.jaja-list-style-none {
+  list-style: none;
+}
+
+.jaja-event-detail-border {
+  border-inline-start-width: 2px;
+  border-inline-start-style: solid;
+  border-inline-start-color: #f4dfd7;
+}
+
 @media screen and (max-width: 768px) {
   .jaja-card-image {
     height: 150px;

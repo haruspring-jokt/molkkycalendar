@@ -13,6 +13,34 @@ async function initSetting() {
         'calendarTo': dateParam['to'],
     };
     await fetchTopPageEvents(true, param);
+    detailOpenEvent();
+}
+
+function detailOpenEvent() {
+    $(document).on('click', '.jaja-display-click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $click = $(this);
+        const $target = $click.nextAll('.jaja-display-target').first();
+        if (!$target.length) return;
+
+        // アイコン要素（最初の .las を想定）
+        const $icon = $click.find('i.las').first();
+
+        if ($target.hasClass('jaja-display-none')) {
+            // 開く
+            $target.removeClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-right').addClass('la-angle-down');
+            }
+        } else {
+            // 閉じる
+            $target.addClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-down').addClass('la-angle-right');
+            }
+        }
+    });
 }
 
 /**
@@ -202,7 +230,7 @@ function appendEvents(events) {
             `<p class="is-size-7 my-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
         // エントリー開始
         const entryStart = isCompetition(event['category']) ?
-            `<p class="is-size-7 my-1">${createDefaultTagClass("エントリー開始")}${event['entryStart']}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("エントリー")}${event['entryStart']}</p>` : '';
         // 参加費
         const entryFee = `<p class="is-size-7 my-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
         // 備考
@@ -210,6 +238,7 @@ function appendEvents(events) {
 
         // 更新日時の日付フォーマット
         const updateDate = `${updateDateObj.getFullYear()}-${updateDateObj.getMonth() + 1}-${updateDateObj.getDate()}`;
+        const updateDateMsg = isUpdated || isNew ? `<span class="has-text-success">更新日: ${updateDate}</span>` : `更新日: ${updateDate}`;
 
         // ソースボタン
         const source = `<a href="${event['source']}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold">
@@ -237,16 +266,23 @@ function appendEvents(events) {
                     <div class="content">
                         <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
                         <p class="title is-5 mb-0 mt-1 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
-                        <p class="subtitle is-size-7 has-text-grey mb-1 mt-0">${seriesName}${org}</p>
-                        <div class="jaja-event-card-detail py-1">
-                            ${placeLink}
-                            ${rule}
-                            ${teamNum}
-                            ${entryStart}
-                            ${entryFee}
-                            ${remarks}
+                        <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
+                        <div class="content">
+                            <p class="is-fullwidth has-text-primary is-size-65 jaja-display-click mb-1 has-text-weight-semibold">
+                                <span class="jaja-display-click-text">くわしくみる</span>
+                                <i class="las la-angle-right is-size-6 ml-2 pt-1 has-text-primary"></i></p>
+                            <div class="jaja-display-none jaja-display-target">
+                                <div class="jaja-event-card-detail-list py-1 pl-1 jaja-event-detail-border">
+                                    ${placeLink}
+                                    ${rule}
+                                    ${teamNum}
+                                    ${entryStart}
+                                    ${entryFee}
+                                    ${remarks}
+                                </div>
+                                <p class="is-size-8 has-text-grey mt-1">${updateDateMsg}</p>
+                            </div>
                         </div>
-                        <p class="is-size-8 has-text-grey mt-1">更新日: ${updateDate}</p>
                     </div>
                 </div>
                 <footer class="card-footer">
@@ -329,7 +365,7 @@ function createRemarksDiv(event, i) {
     }
     if (isThereRemark) {
         return `
-            <div class="notification p-0 my-3 mx-1 is-size-7 has-background-white-ter">
+            <div class="notification p-0 my-2 mx-1 is-size-7 has-background-white-ter">
                 <p class="p-2">${entryRemarks + remarks}</p>
             </div>`;
     } else {

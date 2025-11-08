@@ -1,10 +1,12 @@
 $(async function () {
     await initSetting();
     initPlayerDetailEvent();
+    initRecentPoinsMoreEvent();
 });
 
 async function initSetting() {
     await fetchPointsPageStandings();
+    await fetchRecentPoints();
 }
 
 async function fetchPointsPageStandings() {
@@ -16,17 +18,58 @@ async function fetchPointsPageStandings() {
     }
 }
 
+async function fetchRecentPoints() {
+    const datas = await fetchPlayerDetail("");
+    appendRecentPoints(datas);
+}
+
 /**
  * player-recordクリックイベント
  */
 async function initPlayerDetailEvent() {
     $('.player-record').click(async function () {
         const playerId = $(this).data('player-id');
+        $("#player-detail").show();
         if (playerId) {
             const datas = await fetchPlayerDetail(playerId);
             appendPlayerDetail(datas, playerId);
         }
     });
+}
+
+/**
+ * 最近のポイント もっとみる ボタンのクリックイベント
+ */
+function initRecentPoinsMoreEvent() {
+    $('#recent-points-more').click(function() {
+        // 次の10件を表示
+        const visibleItems = $('#recent-points-list li:visible').length;
+        $('#recent-points-list li').slice(visibleItems, visibleItems + 10).removeClass('jaja-display-none');
+        
+        // すべて表示された場合はボタンを非表示
+        if ($('#recent-points-list li:visible').length >= $('#recent-points-list li').length) {
+            $(this).hide();
+        }
+    });
+}
+
+function appendRecentPoints(datas) {
+    datas.sort((a, b) => new Date(b['create']) - new Date(a['create']));
+    for (const i in datas) {
+        if (i >= 100) {
+            break;
+        }
+        const rec = datas[i];
+        const pName = `<span class="has-text-danger-50 has-text-weight-semibold">${rec.player_name}</span>`
+        const eName = `<span class="has-text-weight-semibold">${rec.event_name}</span>`
+        const rankPoint = `<span class="has-text-primary-50 has-text-weight-semibold">${rec.rank}位 ${rec.points}P</span>`
+        $("#recent-points-list").append(`
+            <li class="is-size-7 mb-2 ${i >= 10 ? "jaja-display-none" : ""}">${pName} が ${eName} で ${rankPoint}を獲得！
+            </li>
+        `);
+    }
+    $("#recent-points").append(`<button id="recent-points-more" class="button is-fullwidth is-size-7 is-outlined is-danger">
+        もっとみる<i class="las la-angle-down ml-1 has-text-primary"></i></button>`);
 }
 
 function appendPlayerDetail(datas, playerId) {

@@ -286,7 +286,11 @@ async function fetchPlayerDetail(playerId) {
             dataType: 'json'
         }).done(function (datas) {
             const filteredDatas = datas.filter((record) => {
-                return record['player_id'] === playerId;
+                if (playerId != "") {
+                    return record['player_id'] === playerId;
+                } else {
+                    return true;
+                }
             });
             resolve(filteredDatas);
         })
