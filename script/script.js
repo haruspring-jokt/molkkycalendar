@@ -351,13 +351,20 @@ function initCommonDateFilter() {
     var dateParam = fetchDefaultDateParam();
     $('.filter-calendar-from').val(dateParam['from']);
     $('.filter-calendar-to').val(dateParam['to']);
+    const fromDate = new Date($('.filter-calendar-from').val());
+    const toDate = new Date($('.filter-calendar-to').val());
+    const diffDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
+    localStorage.setItem('dateFilterDiff', diffDays.toString());
 
     // fromの日付が変更された時のイベントハンドラ
     $('.filter-calendar-from').on('change', async function () {
         const fromDate = new Date($(this).val());
-        // fromの1ヶ月後の日付を計算
+        const diffDays = parseInt(localStorage.getItem('dateFilterDiff')) || 30;
+
+        // diffDays後の日付を計算
         const toDate = new Date(fromDate);
-        toDate.setMonth(toDate.getMonth() + 1);
+        toDate.setDate(fromDate.getDate() + diffDays);
+
         // toの日付を更新
         const toDateString = toDate.toISOString().split('T')[0];
         $('.filter-calendar-to').val(toDateString);
@@ -367,6 +374,11 @@ function initCommonDateFilter() {
 
     // toの日付が変更された時のイベントハンドラ
     $('.filter-calendar-to').on('change', async function () {
+        const fromDate = new Date($('.filter-calendar-from').val());
+        const toDate = new Date($(this).val());
+        const diffDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
+        localStorage.setItem('dateFilterDiff', diffDays.toString());
+
         await updateEvents();
     });
 }
@@ -412,17 +424,25 @@ function isEqualsPrefectureCodeAndName(code, name) {
 }
 
 function fetchDefaultDateParam() {
-    var date = new Date();
-    var y = date.getFullYear();
-    var m = ("00" + (date.getMonth() + 1)).slice(-2);
-    var d = ("00" + date.getDate()).slice(-2);
-    var calendarFrom = y + "-" + m + "-" + d;
-    m = ("00" + (date.getMonth() + 2)).slice(-2);
-    if (m == "13") {
-        y = date.getFullYear() + 1;
-        m = "01";
+    var defaultDiff = parseInt(localStorage.getItem('dateFilterDiff')) || 30;
+    if (defaultDiff < 1) {
+        localStorage.setItem('dateFilterDiff', '30');
+        defaultDiff = 30;
     }
+    
+    const fromDate = new Date();
+    var y = fromDate.getFullYear();
+    var m = ("00" + (fromDate.getMonth() + 1)).slice(-2);
+    var d = ("00" + fromDate.getDate()).slice(-2);
+    var calendarFrom = y + "-" + m + "-" + d;
+
+    const toDate = new Date();
+    toDate.setDate(toDate.getDate() + defaultDiff);
+    y = toDate.getFullYear();
+    m = ("00" + (toDate.getMonth() + 1)).slice(-2);
+    d = ("00" + toDate.getDate()).slice(-2);
     var calendarTo = y + "-" + m + "-" + d;
+
     return {
         'from': calendarFrom,
         'to': calendarTo
@@ -441,7 +461,7 @@ function createDataTag(event) {
         '体験会': 'event-tag-3', '練習会': 'event-tag-3',
         'ブース': 'event-tag-5', 'その他': 'event-tag-6'
     }[event['category']];
-    if (event['article']) {
+    if (event['article'] || event['pickupSerial']) {
         tag = tag + ' event-tag-9';
     }
     return tag;

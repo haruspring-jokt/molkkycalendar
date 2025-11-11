@@ -7,12 +7,11 @@ async function initSetting() {
     createAreaFilter();
     initDateFilter();
     var dateParam = fetchDefaultDateParam();
-    var param = {
+    await fetchTopPageEvents(true, {
         'prefecture': '00',
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
-    };
-    await fetchTopPageEvents(true, param);
+    });
     detailOpenEvent();
 }
 
@@ -144,6 +143,7 @@ function appendEvents(events) {
                     次の日<i class="las la-angle-right"></i>
                 </a>` : '';
             const minWidth = "style='min-width: 80px;'";
+            const youbiColor = youbi === '(土)' ? "has-text-info-50" : youbi === '(日)' ? "has-text-danger-50" : "";
 
             $("#events").append(`
                 <div id="date-${formattedDate}" class="">
@@ -155,7 +155,7 @@ function appendEvents(events) {
                                 </div>
                                 <div class="level-item has-text-centered">
                                     <p class="is-size-65 mb-0 has-text-weight-semibold">
-                                        <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                                        <i class="lar la-calendar"></i> ${formattedDate} <span class="${youbiColor}">${youbi}</span>
                                     </p>
                                 </div>
                                 <div class="level-right" ${minWidth}>
@@ -206,6 +206,8 @@ function appendEvents(events) {
         // イベント画像
         const imageArea = createImageDiv(event, i);
 
+        // 曜日クラス
+        const youbiColor = youbi === '(土)' ? "has-text-info-50" : youbi === '(日)' ? "has-text-danger-50" : "";
         // イベントタイトル
         const eventTitle = createTitle(event);
         // イベントシリーズ
@@ -224,7 +226,7 @@ function appendEvents(events) {
         const placeLink = `<p class="is-size-7 my-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
         // ルール
         const rule = isCompetition(event['category']) ?
-            `<p class="is-size-7 my-1">${createDefaultTagClass("ルール")}${composition}</p>` : '';
+                `<p class="is-size-7 my-1">${createDefaultTagClass("ルール")}${composition} ${event['rule']}</p>` : '';
         // 定員
         const teamNum = isCompetition(event['category']) ?
             `<p class="is-size-7 my-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
@@ -264,7 +266,7 @@ function appendEvents(events) {
                 </div>
                 <div class="card-content px-3 py-1">
                     <div class="content">
-                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
+                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} <span class="${youbiColor}">${youbi}</span> ${eventTime}</span>
                         <p class="title is-5 mb-0 mt-1 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
                         <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
                         <div class="content">

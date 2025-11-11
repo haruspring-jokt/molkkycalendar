@@ -54,7 +54,7 @@ function initRecentPoinsMoreEvent() {
 }
 
 function appendRecentPoints(datas) {
-    datas.sort((a, b) => new Date(b['create']) - new Date(a['create']));
+    datas.sort((a, b) => new Date(b['create']) - new Date(a['create']) || b['seq'] - a['seq']);
     for (const i in datas) {
         if (i >= 100) {
             break;

@@ -116,23 +116,26 @@ class JajaConstants {
         };
     }
     static get amazonBoxList() {
+        function getLink(dp) {
+            return `https://www.amazon.co.jp/dp/${dp}?tag=molkkycalenda-22&amp;linkCode=osi&amp;th=1&amp;psc=1`;
+        }
         return [
             {
                 img: "https://m.media-amazon.com/images/I/41rwQkiTMZL._SL500_.jpg",
                 title: "モルック 公式 リフィル セット 日本正規品 (スキットルのみ 1-12番）",
-                link: "https://www.amazon.co.jp/dp/B0D48MMXPF?tag=molkkycalenda-22&amp;linkCode=osi&amp;th=1&amp;psc=1",
+                link: getLink("B0D48MMXPF"),
                 org: "OHSサプライ(OHS Supply)",
             },
             {
                 img: "https://m.media-amazon.com/images/I/31TT7+z3BXL._SL500_.jpg",
                 title: "公式 日本正規品 TACTIC モルック棒 2本セット モルック MOLKKY (正規品 公式 OHSサプライ 外遊び 大会 スポーツ 人気)",
-                link: "https://www.amazon.co.jp/dp/B0CW4XQNLR?tag=molkkycalenda-22&amp;linkCode=osi&amp;th=1&amp;psc=1",
+                link: getLink("B0CW4XQNLR"),
                 org: "OHSサプライ(OHS Supply)",
             },
             {
                 img: "https://m.media-amazon.com/images/I/41YjtrMLYAL._SL500_.jpg",
                 title: "モルック トーナメントモデル (公式バック、モルッカーリ付き） 日本正規公式品",
-                link: "https://www.amazon.co.jp/dp/B0B11WN3YB?tag=molkkycalenda-22&amp;linkCode=osi&amp;th=1&amp;psc=1",
+                link: getLink("B0B11WN3YB"),
                 org: "OHSサプライ(OHS Supply)",
             }
         ]

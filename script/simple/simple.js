@@ -7,12 +7,11 @@ async function initSettingSimplePage() {
     createAreaFilter();
     initDateFilter();
     var dateParam = fetchDefaultDateParam();
-    var param = {
+    await fetchSimplePageEvents(true, {
         'prefecture': '00',
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
-    };
-    await fetchSimplePageEvents(true, param);
+    });
 }
 
 /**
@@ -91,6 +90,7 @@ function appendSimpleEvents(events) {
         const formattedDate = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
         const week = ['日', '月', '火', '水', '木', '金', '土'];
         const youbi = '(' + week[eventDate.getDay()] + ')';
+        const youbiColor = youbi === '(土)' ? "has-text-info-50" : youbi === '(日)' ? "has-text-danger-50" : "";
 
         // 日付が変わった場合にテーブルを変更
         if (currentDate !== formattedDate) {
@@ -102,7 +102,7 @@ function appendSimpleEvents(events) {
                 <div id="date-${formattedDate}">
                     <section class="content mb-0 mt-6">
                         <h3 class="title is-size-5 mb-3 px-2">
-                            <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                            <i class="lar la-calendar"></i> ${formattedDate} <span class="${youbiColor}">${youbi}</span>
                         </h3>
                     </section>
                     <table id="simple-table" class="table is-fullwidth is-narrow is-striped is-size-65">
