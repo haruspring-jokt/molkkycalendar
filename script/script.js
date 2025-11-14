@@ -1,7 +1,6 @@
 const TEXT_SIZE = "is-size-65";
 
 $(function () {
-
     commonPageSetting();
     // Check for click events on the navbar burger icon
     $(".navbar-burger").click(function () {
@@ -13,11 +12,15 @@ $(function () {
 });
 
 function commonPageSetting() {
-
     appendHeader();
     appendFooter();
 }
 
+/*
+ * ===================================================
+ * 全ページの共通設定
+ * ===================================================
+ */
 
 /**
  * ヘッダー追加
@@ -165,6 +168,10 @@ function appendFooter() {
     $("#jaja-footer").append(footerHtml);
 }
 
+/**
+ * 共通Amazonリンク作成
+ * @returns 
+ */
 function initAmazonBox() {
     const amazons = JajaConstants.amazonBoxList;
     if (!amazons || amazons.length === 0) {
@@ -196,6 +203,18 @@ function initAmazonBox() {
         </article>`);
 }
 
+/*
+ * ===================================================
+ * Google Cloud Storageからの取得処理
+ * ===================================================
+ */
+
+/**
+ * 最近のカレンダーイベント取得
+ * @param {*} isInit 
+ * @param {*} param 
+ * @returns 
+ */
 async function fetchRecentEvents(isInit, param) {
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/recent.json";
     const maxItems = 100;
@@ -216,6 +235,12 @@ async function fetchRecentEvents(isInit, param) {
     });
 }
 
+/**
+ * 新規追加されたカレンダーイベントの取得
+ * @param {*} isInit 
+ * @param {*} param 
+ * @returns 
+ */
 async function fetchNewEvents(isInit, param) {
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
     const maxItems = 300;
@@ -277,6 +302,11 @@ async function fetchStandings() {
     });
 }
 
+/**
+ * ポイントランキング 選手別結果一覧取得
+ * @param {*} playerId 
+ * @returns 
+ */
 async function fetchPointsDetailByPlayer(playerId) {
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
     return new Promise((resolve, reject) => {
@@ -300,6 +330,11 @@ async function fetchPointsDetailByPlayer(playerId) {
     });
 }
 
+/**
+ * ポイントランキング 選手情報の取得
+ * @param {*} playerId 設定されている場合1件取得 設定無しですべて取得
+ * @returns 
+ */
 async function fetchPlayerDetail(playerId) {
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_players.json";
     return new Promise((resolve, reject) => {
@@ -323,45 +358,23 @@ async function fetchPlayerDetail(playerId) {
     });
 }
 
-function createCommonAreaFilter() {
-    areaOptions = JajaConstants.areaSelects;
-    for (i in areaOptions) {
-        opt = areaOptions[i];
-        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
-    }
-    // ローカルストレージにエリアフィルタ入力履歴がある場合、デフォルト値に設定する
-    if (localStorage.getItem('areaFilter')) {
-        const areaFilter = localStorage.getItem('areaFilter');
-        $(".filter-area").val(areaFilter);
-    }
-
-    // エリア選択時のイベントハンドラを追加
-    $('.filter-area').on('change', async function () {
-        // ローカルストレージに選択したエリアフィルタを保存
-        localStorage.setItem('areaFilter', $(this).val());
-        await updateEvents();
-    });
-}
+/*
+ * ===================================================
+ * カレンダーのフィルター関連共通処理
+ * ===================================================
+ */
 
 /**
- * カテゴリフィルターボタンの設定
+ * カテゴリフィルターボタンの初期設定
  */
 function initCommonCategoryFilter() {
-    // 初期状態ですべてのイベントを表示
-    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
     categoryFilterEvent();
     applyCategoryFilter();
 }
 
-function applyCategoryFilter() {
-    // 初期表示時に localStorage の categoryFilter があればそれを適用する
-    const storedCategory = localStorage.getItem('categoryFilter');
-    if (storedCategory && $(`.filter-category-${storedCategory}`).length) {
-        // trigger を使うと既存のクリック処理が実行されるのでフィルタ適用が一貫する
-        $(`.filter-category-${storedCategory}`).trigger('click');
-    }
-}
-
+/**
+ * カテゴリフィルターボタンのクリックイベント
+ */
 function categoryFilterEvent() {
     // カテゴリーフィルターボタンのクリックイベント
     $('.filter-category').click(function () {
@@ -392,15 +405,43 @@ function categoryFilterEvent() {
     });
 }
 
-function initCommonDateFilter() {
-    var dateParam = fetchDefaultDateParam();
-    $('.filter-calendar-from').val(dateParam['from']);
-    $('.filter-calendar-to').val(dateParam['to']);
-    const fromDate = new Date($('.filter-calendar-from').val());
-    const toDate = new Date($('.filter-calendar-to').val());
-    const diffDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
-    localStorage.setItem('dateFilterDiff', diffDays.toString());
+/**
+ * カテゴリフィルターの追加
+ */
+function applyCategoryFilter() {
+    // 初期表示時に localStorage の categoryFilter があればそれを適用する
+    const storedCategory = localStorage.getItem('categoryFilter');
+    if (storedCategory && $(`.filter-category-${storedCategory}`).length) {
+        // categoryFilterEventを発火させる
+        $(`.filter-category-${storedCategory}`).trigger('click');
+    } else {
+        resetCommonCategoryFilter();
+    }
+}
 
+/**
+ * カテゴリフィルターのリセット
+ */
+function resetCommonCategoryFilter() {
+    const def = JajaConstants.defaultCalendarFilterParam.category;
+    $(`.filter-category-${def}`).addClass('is-primary').removeClass('is-light');
+    localStorage.setItem('categoryFilter', def);
+    // categoryFilterEventを発火させる
+    $(`.filter-category-${def}`).trigger('click');
+}
+
+/**
+ * 共通日付フィルターの初期化
+ */
+function initCommonDateFilter() {
+    resetCommonDateFilter(false);
+    dateChangeEvent();
+}
+
+/**
+ * 日付変更イベント
+ */
+function dateChangeEvent() {
     // fromの日付が変更された時のイベントハンドラ
     $('.filter-calendar-from').on('change', async function () {
         const fromDate = new Date($(this).val());
@@ -416,7 +457,6 @@ function initCommonDateFilter() {
         // イベントを再取得
         await updateEvents();
     });
-
     // toの日付が変更された時のイベントハンドラ
     $('.filter-calendar-to').on('change', async function () {
         const fromDate = new Date($('.filter-calendar-from').val());
@@ -428,51 +468,33 @@ function initCommonDateFilter() {
     });
 }
 
-function isNewCommonEvent(event, now) {
-    const registerDateObj = new Date(event['registerDate']);
-    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
-
-function isRecentCommonEvent(isNewEvent, now, updateDateObj) {
-    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
-
-function isEqualsPrefectureCodeAndName(code, name) {
-    if (code == '00') {
-        return ture;
+/**
+ * 日付フィルターリセット
+ * @param {boolean} isForceReset デフォルトの日付差分でリセットする
+ */
+function resetCommonDateFilter(isForceReset) {
+    if (isForceReset) {
+        localStorage.setItem('dateFilterDiff', JajaConstants.defaultCalendarFilterParam.dateDiff);
     }
-    if (code.slice(0, 1) == 'A') {
-        var areaList = {
-            'A1': ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島', '北海道・東北その他'],
-            'A2': ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川', '山梨', '首都圏その他'],
-            'A4': ['新潟', '富山', '石川', '福井', '長野', '中部・北陸その他'],
-            'A3': ['岐阜', '静岡', '愛知', '三重', '東海その他'],
-            'A5': ['滋賀', '京都', '大阪', '兵庫', '奈良', '和歌山', '近畿その他'],
-            'A6': ['鳥取', '島根', '岡山', '広島', '山口', '中国その他'],
-            'A7': ['徳島', '香川', '愛媛', '高知', '四国その他'],
-            'A8': ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄', '九州・沖縄その他'],
-            'A0': ['海外']
-        };
-        return areaList[code].includes(name);
-    }
-    var prefectureList = {
-        '01': '北海道', '02': '青森', '03': '岩手', '04': '宮城', '05': '秋田', '06': '山形',
-        '07': '福島', '08': '茨城', '09': '栃木', '10': '群馬', '11': '埼玉', '12': '千葉',
-        '13': '東京', '14': '神奈川', '15': '新潟', '16': '富山', '17': '石川', '18': '福井',
-        '19': '山梨', '20': '長野', '21': '岐阜', '22': '静岡', '23': '愛知', '24': '三重',
-        '25': '滋賀', '26': '京都', '27': '大阪', '28': '兵庫', '29': '奈良', '30': '和歌山',
-        '31': '鳥取', '32': '島根', '33': '岡山', '34': '広島', '35': '山口', '36': '徳島',
-        '37': '香川', '38': '愛媛', '39': '高知', '40': '福岡', '41': '佐賀', '42': '長崎',
-        '43': '熊本', '44': '大分', '45': '宮崎', '46': '鹿児島', '47': '沖縄'
-    };
-    return prefectureList[code] == name;
+    var dateParam = fetchDefaultDateParam();
+    $('.filter-calendar-from').val(dateParam['from']);
+    $('.filter-calendar-to').val(dateParam['to']);
+    const fromDate = new Date($('.filter-calendar-from').val());
+    const toDate = new Date($('.filter-calendar-to').val());
+    const diffDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
+    localStorage.setItem('dateFilterDiff', diffDays.toString());
 }
 
+/**
+ * 初期表示時の日付フィルター値を取得する
+ * @returns 
+ */
 function fetchDefaultDateParam() {
-    var defaultDiff = parseInt(localStorage.getItem('dateFilterDiff')) || 30;
+    var defaultDiff = parseInt(localStorage.getItem('dateFilterDiff'))
+        || JajaConstants.defaultCalendarFilterParam.dateDiff;
     if (defaultDiff < 1) {
-        localStorage.setItem('dateFilterDiff', '30');
-        defaultDiff = 30;
+        localStorage.setItem('dateFilterDiff', JajaConstants.defaultCalendarFilterParam.dateDiff.toString());
+        defaultDiff = JajaConstants.defaultCalendarFilterParam.dateDiff;
     }
 
     const fromDate = new Date();
@@ -494,6 +516,106 @@ function fetchDefaultDateParam() {
     };
 }
 
+/**
+ * 都道府県フィルターの設定
+ */
+function createCommonAreaFilter() {
+    areaOptions = JajaConstants.areaSelects;
+    for (i in areaOptions) {
+        opt = areaOptions[i];
+        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
+    }
+    // ローカルストレージにエリアフィルタ入力履歴がある場合、デフォルト値に設定する
+    if (localStorage.getItem('areaFilter')) {
+        const areaFilter = localStorage.getItem('areaFilter');
+        $(".filter-area").val(areaFilter);
+    }
+    areaFilterEvent();
+}
+
+/**
+ * 都道府県フィルター変更イベント
+ */
+function areaFilterEvent() {
+    $('.filter-area').on('change', async function () {
+        // ローカルストレージに選択したエリアフィルタを保存
+        localStorage.setItem('areaFilter', $(this).val());
+        await updateEvents();
+    });
+}
+
+/**
+ * 都道府県フィルターリセット
+ */
+function resetCommonCalendarAreaFilter() {
+    const param = JajaConstants.defaultCalendarFilterParam;
+    localStorage.setItem('areaFilter', param.area);
+    $(".filter-area").val(param.area);
+}
+
+/**
+ * 全フィルターリセットイベント
+ */
+function createCommonCalenderFilterResetEvent() {
+    $('.jaja-calendar-filter-reset').on('click', async () => {
+        resetCommonCalendarAreaFilter();
+        resetCommonDateFilter(true);
+        resetCommonCategoryFilter();
+        await updateEvents();
+    });
+}
+
+/*
+ * ===================================================
+ * ユーティリティー
+ * ===================================================
+ */
+
+/**
+ * 最近作成されたイベントであるか
+ * @param {*} event 
+ * @param {*} now 
+ * @returns 
+ */
+function isNewCommonEvent(event, now) {
+    const registerDateObj = new Date(event['registerDate']);
+    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+/**
+ * 最近更新されたイベントであるか
+ * @param {*} isNewEvent 
+ * @param {*} now 
+ * @param {*} updateDateObj 
+ * @returns 
+ */
+function isRecentCommonEvent(isNewEvent, now, updateDateObj) {
+    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+/**
+ * エリアの設定値が適切か判定する
+ * @param {} code 
+ * @param {*} name 
+ * @returns 
+ */
+function isEqualsPrefectureCodeAndName(code, name) {
+    if (code == '00') {
+        return ture;
+    }
+    if (code.slice(0, 1) == 'A') {
+        var areaList = JajaConstants.areaList;
+        return areaList[code].includes(name);
+    }
+    var prefectureList = JajaConstants.prefectureList;
+    return prefectureList[code] == name;
+}
+
+/**
+ * イベントのデータタグを設定する
+ * @param {} event 
+ * @returns 
+ */
 function createDataTag(event) {
     if (!event['category']) {
         return 'event-tag-99';
@@ -512,10 +634,23 @@ function createDataTag(event) {
     return tag;
 }
 
+/**
+ * イベント種類が大会のいずれかであるか
+ * @param {*} category 
+ * @returns 
+ */
 function isCompetition(category) {
     return ['大会', '大会（長期）'].includes(category);
 }
 
+/**
+ * イベント詳細の大会構成を作成する
+ * @param {*} composition 
+ * @param {*} maxMember 
+ * @param {*} minMember 
+ * @param {*} rule 
+ * @returns 
+ */
 function createComposition(composition, maxMember, minMember, rule) {
     if (composition == 'チーム') {
         if (maxMember == "" && minMember == "") {

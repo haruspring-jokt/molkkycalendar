@@ -14,6 +14,11 @@ async function initSettingSimplePage() {
         'calendarTo': dateParam['to'],
     });
     initCategoryFilter();
+    createFilterResetEvent();
+}
+
+function createFilterResetEvent() {
+    createCommonCalenderFilterResetEvent();
 }
 
 /**

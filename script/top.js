@@ -14,6 +14,7 @@ async function initSetting() {
     });
     detailOpenEvent();
     initCategoryFilter();
+    createFilterResetEvent();
 }
 
 function detailOpenEvent() {
@@ -41,6 +42,10 @@ function detailOpenEvent() {
             }
         }
     });
+}
+
+function createFilterResetEvent() {
+    createCommonCalenderFilterResetEvent();
 }
 
 /**
