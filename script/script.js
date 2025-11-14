@@ -306,8 +306,16 @@ function createCommonAreaFilter() {
         opt = areaOptions[i];
         $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
     }
+    // ローカルストレージにエリアフィルタ入力履歴がある場合、デフォルト値に設定する
+    if (localStorage.getItem('areaFilter')) {
+        const areaFilter = localStorage.getItem('areaFilter');
+        $(".filter-area").val(areaFilter);
+    }
+
     // エリア選択時のイベントハンドラを追加
     $('.filter-area').on('change', async function () {
+        // ローカルストレージに選択したエリアフィルタを保存
+        localStorage.setItem('areaFilter', $(this).val());
         await updateEvents();
     });
 }
@@ -318,7 +326,20 @@ function createCommonAreaFilter() {
 function initCommonCategoryFilter() {
     // 初期状態ですべてのイベントを表示
     $('.filter-category-0').addClass('is-primary').removeClass('is-light');
+    categoryFilterEvent();
+    applyCategoryFilter();
+}
 
+function applyCategoryFilter() {
+    // 初期表示時に localStorage の categoryFilter があればそれを適用する
+    const storedCategory = localStorage.getItem('categoryFilter');
+    if (storedCategory && $(`.filter-category-${storedCategory}`).length) {
+        // trigger を使うと既存のクリック処理が実行されるのでフィルタ適用が一貫する
+        $(`.filter-category-${storedCategory}`).trigger('click');
+    }
+}
+
+function categoryFilterEvent() {
     // カテゴリーフィルターボタンのクリックイベント
     $('.filter-category').click(function () {
         $('.filter-category').addClass('is-light').removeClass('is-primary');
@@ -344,6 +365,7 @@ function initCommonCategoryFilter() {
                 $(this).toggle(visibleEvents > 0);
             });
         }
+        localStorage.setItem('categoryFilter', categoryNum);
     });
 }
 
@@ -429,7 +451,7 @@ function fetchDefaultDateParam() {
         localStorage.setItem('dateFilterDiff', '30');
         defaultDiff = 30;
     }
-    
+
     const fromDate = new Date();
     var y = fromDate.getFullYear();
     var m = ("00" + (fromDate.getMonth() + 1)).slice(-2);

@@ -1,18 +1,19 @@
 $(async function () {
     await initSetting();
-    initCategoryFilter();
 });
 
 async function initSetting() {
     createAreaFilter();
     initDateFilter();
+    const prefecture = localStorage.getItem('areaFilter');
     var dateParam = fetchDefaultDateParam();
     await fetchTopPageEvents(true, {
-        'prefecture': '00',
+        'prefecture': prefecture || '00',
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
     });
     detailOpenEvent();
+    initCategoryFilter();
 }
 
 function detailOpenEvent() {
@@ -81,10 +82,6 @@ async function fetchTopPageEvents(isInit, param) {
  * イベントの再取得・表示
  */
 async function updateEvents() {
-    // カテゴリフィルターを「すべて」に戻す
-    $('.filter-category').addClass('is-light').removeClass('is-primary');
-    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
-
     const param = {
         'prefecture': $('.filter-area').val() || '00',
         'calendarFrom': $('.filter-calendar-from').val(),
@@ -96,6 +93,7 @@ async function updateEvents() {
 
     // 新しいイベントを取得して表示
     await fetchTopPageEvents(false, param);
+    applyCategoryFilter();
 }
 
 /**
