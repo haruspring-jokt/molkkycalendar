@@ -192,7 +192,9 @@ function appendEvents(events) {
         const dataTag = createDataTag(event);
 
         // 都道府県ラベル
-        const prefecture = `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${event['prefecture']}</span>`;
+        const prefectureName = event['prefecture'].slice(-3) == "その他" ? event['prefecture'].slice(0, -3) : event['prefecture'];
+        const prefecture = 
+            `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${prefectureName}</span>`;
         // カテゴリーラベル
         const category = `<span class="tag m-1 ${labelColor} shadow has-text-weight-bold">${event['category']}</span>`;
         // 大会ルールラベル

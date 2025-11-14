@@ -92,6 +92,7 @@ ul.jaja-list-style-none {
   gap: 6px;
   z-index: 10;
   pointer-events: auto;
+  flex-wrap: wrap;
   /* 必要ならクリック可能に */
 }
 
