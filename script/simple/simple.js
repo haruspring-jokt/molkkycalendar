@@ -1,6 +1,6 @@
 $(async function () {
     await initSettingSimplePage();
-    
+    appendSimplePageCommonParts();
 });
 
 async function initSettingSimplePage() {
@@ -15,6 +15,12 @@ async function initSettingSimplePage() {
     });
     initCategoryFilter();
     createFilterResetEvent();
+}
+
+function appendSimplePageCommonParts() {
+    appendCommonEventInfoForm();
+    appendCommonSiteLinks();
+    appendCommonGoogleAds();
 }
 
 function createFilterResetEvent() {

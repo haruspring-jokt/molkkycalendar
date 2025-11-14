@@ -29,6 +29,11 @@ class JajaConstants {
     static get molkkyprime() {
         return "https://www.molkkyprime.com";
     }
+    static get fullPath() {
+        return {
+            points: "https://jajapatatas.com/points"
+        }
+    }
     static get defaultCalendarFilterParam() {
         return {
             "area": "00",
@@ -40,10 +45,10 @@ class JajaConstants {
         return [
             { "key": "00", "text": "すべて" },
             { "key": "A1", "text": "【北海道・東北エリア】" },
-            { "key": "A2", "text": "【首都圏エリア】" },
+            { "key": "A2", "text": "【関東エリア】" },
             { "key": "A3", "text": "【東海エリア】" },
-            { "key": "A4", "text": "【中部・北陸エリア】" },
-            { "key": "A5", "text": "【近畿エリア】" },
+            { "key": "A4", "text": "【甲信越・北陸エリア】" },
+            { "key": "A5", "text": "【関西エリア】" },
             { "key": "A6", "text": "【中国エリア】" },
             { "key": "A7", "text": "【四国エリア】" },
             { "key": "A8", "text": "【九州・沖縄エリア】" },
@@ -100,10 +105,10 @@ class JajaConstants {
     static get areaList() {
         return {
             'A1': ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島', '北海道・東北その他'],
-            'A2': ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川', '山梨', '首都圏その他'],
-            'A4': ['新潟', '富山', '石川', '福井', '長野', '中部・北陸その他'],
+            'A2': ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川', '関東その他'],
+            'A4': ['新潟', '富山', '石川', '福井', '山梨', '長野', '甲信越・北陸その他'],
             'A3': ['岐阜', '静岡', '愛知', '三重', '東海その他'],
-            'A5': ['滋賀', '京都', '大阪', '兵庫', '奈良', '和歌山', '近畿その他'],
+            'A5': ['滋賀', '京都', '大阪', '兵庫', '奈良', '和歌山', '関西その他'],
             'A6': ['鳥取', '島根', '岡山', '広島', '山口', '中国その他'],
             'A7': ['徳島', '香川', '愛媛', '高知', '四国その他'],
             'A8': ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄', '九州・沖縄その他'],
@@ -121,6 +126,18 @@ class JajaConstants {
             '37': '香川', '38': '愛媛', '39': '高知', '40': '福岡', '41': '佐賀', '42': '長崎',
             '43': '熊本', '44': '大分', '45': '宮崎', '46': '鹿児島', '47': '沖縄'
         };
+    }
+    static get categoryFilters() {
+        return [
+            { key: "0", name: "すべて" },
+            { key: "9", name: "注目イベント" },
+            { key: "1", name: "大会" },
+            { key: "2", name: "長期の大会" },
+            { key: "7", name: "大会すべて" },
+            { key: "3", name: "体験会・練習会" },
+            { key: "5", name: "ブース" },
+            { key: "6", name: "その他" }
+        ];
     }
     static get amazonBoxList() {
         function getLink(dp) {
@@ -146,5 +163,22 @@ class JajaConstants {
                 org: "OHSサプライ(OHS Supply)",
             }
         ]
+    }
+    static get molkkyCalendarEventsStorage() {
+        return "https://storage.googleapis.com/molkky-calendar-json/events.json";
+    }
+    static get molkkyCalendarStorage() {
+        const root = "https://storage.googleapis.com/";
+        const bucket = "molkky-calendar-json/";
+        const suffix = ".json";
+        return {
+            events: root + bucket + "events" + suffix,
+            recent: root + bucket + "recent" + suffix,
+            points: {
+                currentSeason: root + bucket + "point_current_season" + suffix,
+                results: root + bucket + "point_results" + suffix,
+                players: root + bucket + "point_players" + suffix
+            }
+        };
     }
 }

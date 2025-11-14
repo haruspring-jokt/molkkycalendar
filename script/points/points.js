@@ -1,15 +1,20 @@
 $(async function () {
-    await initSetting();
+    $('.navbar').removeClass('is-primary').addClass('is-danger');
+    appendPointsPageCommonParts();
     initPlayerDetailEvent();
     initRecentPoinsMoreEvent();
-    // navbarのクラスをis-dangerにする
-
+    await initSetting();
 });
+
+function appendPointsPageCommonParts() {
+    appendCommonPointsInfoForm();
+    appendCommonPointsSiteLinks();
+    appendCommonGoogleAds();
+} 
 
 async function initSetting() {
     await fetchPointsPageStandings();
     await fetchRecentPoints();
-    $('.navbar').removeClass('is-primary').addClass('is-danger');
 }
 
 async function fetchPointsPageStandings() {

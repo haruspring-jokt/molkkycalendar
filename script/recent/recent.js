@@ -1,12 +1,14 @@
 $(async function () {
     await initSettingRecentPage();
-    initCategoryFilter();
+    
+    appendRecentPageCommonParts();
 });
 
 async function initSettingRecentPage() {
     createAreaFilter();
     var param = {};
     await fetchRecentPageEvents(true, param);
+    initCategoryFilter();
 }
 
 /**
@@ -14,6 +16,12 @@ async function initSettingRecentPage() {
  */
 function initCategoryFilter() {
     initCommonCategoryFilter();
+}
+
+function appendRecentPageCommonParts() {
+    appendCommonEventInfoForm();
+    appendCommonSiteLinks();
+    appendCommonGoogleAds();
 }
 
 /**

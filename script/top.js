@@ -1,10 +1,15 @@
 $(async function () {
+    appendTopPageCommonParts();
+    createAreaFilter();
+    initDateFilter();
+    detailOpenEvent();
+    initCategoryFilter();
+    createFilterResetEvent();
     await initSetting();
 });
 
 async function initSetting() {
-    createAreaFilter();
-    initDateFilter();
+    
     const prefecture = localStorage.getItem('areaFilter');
     var dateParam = fetchDefaultDateParam();
     await fetchTopPageEvents(true, {
@@ -12,9 +17,12 @@ async function initSetting() {
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
     });
-    detailOpenEvent();
-    initCategoryFilter();
-    createFilterResetEvent();
+}
+
+function appendTopPageCommonParts() {
+    appendCommonEventInfoForm();
+    appendCommonSiteLinks();
+    appendCommonGoogleAds();
 }
 
 function detailOpenEvent() {

@@ -1,4 +1,4 @@
-const TEXT_SIZE = "is-size-65";
+
 
 $(function () {
     commonPageSetting();
@@ -137,28 +137,30 @@ function appendFooter() {
         });
     }
 
+    const textSize = "is-size-65";
+    const textClass = "has-text-primary-90";
     // フッターHTMLを一括生成
     const footerHtml = `
         <div class="columns has-background-primary" id="site-map">
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">全国モルックカレンダー</strong>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.top}">トップ</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.recent}">新規イベント</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.simple}">シンプル版</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.points}">独自ポイントランキング</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.top}">トップ</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.recent}">新規イベント</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.simple}">シンプル版</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.points}">独自ポイントランキング</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a></li>
             </ul>
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">主催者向けイベント掲載申請</strong>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.formFormat}" target="_blank">掲載申請フォーム</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.formFormat}" target="_blank">掲載申請フォーム</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a></li>
             </ul>
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">リンク</strong>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.youtube}" target="_blank">YouTube</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.twitter}" target="_blank">Twitter(X)</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.suzuri}" target="_blank">SUZURI</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.scoresheet}" target="_blank">モルック用スコアシートPDF</a></li>
-                <li><a class="content ${TEXT_SIZE} has-text-primary-90" href="${links.molkkyprime}" target="_blank">モルック関東プライムリーグ</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.youtube}" target="_blank">YouTube</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.twitter}" target="_blank">Twitter(X)</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.suzuri}" target="_blank">SUZURI</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.scoresheet}" target="_blank">モルック用スコアシートPDF</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.molkkyprime}" target="_blank">モルック関東プライムリーグ</a></li>
             </ul>
         </div>
         <p class="content is-size-7 has-text-primary is-pulled-right">2024 全国モルックカレンダー Mölkky clan jaja patatas</p>
@@ -166,6 +168,113 @@ function appendFooter() {
 
     // フッターに追加
     $("#jaja-footer").append(footerHtml);
+}
+
+function appendCommonEventInfoForm() {
+    $(".jaja-calendar-event-info-form").append(`
+            <p class="m-2">
+                <a class=""
+                    href="${JajaConstants.formFormat}"
+                    target="_blank"><button class="button is-success is-fullwidth is-outlined is-small">
+                        <i class="las la-file-upload mx-1 is-size-5 has-text-success"></i>イベント掲載申請（項目別）</button></a>
+            </p>
+            <p class="m-2">
+                <a class=""
+                    href="${JajaConstants.formFree}"
+                    target="_blank"><button class="button is-success is-fullwidth is-outlined is-small">
+                        <i class="las la-file-upload mx-1 is-size-5 has-text-success"></i>イベント掲載申請（フリーフォーム）</button></a>
+            </p>
+        `);
+}
+
+function appendCommonPointsSiteLinks() {
+    const depth = location.pathname.split("/").length - 1;
+    const addPath = (depth === 2 ? "../" : depth === 3 ? "../../" : "");
+    $(".jaja-calendar-points-site-links").append(`
+            <p class="m-2">
+                <a class="" href="${addPath}"><button class="button is-primary is-fullwidth is-small">
+                        <i class="las la-calendar-check mx-1 is-size-5 has-text-light"></i>
+                        <span class="has-text-light">全国モルックカレンダートップ</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.blog}" target="_blank"><button
+                        class="button is-primary is-fullwidth is-small"><i
+                            class="las la-newspaper mx-1 is-size-5 has-text-light"></i>
+                        <span class="has-text-light">全国モルックカレンダーニュースブログ</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.twitter}" target="_blank"><button
+                        class="button is-info is-fullwidth is-small"><i
+                            class="lab la-twitter mx-1 is-size-5"></i><span class="">X（Twitter）
+                            @molkkycalendar</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.scoresheet}"
+                    target="_blank"><button class="button is-info is-fullwidth is-small">
+                        <i class="las la-file-pdf mx-1 is-size-5"></i>
+                        <span class="">モルック用スコアシートPDF</span></button></a>
+            </p>
+        `);
+}
+
+function appendCommonPointsInfoForm() {
+    $(".jaja-calendar-points-info-form").append(`
+            <p class="m-2">
+                <a class="" href="https://forms.gle/Kx1eHh6WjE5MMCJL9" target="_blank"><button
+                        class="button is-danger is-fullwidth is-small"><i
+                            class="las la-file-upload mx-1 is-size-5 has-text-light"></i>
+                        <span class="has-text-light">大会結果申請フォーム</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="https://blog.jajapatatas.com/entry/announce/pointsystem"
+                    target="_blank"><button class="button is-danger is-fullwidth is-small is-outlined">
+                        <i class="las la-question mx-1 is-size-5"></i>申請方法について</button></a>
+            </p>
+        `);
+}
+
+function appendCommonSiteLinks() {
+    const depth = location.pathname.split("/").length - 1;
+    const addPath = (depth === 2 ? "../." : depth === 3 ? "../../." : "") + "/points";
+    $(".jaja-calendar-site-links").append(`
+            <p class="m-2">
+                <a class="" href="${addPath}"><button class="button is-danger is-fullwidth is-small">
+                        <i class="las la-trophy has-text-light mx-1 is-size-5"></i>
+                        <span class="has-text-light">独自ポイントランキング</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.blog}" target="_blank"><button
+                        class="button is-primary is-fullwidth is-small"><i
+                            class="las la-newspaper mx-1 is-size-5 has-text-light"></i>
+                        <span class="has-text-light">全国モルックカレンダーニュースブログ</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.twitter}" target="_blank"><button
+                        class="button is-info is-fullwidth is-small"><i
+                            class="lab la-twitter mx-1 is-size-5"></i><span class="">X（Twitter）
+                            @molkkycalendar</span></button></a>
+            </p>
+            <p class="m-2">
+                <a class="" href="${JajaConstants.scoresheet}"
+                    target="_blank"><button class="button is-info is-fullwidth is-small">
+                        <i class="las la-file-pdf mx-1 is-size-5"></i>
+                        <span class="">モルック用スコアシートPDF</span></button></a>
+            </p>
+        `);
+}
+
+function appendCommonGoogleAds() {
+    $(".jaja-calendar-google-ads").append(`
+            <script async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8922718369591652"
+                crossorigin="anonymous"></script>
+            <!-- 横長 タイプA -->
+            <ins class="adsbygoogle" style="display:ruby-text" data-ad-client="ca-pub-8922718369591652"
+                data-ad-slot="9630561909" data-ad-format="horizontal" data-full-width-responsive="false"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        `);
 }
 
 /**
@@ -216,8 +325,7 @@ function initAmazonBox() {
  * @returns 
  */
 async function fetchRecentEvents(isInit, param) {
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/recent.json";
-    const maxItems = 100;
+    const publicUrl = JajaConstants.molkkyCalendarStorage.recent;
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -242,9 +350,7 @@ async function fetchRecentEvents(isInit, param) {
  * @returns 
  */
 async function fetchNewEvents(isInit, param) {
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/events.json";
-    const maxItems = 300;
-
+    const publicUrl = JajaConstants.molkkyCalendarStorage.events;
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -284,7 +390,7 @@ async function fetchNewEvents(isInit, param) {
  * @returns 順位表データ
  */
 async function fetchStandings() {
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_current_season.json";
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.currentSeason;
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -308,7 +414,7 @@ async function fetchStandings() {
  * @returns 
  */
 async function fetchPointsDetailByPlayer(playerId) {
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.results;
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -336,7 +442,7 @@ async function fetchPointsDetailByPlayer(playerId) {
  * @returns 
  */
 async function fetchPlayerDetail(playerId) {
-    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_players.json";
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.players;
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -368,8 +474,19 @@ async function fetchPlayerDetail(playerId) {
  * カテゴリフィルターボタンの初期設定
  */
 function initCommonCategoryFilter() {
+    appendCategoryFilter();
     categoryFilterEvent();
     applyCategoryFilter();
+}
+
+function appendCategoryFilter() {
+    const filters = JajaConstants.categoryFilters;
+    filters.forEach(filter => {
+        $(".jaja-calendar-filter-category").append(`
+            <button class="button is-rounded is-light is-small m-1 filter-category filter-category-${filter.key}">
+                ${filter.name}</button>
+        `);
+    });
 }
 
 /**
