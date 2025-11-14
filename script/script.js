@@ -277,8 +277,31 @@ async function fetchStandings() {
     });
 }
 
-async function fetchPlayerDetail(playerId) {
+async function fetchPointsDetailByPlayer(playerId) {
     const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_results.json";
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((record) => {
+                if (playerId != "") {
+                    return record['player_id'] === playerId;
+                } else {
+                    return true;
+                }
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+async function fetchPlayerDetail(playerId) {
+    const publicUrl = "https://storage.googleapis.com/molkky-calendar-json/point_players.json";
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,

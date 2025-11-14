@@ -2,11 +2,14 @@ $(async function () {
     await initSetting();
     initPlayerDetailEvent();
     initRecentPoinsMoreEvent();
+    // navbarのクラスをis-dangerにする
+
 });
 
 async function initSetting() {
     await fetchPointsPageStandings();
     await fetchRecentPoints();
+    $('.navbar').removeClass('is-primary').addClass('is-danger');
 }
 
 async function fetchPointsPageStandings() {
@@ -19,7 +22,7 @@ async function fetchPointsPageStandings() {
 }
 
 async function fetchRecentPoints() {
-    const datas = await fetchPlayerDetail("");
+    const datas = await fetchPointsDetailByPlayer("");
     appendRecentPoints(datas);
 }
 
@@ -31,8 +34,9 @@ async function initPlayerDetailEvent() {
         const playerId = $(this).data('player-id');
         $("#player-detail").show();
         if (playerId) {
-            const datas = await fetchPlayerDetail(playerId);
-            appendPlayerDetail(datas, playerId);
+            const pointsDatas = await fetchPointsDetailByPlayer(playerId);
+            const playerDatas = await fetchPlayerDetail(playerId);
+            appendPlayerDetail(playerId, pointsDatas, playerDatas[0]);
         }
     });
 }
@@ -41,11 +45,11 @@ async function initPlayerDetailEvent() {
  * 最近のポイント もっとみる ボタンのクリックイベント
  */
 function initRecentPoinsMoreEvent() {
-    $('#recent-points-more').click(function() {
+    $('#recent-points-more').click(function () {
         // 次の10件を表示
         const visibleItems = $('#recent-points-list li:visible').length;
         $('#recent-points-list li').slice(visibleItems, visibleItems + 10).removeClass('jaja-display-none');
-        
+
         // すべて表示された場合はボタンを非表示
         if ($('#recent-points-list li:visible').length >= $('#recent-points-list li').length) {
             $(this).hide();
@@ -72,8 +76,8 @@ function appendRecentPoints(datas) {
         もっとみる<i class="las la-angle-down ml-1 has-text-primary"></i></button>`);
 }
 
-function appendPlayerDetail(datas, playerId) {
-    datas.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
+function appendPlayerDetail(playerId, pointsDatas, player) {
+    pointsDatas.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
 
     // 既に表示されている場合は中身を空にする
     $('#player-detail-content').empty();
@@ -83,27 +87,24 @@ function appendPlayerDetail(datas, playerId) {
     $(pidClass).addClass('has-background-danger-90');
 
     // タップしたtrタグのdata-player-name属性から選手名を取得
-    const playerName = $(pidClass).data('player-name');
-    const playerTeamTag = $(pidClass).data('player-team-tag');
-    const playerX = $(pidClass).data('player-x');
-    const playerInstagram = $(pidClass).data('player-instagram');
-    const playerTiktok = $(pidClass).data('player-tiktok');
-    const playerYoutube = $(pidClass).data('player-youtube');
-    const playerOther = $(pidClass).data('player-other');
-    const playerPoints = $(pidClass).data('player-points');
-    var rank = $(pidClass).data('player-rank').toString();
+    const playerName = player.player_name;
+    const playerTeamTag = createTeamTag(
+        player.team_tag_1, player.team_tag_2, player.team_tag_3, player.team_tag_4
+    );
+    const area = player.area;
+    var playerPoints = player.s2526_points;
+    var rank = parseInt(player.s2526_rank).toString();
     const suffix =
         rank.slice(-1) === "1" ? "st" :
             rank.slice(-1) === "2" ? "nd" :
                 rank.slice(-1) === "3" ? "rd" : "th";
     rank += suffix;
-    const area = $(pidClass).data('player-area');
 
-    const xAccount = createXLink(playerX);
-    const instagram = createInstagramLink(playerInstagram);
-    const tiktok = createTiktokLink(playerTiktok);
-    const youtube = createYoutubeLink(playerYoutube);
-    const otherLink = createOtherLink(playerOther);
+    const xAccount = createXLink(player.x_account);
+    const instagram = createInstagramLink(player.instagram_account);
+    const tiktok = createTiktokLink(player.tiktok_account);
+    const youtube = createYoutubeLink(player.youtube_account);
+    const otherLink = createOtherLink(player.other_sns);
     const links = `<span class="is-size-5 is-pulled-right">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
     const areaTag = area != "" ? `<span class="tag narrow has-text-weight-bold p-1 mr-2">${area}</span>` : "";
     const teamTag = playerTeamTag != "" ?
@@ -119,7 +120,9 @@ function appendPlayerDetail(datas, playerId) {
     var medalNum = 0;
 
     var results = "";
-    for (const record of datas) {
+    for (const record of pointsDatas) {
+
+
         // 最近のイベントかの判定
         const now = new Date();
         const updateDateObj = new Date(record['event_date']);
@@ -260,9 +263,7 @@ function appendStandings(datas) {
                 `<span class="has-text-grey is-size-65">${name}</span>`;
         }).join('<span class="has-text-grey is-size-65">｜</span>');
         const area = record['area'] != "" ? `<span class="tag narrow has-text-weight-bold p-1">${record['area']}</span>` : "";
-        // team_tag_1からteam_tag_4を配列にして、存在するものだけパイプでつなぐ
-        const teamTag = [record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']]
-            .filter(Boolean).join('｜');
+        const teamTag = createTeamTag(record['team_tag_1'], record['team_tag_2'], record['team_tag_3'], record['team_tag_4']);
 
         const xAccount = createXLink(record['x_account']);
         const instagram = createInstagramLink(record['instagram_account']);
@@ -272,11 +273,7 @@ function appendStandings(datas) {
         const links = `<span class="is-size-6">${xAccount}${instagram}${tiktok}${youtube}${otherLink}</span>`;
 
         const playerData = `
-                data-player-id="${record['player_id']}" data-player-team-tag="${teamTag}"
-                data-player-name="${record['player_name']}" data-player-x="${record['x_account']}"
-                data-player-instagram="${record['instagram_account']}" data-player-tiktok="${record['tiktok_account']}"
-                data-player-youtube="${record['youtube_account']}" data-player-other="${record['other_sns']}"
-                data-player-points="${record['points']}" data-player-rank="${rank}" data-player-area="${record['area']}"
+                data-player-id="${record['player_id']}"
             `;
 
         // イベントカード要素の追加
@@ -295,6 +292,11 @@ function appendStandings(datas) {
             </tr>`
         );
     }
+}
+
+function createTeamTag(tag1, tag2, tag3, tag4) {
+    return [tag1, tag2, tag3, tag4]
+        .filter(Boolean).join('｜');
 }
 
 function createXLink(account) {
