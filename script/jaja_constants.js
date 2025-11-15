@@ -177,7 +177,8 @@ class JajaConstants {
             points: {
                 currentSeason: root + bucket + "point_current_season" + suffix,
                 results: root + bucket + "point_results" + suffix,
-                players: root + bucket + "point_players" + suffix
+                players: root + bucket + "point_players" + suffix,
+                tournaments: root + bucket + "point_tournaments" + suffix
             }
         };
     }

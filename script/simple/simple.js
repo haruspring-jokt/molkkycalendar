@@ -1,6 +1,6 @@
 $(async function () {
-    await initSettingSimplePage();
     appendSimplePageCommonParts();
+    await initSettingSimplePage();
 });
 
 async function initSettingSimplePage() {

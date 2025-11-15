@@ -464,6 +464,34 @@ async function fetchPlayerDetail(playerId) {
     });
 }
 
+/**
+ * ポイントランキング 大会結果の取得
+ * @param {*} id 設定されている場合1件取得 設定無しですべて取得
+ * @returns 
+ */
+async function fetchTournaments(eventId) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.tournaments;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((record) => {
+                if (eventId != "") {
+                    return record['event_id'] === eventId;
+                } else {
+                    return true;
+                }
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
 /*
  * ===================================================
  * カレンダーのフィルター関連共通処理

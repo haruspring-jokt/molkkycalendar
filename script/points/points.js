@@ -1,16 +1,8 @@
 $(async function () {
-    $('.navbar').removeClass('is-primary').addClass('is-danger');
-    appendPointsPageCommonParts();
+    await initSetting();
     initPlayerDetailEvent();
     initRecentPoinsMoreEvent();
-    await initSetting();
 });
-
-function appendPointsPageCommonParts() {
-    appendCommonPointsInfoForm();
-    appendCommonPointsSiteLinks();
-    appendCommonGoogleAds();
-} 
 
 async function initSetting() {
     await fetchPointsPageStandings();
@@ -70,7 +62,7 @@ function appendRecentPoints(datas) {
         }
         const rec = datas[i];
         const pName = `<span class="has-text-danger-50 has-text-weight-semibold">${rec.player_name}</span>`
-        const eName = `<span class="has-text-weight-semibold">${rec.event_name}</span>`
+        const eName = `<a href="./tournament?id=${rec.event_id}"><span class="has-text-weight-semibold">${rec.event_name}</span></a>`
         const rankPoint = `<span class="has-text-primary-50 has-text-weight-semibold">${rec.rank}位 ${rec.points}P</span>`
         $("#recent-points-list").append(`
             <li class="is-size-7 mb-2 ${i >= 10 ? "jaja-display-none" : ""}">${pName} が ${eName} で ${rankPoint}を獲得！
@@ -174,7 +166,7 @@ function appendPlayerDetail(playerId, pointsDatas, player) {
             <tr class="is-size-65">
                 <td class="py-2 px-1">
                     ${cateTag}
-                    ${eventName}<br/>
+                    <a href="./tournament?id=${record['event_id']}">${eventName}</a><br/>
                     ${entryName}
                 </td>
                 <td class="has-text-right is-middle py-2 px-1">
@@ -208,7 +200,8 @@ function appendPlayerDetail(playerId, pointsDatas, player) {
                     <table class="table is-fullwidth">
                         <thead>
                             <tr class="is-size-65">
-                                <th class="is-middle">大会</th>
+                                <th class="is-middle">大会
+                                    <span class="has-text-danger has-text-fontweight-bold is-size-7 ml-2">タップで詳細ページへ</bold></th>
                                 <th class="has-text-right is-middle is-size-7">位(Pts)</th>
                             </tr>
                         </thead>
@@ -287,7 +280,7 @@ function appendStandings(datas) {
                 <td class="has-text-right has-text-weight-bold is-middle has-text-danger">${rank}</td>
                 <td>
                     <p class="is-size-6 player-name-tag my-1">
-                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold">${playerDispName}</span>${links}
+                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold has-text-link">${playerDispName}</span>${links}
                     </p>
                     <p class="is-size-6 my-1">
                         ${area} <span class="is-size-7 has-text-grey"><i class="las la-tags mr-1"></i>${teamTag}</span></td>

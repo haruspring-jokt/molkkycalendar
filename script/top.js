@@ -1,11 +1,11 @@
 $(async function () {
     appendTopPageCommonParts();
-    createAreaFilter();
-    initDateFilter();
-    detailOpenEvent();
-    initCategoryFilter();
-    createFilterResetEvent();
     await initSetting();
+    createAreaFilter();
+    detailOpenEvent();
+    createFilterResetEvent();
+    initDateFilter();
+    initCategoryFilter();
 });
 
 async function initSetting() {
