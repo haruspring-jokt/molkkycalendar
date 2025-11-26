@@ -138,10 +138,10 @@ function appendFooter() {
     }
 
     const textSize = "is-size-65";
-    const textClass = "has-text-primary-90";
+    const textClass = "has-text-light";
     // フッターHTMLを一括生成
     const footerHtml = `
-        <div class="columns has-background-primary" id="site-map">
+        <div class="columns" id="site-map">
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">全国モルックカレンダー</strong>
                 <li><a class="content ${textSize} ${textClass}" href="${links.top}">トップ</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.recent}">新規イベント</a></li>
@@ -163,11 +163,12 @@ function appendFooter() {
                 <li><a class="content ${textSize} ${textClass}" href="${links.molkkyprime}" target="_blank">モルック関東プライムリーグ</a></li>
             </ul>
         </div>
-        <p class="content is-size-7 has-text-primary is-pulled-right">2024 全国モルックカレンダー Mölkky clan jaja patatas</p>
+        <p class="content is-size-7 has-text-light is-pulled-right">2024 全国モルックカレンダー Mölkky clan jaja patatas</p>
     `;
 
     // フッターに追加
     $("#jaja-footer").append(footerHtml);
+    $('.footer').addClass('has-background-primary');
 }
 
 function appendCommonEventInfoForm() {

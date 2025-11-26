@@ -22,7 +22,11 @@ function appendTournamentResult(datas) {
         return;
     }
     const data = datas[0];
+    appendTournamentResultBaseInfo(data);
+    appendTournamentResultRow(data);
+}
 
+function appendTournamentResultBaseInfo(data) {
     // 大会情報の追加
     const info = {
         seq: data.seq,
@@ -43,11 +47,10 @@ function appendTournamentResult(datas) {
         season: data.season,
     };
     const eventTeamRule = info.play_category == "個人戦" ?
-            "個人" : "チーム (" + info.team_size + ")";
+        "個人" : "チーム (" + info.team_size + ")";
     const teamTagClass = eventTeamRule == "個人" ? "is-link has-text-weight-bold" : "is-success has-text-weight-bold";
     const pointTier = info.point_tier + " Tier";
-    
-    const pointTierClass = (function(pt) {
+    const pointTierClass = (function (pt) {
         switch ((pt || '').toString().toUpperCase()) {
             case 'S': return 'is-danger';
             case 'A': return 'is-primary';
@@ -74,7 +77,6 @@ function appendTournamentResult(datas) {
                 <span class="tag narrow ${pointTierClass}"><span class="is-size-7 has-text-light has-text-weight-bold">
                     ${pointTier}</span></span>
             </p>
-            
             <p class="is-size-5 has-text-weight-bold mb-1">${info.event_name}</p>
             <p class="subtitle is-size-65 has-text-grey">
                 <i class="las la-user"></i>${info.org}<br />
@@ -87,21 +89,21 @@ function appendTournamentResult(datas) {
             ${resultSheet}
         </div>
     `);
-
+    // 画像（表彰写真など）の追加
     if (info.result_img != "") {
         $(".section.jaja-calendar-points-tournament-remarks").append(`
             <div class="content">
                 <div class="card">
                     <div class="card-image">
                         <figure class="image">
-                            <img src="https://pbs.twimg.com/media/G2eh6UfbIAAOlT-?format=jpg" />
+                            <img src="${info.result_img}" />
                         </figure>
                     </div>
                 </div>
             </div>
         `);
     }
-
+    // SNS投稿リンクの追加
     if (info.result_sns != "") {
         $(".section.jaja-calendar-points-tournament-remarks").append(`
             <div class="content">
@@ -109,8 +111,9 @@ function appendTournamentResult(datas) {
             </div>
         `);
     }
+}
 
-    // 順位の追加
+function appendTournamentResultRow(data) {
     // 1～16位の結果を配列にマップ化
     const results = [];
     for (let position = 1; position <= 16; position++) {
@@ -126,57 +129,69 @@ function appendTournamentResult(datas) {
     }
     for (const i in results) {
         const res = results[i];
-        appendTournamentResultRow(res);
-    }
-}
+        const isNone = res.pother === "(NONE)";
 
-function appendTournamentResultRow(res) {
-    const splitByComma = (s) => {
-        if (s == null) return [];
-        const str = String(s).trim();
-        if (str === '') return [];
-        return str.split(',').map(v => v.trim());
-    };
+        const splitByComma = (s) => {
+            if (s == null) return [];
+            const str = String(s).trim();
+            if (str === '') return [];
+            return str.split(',').map(v => v.trim());
+        };
 
-    const pidList = splitByComma(res.pid);
-    const pnameList = splitByComma(res.pname);
-    const pasList = splitByComma(res.pas);
+        const pidList = splitByComma(res.pid);
+        const pnameList = splitByComma(res.pname);
+        const pasList = splitByComma(res.pas);
 
-    const resd = [];
-    for (let i = 0; i < pidList.length; i++) {
-        const innerRes = {
-            pid: pidList[i],
-            pname: pnameList[i],
-            pas: pasList[i],
+        const resd = [];
+        for (let i = 0; i < pidList.length; i++) {
+            const innerRes = {
+                pid: pidList[i],
+                pname: pnameList[i],
+                pas: pasList[i],
+            }
+            resd.push(innerRes);
         }
-        resd.push(innerRes);
-    }
+        // その順位に申請があるか
+        const isApply = resd.length > 0;
+        // その順位にシステム外結果があるか
+        const isExistOther = res.pother !== '';
 
-    const isApply = resd.length > 0;
-    const isExistOther = res.pother !== '';
-    const dispPname = isApply
-        ? resd.map(
-            r => `<span>${r.pname}</span><i class="las la-tshirt ml-1 has-text-grey"></i><span class="has-text-grey-light is-size-7">${r.pas}</span><br/>`
+        // 順位
+        const dispPpsition = isNone || !isApply ?
+            `<span class="has-text-grey-light">${res.position}</span>` :
+            `<span class="has-text-danger">${res.position}</span>`;
+        // 選手・チーム名の表示
+        var dispName = "";
+        if (!isApply && !isExistOther) {
+            dispName = `<span class="has-text-grey-light">（未登録）</span>`;
+        } else if (isApply) {
+            dispName = resd.map(
+                r => `<span>${r.pname}</span><i class="las la-tshirt ml-1 has-text-grey is-size-6"></i>
+                    <span class="has-text-grey-light is-size-7">${r.pas}</span><br/>`
             ).join('')
-        : isExistOther ? `<span class="has-text-grey-light"><i class="las la-ghost mr-1 is-size-5"></i>${res.pother}</span>`
-        : `<span class="has-text-grey-light">（未登録）</span>`;
-    const dispPoint = isApply
-        ? res.point
-        : `<span class="has-text-grey-light">${res.point}</span>`
+        }
+        dispName += isExistOther ?
+            `<span class="has-text-grey-light"><i class="las la-ghost mr-1 is-size-6"></i>${res.pother}</span>` : "";
+        // ポイント表示
+        const dispPoint = isApply
+            ? `<span class="has-text-danger">${res.point}</span>`
+            : `<span class="has-text-grey-light">${res.point}</span>`;
 
-    // 順位を追加
-    $("#tournament-result-content").append(`
-        <tr>
-            <td class="has-text-right has-text-weight-bold is-middle has-text-danger">
-                ${res.position}
-            </td>
-            <td>
-                ${dispPname}
-            </td>
-            <td class="is-middle has-text-right has-text-weight-bold">
-                ${dispPoint}
-            </td>
-        </tr>
-    `);
+        // 順位を追加
+        const noneStr = `<span class="has-text-grey-light">-</span>`;
+        $("#tournament-result-content").append(`
+            <tr>
+                <td class="has-text-right has-text-weight-bold is-middle">
+                    ${dispPpsition}
+                </td>
+                <td>
+                    ${isNone ? noneStr : dispName}
+                </td>
+                <td class="is-middle has-text-right has-text-weight-bold">
+                    ${isNone ? noneStr : dispPoint}
+                </td>
+            </tr>
+        `);
+    }
 }
 
