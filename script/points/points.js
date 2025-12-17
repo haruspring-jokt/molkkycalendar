@@ -7,6 +7,7 @@ $(async function () {
 async function initSetting() {
     await fetchPointsPageStandings();
     await fetchRecentPoints();
+    fetchAnnounce();
 }
 
 async function fetchPointsPageStandings() {
@@ -21,6 +22,22 @@ async function fetchPointsPageStandings() {
 async function fetchRecentPoints() {
     const datas = await fetchPointsDetailByPlayer("");
     appendRecentPoints(datas);
+}
+
+function fetchAnnounce() {
+    const announceList = getAnnounceList();
+    const now = new Date();
+    announceList.sort((a, b) => a.date - b.date);
+    for (const an of announceList) {
+        $("#announce-list").append(`
+            <li>
+                <span class="has-text-weight-semibold is-size-65">(${an.date.toLocaleDateString()}) ${an.title}</span>
+                <p>
+                    <span class="is-size-7">${an.msg}</span>
+                </p>
+            </li>
+        `)
+    }
 }
 
 /**
@@ -334,4 +351,14 @@ function isNewPlayer(record, now) {
 
 function isRecentPlayer(now, updateDateObj) {
     return (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
+}
+
+function getAnnounceList() {
+    return [
+        {
+            date: new Date("2025-12-17"),
+            title: "日本モルック選手権関連大会をポイント対象とします",
+            msg: "日本モルック選手権2026の関連大会（地方予選・本戦）は本来申請対象外ですが、注目度が高く多くの参加が予想されるため、特別に申請可能な大会とするので、いつも通りフォームから申請してください。"
+        },
+    ];
 }
