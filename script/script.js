@@ -48,7 +48,10 @@ function appendHeader() {
     // 階層調整処理
     const depth = location.pathname.split("/").length - 1;
     if (location.pathname !== "/") {
-        const addPath = depth === 2 ? "." : depth === 3 ? "../." : "";
+        const addPath = depth === 2 ? "."
+            : depth === 3 ? "../."
+                : depth === 4 ? "../../."
+                    : "";
         Object.keys(links).forEach((key) => {
             if (!links[key].startsWith("http")) {
                 links[key] = addPath + links[key];
@@ -479,7 +482,9 @@ async function fetchTournaments(eventId) {
             dataType: 'json'
         }).done(function (datas) {
             const filteredDatas = datas.filter((record) => {
-                if (eventId != "") {
+                if (eventId === "ALL") {
+                    return true;
+                } else if (eventId != "") {
                     return record['event_id'] === eventId;
                 } else {
                     return true;

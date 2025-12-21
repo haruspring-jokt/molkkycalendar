@@ -22,18 +22,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../../my-bulma-project.css">
+    <link rel="stylesheet" href="../../../my-bulma-project.css">
     <link rel="stylesheet"
         href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="../../script/script.js"></script>
-    <script src="../../script/jaja_constants.js"></script>
-    <script src="../../script/points/points_common.js"></script>
-    <script src="../../script/points/tournament/tounament.js"></script>
+    <script src="../../../script/script.js"></script>
+    <script src="../../../script/jaja_constants.js"></script>
+    <script src="../../../script/points/points_common.js"></script>
+    <script src="../../../script/points/tournament/list.js"></script>
 
-    <title>大会結果｜モルックオープン大会ポイントランキング｜全国モルックカレンダー</title>
+    <title>大会一覧｜モルックオープン大会ポイントランキング｜全国モルックカレンダー</title>
 </head>
 
 <body>
@@ -50,8 +50,8 @@
         <!-- Title -->
         <section class="hero is-danger pt-5">
             <div class="hero-body">
-                <h1 class="title is-size-2 has-text-light">大会結果
-                    <p class="subtitle has-text-light">ポイントランキングに記録された大会結果の詳細</p>
+                <h1 class="title is-size-2 has-text-light">大会一覧
+                    <p class="subtitle has-text-light">ポイントランキングに記録された大会の一覧</p>
                 </h1>
             </div>
         </section>
@@ -60,8 +60,9 @@
         <section class="section">
             <nav class="breadcrumb mb-2" aria-label="breadcrumbs">
                 <ul class="is-size-65">
-                    <li><a href="../">ポイントランキング</a></li>
-                    <li class="is-active"><a href="./" aria-current="page">大会結果</a></li>
+                    <li><a href="../../">ポイントランキング</a></li>
+                    <li class="is-active">大会結果</li>
+                    <li class="is-active"><a href="./" aria-current="page">大会一覧</a></li>
                 </ul>
             </nav>
             <div class="content">
@@ -84,34 +85,31 @@
 
         <!-- tournament info -->
         <section class="section" id="tounament-info">
-            <h3 class="title is-size-5">大会結果の詳細</h3>
+            <h3 class="title is-size-5">大会結果一覧</h3>
         </section>
 
         <!-- result table -->
-        <section class="section" id="tounament-result">
-            <h3 class="title is-size-6">順位</h3>
+        <section class="section" id="tounament-list">
             <p class="mb-2 is-size-65">
                 <i class="las la-ghost has-text-grey mr-1 is-size-5"></i>: システム登録外の選手・チーム<br />
-                ※参加数が32未満の個人戦は通常の半分のポイントを付与しています。
+                ※ポイントランキングに登録された大会のみが表示されます。<br />
+                ※大会ティアは最大ポイントによって決定されており、大会自体の規模や価値、評価を示すものではありません。<br />
+                <span class="has-text-danger has-text-weight-bold">選手リンクは後日実装予定です</span>
             </p>
-            <div class="content" id="">
-                <table class="table is-fullwidth is-narrow is-size-65 is-striped">
+            <div class="table-container">
+                <table class="table is-narrow is-fullwidth">
                     <thead>
-                        <tr class="has-background-danger">
-                            <th class="has-text-light"><abbr title="順位">位</abbr></th>
-                            <th class="has-text-light"><abbr title="プレーヤー">プレーヤー</abbr></th>
-                            <th class="has-text-light"><abbr title="ポイント">Pts</abbr></th>
+                        <tr class="has-background-danger table is-size-65">
+                            <th class="has-text-light" style="min-width: 200px;"><abbr title="大会">大会</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="大会">日付</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="1位">1位</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="2位">2位</abbr></th>
                         </tr>
                     </thead>
-                    <tbody id="tournament-result-content">
+                    <tbody id="tournament-list-content" class="table">
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        <!-- tournament remarks -->
-        <section class="section jaja-calendar-points-tournament-remarks">
-
         </section>
 
         <!-- Links -->
@@ -140,8 +138,6 @@
 
         <!-- whatis -->
         <section class="section" id="whatis">
-            <div class="content" id="player-detail-content">
-            </div>
             <div class="content">
                 <h3 class="title is-size-5">オープン大会ポイントランキング(β)とは</h3>
                 <div class="block is-size-65">
