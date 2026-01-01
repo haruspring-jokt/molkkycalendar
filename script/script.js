@@ -37,6 +37,8 @@ function appendHeader() {
         twitter: JajaConstants.twitter,
         youtube: JajaConstants.youtube,
         suzuri: JajaConstants.suzuri,
+        archive2026: JajaConstants.archive2026,
+        archive2025: JajaConstants.archive2025,
         archive2024: JajaConstants.archive2024,
         archive2023: JajaConstants.archive2023,
         formFormat: JajaConstants.formFormat,
@@ -82,6 +84,8 @@ function appendHeader() {
                         <a class="navbar-link has-text-light">More</a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item has-text-primary-50" href="${links.jajablog}" target="_blank">全国モルックカレンダーニュースブログ</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.archive2026}" target="_blank">過去のイベント 2026年版</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.archive2025}" target="_blank">過去のイベント 2025年版</a>
                             <a class="navbar-item has-text-primary-50" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a>
                             <a class="navbar-item has-text-primary-50" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a>
                             <a class="navbar-item has-text-primary-50" href="${links.formFormat}" target="_blank">掲載申請フォーム</a>
@@ -121,6 +125,8 @@ function appendFooter() {
         twitter: JajaConstants.twitter,
         youtube: JajaConstants.youtube,
         suzuri: JajaConstants.suzuri,
+        archive2026: JajaConstants.archive2026,
+        archive2025: JajaConstants.archive2025,
         archive2024: JajaConstants.archive2024,
         archive2023: JajaConstants.archive2023,
         formFormat: JajaConstants.formFormat,
@@ -150,6 +156,8 @@ function appendFooter() {
                 <li><a class="content ${textSize} ${textClass}" href="${links.recent}">新規イベント</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.simple}">シンプル版</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.points}">独自ポイントランキング</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.archive2026}" target="_blank">過去のイベント 2026年版</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.archive2025}" target="_blank">過去のイベント 2025年版</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.archive2024}" target="_blank">過去のイベント 2024年版</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a></li>
             </ul>

@@ -11,6 +11,12 @@ class JajaConstants {
     static get blog() {
         return "https://blog.jajapatatas.com/";
     }
+    static get archive2026() {
+        return "https://docs.google.com/spreadsheets/d/1_YkA48QMmdshBVWfGWFppTWsTlFJfpct1-lyhgob7X8";
+    }
+    static get archive2025() {
+        return "https://docs.google.com/spreadsheets/d/1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";
+    }
     static get archive2024() {
         return "https://docs.google.com/spreadsheets/d/1TrmgKPVHvg1VqF4sXU_NGf5-rVghhFNv3pYrgKlhMEE";
     }
