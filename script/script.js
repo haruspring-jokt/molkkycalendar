@@ -238,8 +238,14 @@ function appendCommonPointsInfoForm() {
                         <span class="has-text-light">大会結果申請フォーム</span></button></a>
             </p>
             <p class="m-2">
+                <a class="" href="${document.location.origin}/points/tournament/list"><button
+                        class="button is-dark is-fullwidth is-small is-outlined"><i
+                            class="las la-medal mx-1 is-size-5"></i>
+                        <span class="">大会結果一覧</span></button></a>
+            </p>
+            <p class="m-2">
                 <a class="" href="https://blog.jajapatatas.com/entry/announce/pointsystem"
-                    target="_blank"><button class="button is-danger is-fullwidth is-small is-outlined">
+                    target="_blank"><button class="button is-dark is-fullwidth is-small is-outlined">
                         <i class="las la-question mx-1 is-size-5"></i>申請方法について</button></a>
             </p>
         `);
@@ -497,6 +503,31 @@ async function fetchTournaments(eventId) {
                 } else {
                     return true;
                 }
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+/**
+ * ポイントランキング 大会結果の取得 イベントIDリストで絞り込み
+ * @param {*} id 設定されている場合1件取得 設定無しですべて取得
+ * @returns 
+ */
+async function fetchTournamentsByEventIdList(eventIdList) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.tournaments;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((record) => {
+                // event_idがeventIdListに該当するものにフィルタする
+                return eventIdList.includes(record['event_id']);
             });
             resolve(filteredDatas);
         })

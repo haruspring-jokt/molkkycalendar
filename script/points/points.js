@@ -44,6 +44,7 @@ function fetchAnnounce() {
  * player-recordクリックイベント
  */
 async function initPlayerDetailEvent() {
+    return;
     $('.player-record').click(async function () {
         const playerId = $(this).data('player-id');
         $("#player-detail").show();
@@ -78,7 +79,9 @@ function appendRecentPoints(datas) {
             break;
         }
         const rec = datas[i];
-        const pName = `<span class="has-text-danger-50 has-text-weight-semibold">${rec.player_name}</span>`
+        const pName = `<a href="./player?pid=${rec.player_id}">
+            <span class="has-text-weight-semibold">
+            ${rec.player_name}</span></a>`
         const eName = `<a href="./tournament?id=${rec.event_id}"><span class="has-text-weight-semibold">${rec.event_name}</span></a>`
         const rankPoint = `<span class="has-text-primary-50 has-text-weight-semibold">${rec.rank}位 ${rec.points}P</span>`
         $("#recent-points-list").append(`
@@ -90,6 +93,12 @@ function appendRecentPoints(datas) {
         もっとみる<i class="las la-angle-down ml-1 has-text-primary"></i></button>`);
 }
 
+/**
+ * 現在使用していないメソッド（選手詳細表示）
+ * @param {*} playerId 
+ * @param {*} pointsDatas 
+ * @param {*} player 
+ */
 function appendPlayerDetail(playerId, pointsDatas, player) {
     pointsDatas.sort((a, b) => new Date(b['event_date']) - new Date(a['event_date']));
 
@@ -201,7 +210,9 @@ function appendPlayerDetail(playerId, pointsDatas, player) {
     $("#player-detail-content").append(`
         <div class="card mb-3">
             <header class="card-header has-background-danger">
-                <p class="card-header-title is-size-5 has-text-light">${playerDispName}</p>
+                <p class="card-header-title is-size-5 has-text-light">
+                    <a href="./player?pid=${playerId}"><u>${playerDispName}</u></a>
+                </p>
                 <p class="pt-3 mx-2">
                     <span class="is-size-5 has-text-weight-bold has-text-light">${rank}</span><br/>
                     <span class="is-size-65 has-text-light">(${playerPoints} Pts)</span>
@@ -297,7 +308,10 @@ function appendStandings(datas) {
                 <td class="has-text-right has-text-weight-bold is-middle has-text-danger">${rank}</td>
                 <td>
                     <p class="is-size-6 player-name-tag my-1">
-                        ${newPlayerIcon}${updateIcon}<span class="has-text-weight-bold has-text-link">${playerDispName}</span>${links}
+                        ${newPlayerIcon}${updateIcon}
+                        <a href="./player?pid=${record['player_id']}">
+                            <span class="has-text-weight-bold has-text-link">${playerDispName}</span></a>
+                        ${links}
                     </p>
                     <p class="is-size-6 my-1">
                         ${area} <span class="is-size-7 has-text-grey"><i class="las la-tags mr-1"></i>${teamTag}</span></td>

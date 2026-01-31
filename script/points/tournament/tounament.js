@@ -166,12 +166,14 @@ function appendTournamentResultRow(data) {
             dispName = `<span class="has-text-grey-light">（未登録）</span>`;
         } else if (isApply) {
             dispName = resd.map(
-                r => `<span>${r.pname}</span><i class="las la-tshirt ml-1 has-text-grey is-size-6"></i>
-                    <span class="has-text-grey-light is-size-7">${r.pas}</span><br/>`
+                r => `<a href="../player?pid=${r.pid}"><span>${r.pname}</span>
+                    <i class="las la-tshirt ml-1 has-text-grey is-size-6"></i>
+                    <span class="has-text-grey-light is-size-7">${r.pas}</span></a><br/>`
             ).join('')
         }
         dispName += isExistOther ?
-            `<span class="has-text-grey-light"><i class="las la-ghost mr-1 is-size-6"></i>${res.pother}</span>` : "";
+            `<span class="has-text-grey-light">
+                <i class="las la-ghost mr-1 is-size-6"></i>${res.pother}</span>` : "";
         // ポイント表示
         const dispPoint = isApply
             ? `<span class="has-text-danger">${res.point}</span>`
