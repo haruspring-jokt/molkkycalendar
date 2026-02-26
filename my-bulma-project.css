@@ -21699,6 +21699,12 @@ ul.jaja-list-style-none {
     font-size: 0.65rem !important;
   }
 }
+.thumbnail {
+  width: 112px;
+  height: 63px;
+  object-fit: cover;
+}
+
 .topIcon {
   display: inline-block;
   position: fixed;

@@ -165,6 +165,12 @@ print {
   }
 }
 
+.thumbnail {
+  width: 112px;
+  height: 63px;
+  object-fit: cover;
+}
+
 .topIcon {
   display: inline-block;
   position: fixed;

@@ -29,6 +29,9 @@ class JajaConstants {
     static get formFree() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform";
     }
+    static get formOther() {
+        return "https://docs.google.com/forms/d/e/1FAIpQLSdPBFs0j5rdDV8-NAwpTcJeHu7vAXMKZSLewAdbAKnwCl_UYA/viewform";
+    }
     static get scoresheet() {
         return "https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm?usp=sharing";
     }
@@ -185,7 +188,8 @@ class JajaConstants {
                 results: root + bucket + "point_results" + suffix,
                 players: root + bucket + "point_players" + suffix,
                 tournaments: root + bucket + "point_tournaments" + suffix
-            }
+            },
+            recentVideos: root + bucket + "recent_videos" + suffix,
         };
     }
 }

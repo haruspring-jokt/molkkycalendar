@@ -90,6 +90,7 @@ function appendHeader() {
                             <a class="navbar-item has-text-primary-50" href="${links.archive2023}" target="_blank">過去のイベント 2023年版</a>
                             <a class="navbar-item has-text-primary-50" href="${links.formFormat}" target="_blank">掲載申請フォーム</a>
                             <a class="navbar-item has-text-primary-50" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a>
+                            <a class="navbar-item has-text-primary-50" href="${links.formOther}" target="_blank">その他お問い合わせ</a>
                         </div>
                     </div>
                 </div>
@@ -164,6 +165,7 @@ function appendFooter() {
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">主催者向けイベント掲載申請</strong>
                 <li><a class="content ${textSize} ${textClass}" href="${links.formFormat}" target="_blank">掲載申請フォーム</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.formFree}" target="_blank">掲載申請フォーム（フリーフォーマット）</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.formOther}" target="_blank">その他お問い合わせ</a></li>
             </ul>
             <ul class="content column has-text-light"><strong class="has-text-weight-bold has-text-light">リンク</strong>
                 <li><a class="content ${textSize} ${textClass}" href="${links.youtube}" target="_blank">YouTube</a></li>
@@ -195,6 +197,12 @@ function appendCommonEventInfoForm() {
                     href="${JajaConstants.formFree}"
                     target="_blank"><button class="button is-success is-fullwidth is-outlined is-small">
                         <i class="las la-file-upload mx-1 is-size-5 has-text-success"></i>イベント掲載申請（フリーフォーム）</button></a>
+            </p>
+            <p class="m-2">
+                <a class=""
+                    href="${JajaConstants.formOther}"
+                    target="_blank"><button class="button is-success is-fullwidth is-outlined is-small">
+                        <i class="las la-file-upload mx-1 is-size-5 has-text-success"></i>その他各種お問い合わせ</button></a>
             </p>
         `);
 }
@@ -397,6 +405,29 @@ async function fetchNewEvents(isInit, param) {
                 });
                 resolve(filteredDatas);
             })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+/**
+ * 最近の動画リスト取得
+ * @returns 
+ */
+async function fetchRecentVideos() {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.recentVideos;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((event) => {
+                return true;
+            });
+            resolve(filteredDatas);
+        })
             .fail(function (jqXHR, textStatus, errorThrown) {
                 reject(new Error(`Failed to fetch events: ${textStatus}`));
             });
