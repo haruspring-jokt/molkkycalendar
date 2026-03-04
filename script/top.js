@@ -83,7 +83,7 @@ function createAreaFilter() {
  */
 async function createRecentVideos() {
     try {
-        const videos = await fetchRecentVideos();
+        const videos = await fetchRecentVideos(20);
         appendRecentVideos(videos);
     } catch (error) {
         console.error('Error fetching events:', error);

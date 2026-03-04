@@ -32,6 +32,7 @@ function appendHeader() {
         logo: "./asset/logo.png",
         recent: "./recent/",
         simple: "./simple/",
+        video: "./video/",
         points: "./points/",
         jajablog: JajaConstants.blog,
         twitter: JajaConstants.twitter,
@@ -79,6 +80,7 @@ function appendHeader() {
                 <div class="navbar-start">
                     <a class="navbar-item has-text-light" href="${links.recent}">新規イベント</a>
                     <a class="navbar-item has-text-light" href="${links.simple}">シンプル版</a>
+                    <a class="navbar-item has-text-light" href="${links.video}">動画・ライブ</a>
                     <a class="navbar-item has-text-light" href="${links.points}">ポイントランキング</a>
                     <div class="navbar-item has-dropdown is-hoverable">
                         <a class="navbar-link has-text-light">More</a>
@@ -156,6 +158,7 @@ function appendFooter() {
                 <li><a class="content ${textSize} ${textClass}" href="${links.top}">トップ</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.recent}">新規イベント</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.simple}">シンプル版</a></li>
+                <li><a class="content ${textSize} ${textClass}" href="${links.video}">動画・ライブ</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.points}">独自ポイントランキング</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.archive2026}" target="_blank">過去のイベント 2026年版</a></li>
                 <li><a class="content ${textSize} ${textClass}" href="${links.archive2025}" target="_blank">過去のイベント 2025年版</a></li>
@@ -415,7 +418,7 @@ async function fetchNewEvents(isInit, param) {
  * 最近の動画リスト取得
  * @returns 
  */
-async function fetchRecentVideos() {
+async function fetchRecentVideos(num) {
     const publicUrl = JajaConstants.molkkyCalendarStorage.recentVideos;
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -426,7 +429,11 @@ async function fetchRecentVideos() {
             const filteredDatas = datas.filter((event) => {
                 return true;
             });
-            resolve(filteredDatas);
+            if (filteredDatas.length > num) {
+                resolve(filteredDatas.slice(0, num));
+            } else {
+                resolve(filteredDatas)
+            }
         })
             .fail(function (jqXHR, textStatus, errorThrown) {
                 reject(new Error(`Failed to fetch events: ${textStatus}`));
