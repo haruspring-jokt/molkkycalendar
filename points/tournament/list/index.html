@@ -86,6 +86,42 @@
         <!-- tournament info -->
         <section class="section" id="tounament-info">
             <h3 class="title is-size-5">大会結果一覧</h3>
+            <div class="box mb-2">
+                <div class="columns is-multiline">
+                    <div class="column is-size-6">
+                        <div class="field">
+                            <label class="label is-size-6">都道府県・エリア</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select class="filter-area is-size-6"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-size-6">
+                        <div class="field">
+                            <label class="label is-size-6">個人戦・チーム戦</label>
+                            <div class="control">
+                                <label class="radio mr-3"><input type="radio" name="filter-play-type" value="all" checked> すべて</label>
+                                <label class="radio mr-3"><input type="radio" name="filter-play-type" value="individual"> 個人戦</label>
+                                <label class="radio"><input type="radio" name="filter-play-type" value="team"> チーム戦</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-size-6">
+                        <div class="field">
+                            <label class="label is-size-6">開催年月</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select class="filter-yearmonth">
+                                        <option value="">すべて</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- result table -->
@@ -94,7 +130,6 @@
                 <i class="las la-ghost has-text-grey mr-1 is-size-5"></i>: システム登録外の選手・チーム<br />
                 ※ポイントランキングに登録された大会のみが表示されます。<br />
                 ※大会ティアは最大ポイントによって決定されており、大会自体の規模や価値、評価を示すものではありません。<br />
-                <span class="has-text-danger has-text-weight-bold">選手リンクは後日実装予定です</span>
             </p>
             <div class="table-container">
                 <table class="table is-narrow is-fullwidth">

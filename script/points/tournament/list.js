@@ -1,14 +1,100 @@
+let tournamentListData = [];
+
 $(async function () {
     await fetchTournamentList();
+    initTournamentListFilter();
 });
 
 async function fetchTournamentList() {
     try {
         const datas = await fetchTournaments("ALL");
+        tournamentListData = datas;
+        populateTournamentYearMonthFilter(datas);
         appendTournamentList(datas);
     } catch (error) {
         console.error('Error fetching tournament list:', error);
     }
+}
+
+function initTournamentListFilter() {
+    createTournamentAreaFilter();
+    $('input[name="filter-play-type"]').on('change', updateTournamentList);
+    $('.filter-yearmonth').on('change', updateTournamentList);
+    $('.filter-area').on('change', async function () {
+        await updateTournamentList();
+    });
+}
+
+function createTournamentAreaFilter() {
+    const areaOptions = JajaConstants.areaSelects;
+    areaOptions.forEach(opt => {
+        $('.filter-area').append($('<option>').val(opt.key).text(opt.text));
+    });
+}
+
+function populateTournamentYearMonthFilter(datas) {
+    const yearMonthSet = new Set();
+    datas.forEach(data => {
+        const ym = getYearMonth(data.event_date);
+        if (ym) {
+            yearMonthSet.add(ym);
+        }
+    });
+    const yearMonths = Array.from(yearMonthSet).sort((a, b) => b.localeCompare(a));
+    const select = $('.filter-yearmonth');
+    select.empty();
+    select.append($('<option>').val('').text('すべて'));
+    yearMonths.forEach(ym => {
+        select.append($('<option>').val(ym).text(ym.replace('-', '/')));
+    });
+}
+
+function getYearMonth(dateValue) {
+    if (!dateValue) {
+        return '';
+    }
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+    const year = date.getFullYear();
+    const month = ('00' + (date.getMonth() + 1)).slice(-2);
+    return `${year}-${month}`;
+}
+
+async function updateTournamentList() {
+    appendTournamentList(getFilteredTournamentData());
+}
+
+function getFilteredTournamentData() {
+    const selectedArea = $('.filter-area').val() || '00';
+    const selectedPlayType = $('input[name="filter-play-type"]:checked').val() || 'all';
+    const selectedYearMonth = $('.filter-yearmonth').val() || '';
+
+    return tournamentListData.filter(data => {
+        const matchesArea = isEqualsPrefectureCodeAndName(selectedArea, data.prefecture);
+        if (!matchesArea) {
+            return false;
+        }
+
+        if (selectedPlayType === 'individual') {
+            if (data.play_category !== '個人戦') {
+                return false;
+            }
+        } else if (selectedPlayType === 'team') {
+            if (data.play_category === '個人戦') {
+                return false;
+            }
+        }
+
+        if (selectedYearMonth) {
+            if (getYearMonth(data.event_date) !== selectedYearMonth) {
+                return false;
+            }
+        }
+
+        return true;
+    });
 }
 
 function appendTournamentList(datas) {

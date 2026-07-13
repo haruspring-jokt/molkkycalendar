@@ -829,14 +829,22 @@ function isRecentCommonEvent(isNewEvent, now, updateDateObj) {
  */
 function isEqualsPrefectureCodeAndName(code, name) {
     if (code == '00') {
-        return ture;
+        return true;
     }
+    const normalizedName = normalizePrefectureName(name);
     if (code.slice(0, 1) == 'A') {
         var areaList = JajaConstants.areaList;
-        return areaList[code].includes(name);
+        return areaList[code] && areaList[code].includes(normalizedName);
     }
     var prefectureList = JajaConstants.prefectureList;
-    return prefectureList[code] == name;
+    return prefectureList[code] == normalizedName;
+}
+
+function normalizePrefectureName(name) {
+    if (!name) {
+        return name;
+    }
+    return name === 'その他・海外' ? '海外' : name;
 }
 
 /**
