@@ -90,30 +90,57 @@
                 <div class="columns is-multiline">
                     <div class="column is-size-6">
                         <div class="field">
-                            <label class="label is-size-6">都道府県・エリア</label>
+                            <label class="label is-size-65">都道府県・エリア</label>
                             <div class="control">
                                 <div class="select is-fullwidth">
-                                    <select class="filter-area is-size-6"></select>
+                                    <select class="filter-area is-size-65"></select>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="column is-size-6">
                         <div class="field">
-                            <label class="label is-size-6">個人戦・チーム戦</label>
+                            <label class="label is-size-65">個人戦・チーム戦</label>
                             <div class="control">
-                                <label class="radio mr-3"><input type="radio" name="filter-play-type" value="all" checked> すべて</label>
-                                <label class="radio mr-3"><input type="radio" name="filter-play-type" value="individual"> 個人戦</label>
-                                <label class="radio"><input type="radio" name="filter-play-type" value="team"> チーム戦</label>
+                                <label class="radio mr-3 is-size-65"><input type="radio" name="filter-play-type"
+                                        value="all" checked> すべて</label>
+                                <label class="radio mr-3 is-size-65"><input type="radio" name="filter-play-type"
+                                        value="individual"> 個人戦</label>
+                                <label class="radio is-size-65"><input type="radio" name="filter-play-type"
+                                        value="team"> チーム戦</label>
                             </div>
                         </div>
                     </div>
                     <div class="column is-size-6">
                         <div class="field">
-                            <label class="label is-size-6">開催年月</label>
+                            <label class="label is-size-65">開催年月</label>
                             <div class="control">
                                 <div class="select is-fullwidth">
-                                    <select class="filter-yearmonth">
+                                    <select class="filter-yearmonth is-size-65">
+                                        <option value="">すべて</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-size-6">
+                        <div class="field">
+                            <label class="label is-size-65">大会シリーズ ※2件以上のみ表示</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select class="filter-series is-size-65">
+                                        <option value="">すべて</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-size-6">
+                        <div class="field">
+                            <label class="label is-size-65">シーズン</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select class="filter-season is-size-65">
                                         <option value="">すべて</option>
                                     </select>
                                 </div>

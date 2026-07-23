@@ -10,7 +10,16 @@ async function fetchTournamentList() {
         const datas = await fetchTournaments("ALL");
         tournamentListData = datas;
         populateTournamentYearMonthFilter(datas);
-        appendTournamentList(datas);
+        populateTournamentSeriesFilter(datas);
+        populateTournamentSeasonFilter(datas);
+
+        const currentSeason = getCurrentSeason();
+        const seasonSelect = $('.filter-season');
+        if (seasonSelect.find(`option[value="${currentSeason}"]`).length) {
+            seasonSelect.val(currentSeason);
+        }
+
+        appendTournamentList(getFilteredTournamentData());
     } catch (error) {
         console.error('Error fetching tournament list:', error);
     }
@@ -20,6 +29,8 @@ function initTournamentListFilter() {
     createTournamentAreaFilter();
     $('input[name="filter-play-type"]').on('change', updateTournamentList);
     $('.filter-yearmonth').on('change', updateTournamentList);
+    $('.filter-series').on('change', updateTournamentList);
+    $('.filter-season').on('change', updateTournamentList);
     $('.filter-area').on('change', async function () {
         await updateTournamentList();
     });
@@ -62,6 +73,74 @@ function getYearMonth(dateValue) {
     return `${year}-${month}`;
 }
 
+function getCurrentSeason(dateValue = new Date()) {
+    const year = dateValue.getFullYear();
+    const month = dateValue.getMonth() + 1;
+    const baseYear = month >= 9 ? year : year - 1;
+    return `${String(baseYear).slice(2)}${String(baseYear + 1).slice(2)}`;
+}
+
+function populateTournamentSeriesFilter(datas) {
+    const seriesCounts = new Map();
+
+    datas.forEach(data => {
+        const seriesId = data.series_id;
+        if (!seriesId) {
+            return;
+        }
+
+        const current = seriesCounts.get(seriesId) || {
+            seriesId,
+            seriesName: data.series_name || '',
+            count: 0,
+        };
+
+        current.count += 1;
+        if (!current.seriesName && data.series_name) {
+            current.seriesName = data.series_name;
+        }
+        seriesCounts.set(seriesId, current);
+    });
+
+    const seriesOptions = Array.from(seriesCounts.values())
+        .filter(item => item.count >= 2)
+        .sort((a, b) => {
+            if (b.count !== a.count) {
+                return b.count - a.count;
+            }
+            return (a.seriesId || '').localeCompare(b.seriesId || '');
+        });
+
+    const select = $('.filter-series');
+    select.empty();
+    select.append($('<option>').val('').text('すべて'));
+
+    seriesOptions.forEach(item => {
+        const label = item.seriesName + ' (' + item.count + ')' || item.seriesId;
+        select.append($('<option>').val(item.seriesId).text(label));
+    });
+}
+
+function populateTournamentSeasonFilter(datas) {
+    const seasons = new Set();
+
+    datas.forEach(data => {
+        if (data.season) {
+            seasons.add(data.season);
+        }
+    });
+
+    const seasonOptions = Array.from(seasons).filter(Boolean).sort((a, b) => String(b).localeCompare(String(a)));
+
+    const select = $('.filter-season');
+    select.empty();
+    select.append($('<option>').val('').text('すべて'));
+
+    seasonOptions.forEach(season => {
+        select.append($('<option>').val(season).text(season));
+    });
+}
+
 async function updateTournamentList() {
     appendTournamentList(getFilteredTournamentData());
 }
@@ -70,6 +149,8 @@ function getFilteredTournamentData() {
     const selectedArea = $('.filter-area').val() || '00';
     const selectedPlayType = $('input[name="filter-play-type"]:checked').val() || 'all';
     const selectedYearMonth = $('.filter-yearmonth').val() || '';
+    const selectedSeriesId = $('.filter-series').val() || '';
+    const selectedSeason = $('.filter-season').val() || '';
 
     return tournamentListData.filter(data => {
         const matchesArea = isEqualsPrefectureCodeAndName(selectedArea, data.prefecture);
@@ -89,6 +170,18 @@ function getFilteredTournamentData() {
 
         if (selectedYearMonth) {
             if (getYearMonth(data.event_date) !== selectedYearMonth) {
+                return false;
+            }
+        }
+
+        if (selectedSeriesId) {
+            if (String(data.series_id || '') !== String(selectedSeriesId)) {
+                return false;
+            }
+        }
+
+        if (selectedSeason) {
+            if (String(data.season || '') !== String(selectedSeason)) {
                 return false;
             }
         }
@@ -126,6 +219,8 @@ function appendTournamentList(datas) {
             vod_url: data.vod_url,
             team_size: data.team_size,
             season: data.season,
+            series_name: data.series_name,
+            series_id: data.series_id,
         };
 
         const results = [];
@@ -171,14 +266,14 @@ function appendTournamentList(datas) {
         $("#tournament-list-content").append(`
             <tr class="table is-size-7">
                 <td class="is-middle py-2">
-                    <p class="tags jaja-tags has-addons py-0 mb-0">
+                    <p class="tags jaja-tags has-addons py-0 mb-1">
                         <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
                         <span class="tag narrow is-light">${prefecture}</span>
                         <span class="tag narrow ${pointTierClass}"><span class="is-size-7 has-text-light has-text-weight-bold">
                             ${pointTier} ${point}</span></span>
                     </p>
-                    <a href="../?id=${data.event_id}">${eventName}</a>
-                    <input type="hidden" name="id" value="${point}">
+                    <a href="../?id=${data.event_id}">${eventName}</a><br/>
+                    ${info.series_name ? `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${info.series_name}</span>` : ''}
                 </td>
                 <td class="is-middle">
                     ${new Date(info.event_date).toLocaleDateString()}
@@ -189,6 +284,9 @@ function appendTournamentList(datas) {
                 <td class="is-middle">
                     ${position2HTML}
                 </td>
+                <input type="hidden" name="series_id" value="${info.series_id || ''}">
+                <input type="hidden" name="season" value="${info.season || ''}">
+                <input type="hidden" name="id" value="${point}">
             </tr>    
         `);
     });
@@ -211,13 +309,13 @@ function generatePositionHTML(result, info) {
     const playerTag = result.pid != "" ?
         createPlayerLinks(result.pid, result.pname)
         : `<i class="las la-ghost mr-1"></i>${result.pother}`;
-    
+
     const teamTag = info.play_category !== "個人戦" && result.pas != "" ?
         (() => {
             const firstAs = result.pas.split(',')[0].trim();
             return `<br/><span class="has-text-grey">as ${firstAs}</span>`;
         })()
         : "";
-    
+
     return playerTag + teamTag;
 }
