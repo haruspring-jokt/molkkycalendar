@@ -1,32 +1,39 @@
+// 大会詳細ページの初期化処理を実行する
 $(async function () {
     let url = new URL(window.location.href);
     let params = url.searchParams;
     await initSettingTournamentPage(params.get('id'));
 });
 
+// 指定されたイベントIDに基づいて大会詳細データの読み込みを開始する
 async function initSettingTournamentPage(eventId) {
     await fetchTournamentsPageData(eventId);
 }
 
+// 大会詳細ページに表示する大会データとシリーズデータを取得する
 async function fetchTournamentsPageData(eventId) {
     try {
         const datas = await fetchTournaments(eventId);
-        appendTournamentResult(datas);
+        if (datas.length === 0 || datas.length > 1) {
+            return;
+        }
+
+        const data = datas[0];
+        const seriesDatas = data.series_id ? await fetchTournamentsBySeriesId(data.series_id) : [];
+        appendTournamentResult(data, seriesDatas);
     } catch (error) {
         console.error('Error fetching events:', error);
     }
 }
 
-function appendTournamentResult(datas) {
-    if (datas.length === 0 || datas.length > 1) {
-        return;
-    }
-    const data = datas[0];
-    appendTournamentResultBaseInfo(data);
+// 取得した大会データをベース情報と順位結果に分けて描画する
+function appendTournamentResult(data, seriesDatas = []) {
+    appendTournamentResultBaseInfo(data, seriesDatas);
     appendTournamentResultRow(data);
 }
 
-function appendTournamentResultBaseInfo(data) {
+// 大会の基本情報・画像・SNS・VOD・シリーズ一覧をページへ追加する
+function appendTournamentResultBaseInfo(data, seriesDatas = []) {
     // 大会情報の追加
     const info = {
         seq: data.seq,
@@ -45,6 +52,8 @@ function appendTournamentResultBaseInfo(data) {
         vod_url: data.vod_url,
         team_size: data.team_size,
         season: data.season,
+        series_name: data.series_name,
+        series_id: data.series_id,
     };
     const eventTeamRule = info.play_category == "個人戦" ?
         "個人" : "チーム (" + info.team_size + ")";
@@ -67,6 +76,9 @@ function appendTournamentResultBaseInfo(data) {
             <a href="${info.result_sheet}"
                 target="_blank">すべての結果を見る（別サイトを開きます）</a>
         </p>` : "";
+    const seriesDisplay = info.series_name || info.series_id || "未設定";
+    const seriesInfo = info.series_id ?
+        `<span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">シリーズ</span>${seriesDisplay}<br/>` : "";
 
     $("#tounament-info").append(`
         <div class="content jaja-points-tournament-info">
@@ -85,7 +97,8 @@ function appendTournamentResultBaseInfo(data) {
             <p class="is-size-65">
                 <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">シーズン</span>${info.season}<br/>
                 <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">${eventTeamRule}</span><br/>
-                <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">参加</span>${partNum}
+                <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">参加</span>${partNum}<br/>
+                ${seriesInfo}
             ${resultSheet}
         </div>
     `);
@@ -111,8 +124,134 @@ function appendTournamentResultBaseInfo(data) {
             </div>
         `);
     }
+    // VODの追加
+    const vodUrls = splitVodUrls(info.vod_url);
+    if (vodUrls.length > 0) {
+        const vodHtml = vodUrls.map(vodUrl => {
+            const embedUrl = getYoutubeEmbedUrl(vodUrl);
+            return `
+                <div class="content">
+                    <div class="container">
+                        <figure class="image is-16by9">
+                            <iframe class="has-ratio" width="640" height="360" src="${embedUrl}" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        </figure>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        $(".section.jaja-calendar-points-tournament-remarks").append(vodHtml);
+    }
+
+    const otherSeriesTournaments = (seriesDatas || [])
+        .sort((a, b) => new Date(b.event_date) - new Date(a.event_date));
+
+    if (otherSeriesTournaments.length > 0) {
+        const seriesListItems = otherSeriesTournaments.map(item => {
+            const label = item.event_name || item.event_id || '大会';
+            const eventDate = item.event_date ? new Date(item.event_date).toLocaleDateString() : '';
+            return `<li class="mb-1"><span class="tag is-light is-small ml-2 has-text-weight-bold">${eventDate}</span>
+                <a href="../tournament?id=${item.event_id}" class="is-size-65">${label}</a></li>`;
+        }).join('');
+
+        $(".section.jaja-calendar-points-tournament-remarks").append(`
+            <div class="content">
+                <p class="is-size-6 has-text-weight-bold mb-2">シリーズ: ${seriesDisplay}</p>
+                <ul style="list-style: none; padding-left: 0; margin: 0;">
+                    ${seriesListItems}
+                </ul>
+            </div>
+        `);
+    }
 }
 
+// VODのURL文字列を半角カンマ区切りで分割する
+function splitVodUrls(vodUrlValue) {
+    if (!vodUrlValue) {
+        return [];
+    }
+
+    return String(vodUrlValue)
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+}
+
+// YouTube URLを埋め込み用のURLに変換する
+function getYoutubeEmbedUrl(url) {
+    if (!url) {
+        return '';
+    }
+
+    const trimmedUrl = String(url).trim();
+    if (!trimmedUrl) {
+        return '';
+    }
+
+    const youtubeIdPattern = /([A-Za-z0-9_-]{11})/;
+    const directMatch = trimmedUrl.match(youtubeIdPattern);
+
+    try {
+        const parsedUrl = new URL(trimmedUrl);
+        const host = parsedUrl.hostname.replace(/^www\./, '');
+        const pathSegments = parsedUrl.pathname.split('/').filter(Boolean);
+
+        if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'www.youtube.com') {
+            const searchParams = parsedUrl.searchParams;
+            const videoIdFromQuery = searchParams.get('v');
+            if (videoIdFromQuery) {
+                return `https://www.youtube.com/embed/${videoIdFromQuery}`;
+            }
+
+            if (pathSegments.length > 0) {
+                const lastSegment = pathSegments[pathSegments.length - 1];
+                if (lastSegment && youtubeIdPattern.test(lastSegment)) {
+                    return `https://www.youtube.com/embed/${lastSegment}`;
+                }
+            }
+        }
+
+        if (host === 'youtu.be') {
+            const lastSegment = pathSegments[pathSegments.length - 1];
+            if (lastSegment && youtubeIdPattern.test(lastSegment)) {
+                return `https://www.youtube.com/embed/${lastSegment}`;
+            }
+        }
+
+        if (host === 'i.ytimg.com' || host === 'img.youtube.com' || host === 'ytimg.com') {
+            const videoIdFromPath = pathSegments.find((segment, index) => {
+                if (segment === 'an_webp' || segment === 'vi') {
+                    return pathSegments[index + 1] && youtubeIdPattern.test(pathSegments[index + 1]);
+                }
+                return false;
+            });
+            if (videoIdFromPath) {
+                const idIndex = pathSegments.indexOf(videoIdFromPath);
+                const candidate = pathSegments[idIndex + 1];
+                if (candidate && youtubeIdPattern.test(candidate)) {
+                    return `https://www.youtube.com/embed/${candidate}`;
+                }
+            }
+
+            const lastSegment = pathSegments[pathSegments.length - 1];
+            if (lastSegment && youtubeIdPattern.test(lastSegment)) {
+                return `https://www.youtube.com/embed/${lastSegment}`;
+            }
+        }
+    } catch (error) {
+        // URLとして解釈できない場合は、文字列中に含まれる YouTube ID らしきものを探す
+    }
+
+    if (directMatch) {
+        return `https://www.youtube.com/embed/${directMatch[1]}`;
+    }
+
+    return trimmedUrl;
+}
+
+// 大会結果の順位表を作成してページへ追加する
 function appendTournamentResultRow(data) {
     // 1～16位の結果を配列にマップ化
     const results = [];

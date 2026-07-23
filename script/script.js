@@ -537,7 +537,37 @@ async function fetchTournaments(eventId) {
                 if (eventId === "ALL") {
                     return true;
                 } else if (eventId != "") {
-                    return record['event_id'] === eventId;
+                    return String(record['event_id'] || '') === String(eventId);
+                } else {
+                    return true;
+                }
+            });
+            resolve(filteredDatas);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                reject(new Error(`Failed to fetch events: ${textStatus}`));
+            });
+    });
+}
+
+/**
+ * ポイントランキング 大会結果の取得（シリーズIDで絞り込み）
+ * @param {*} seriesId シリーズID
+ * @returns 
+ */
+async function fetchTournamentsBySeriesId(seriesId) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.tournaments;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((record) => {
+                if (seriesId === "ALL") {
+                    return true;
+                } else if (seriesId != "") {
+                    return String(record['series_id'] || '') === String(seriesId);
                 } else {
                     return true;
                 }
