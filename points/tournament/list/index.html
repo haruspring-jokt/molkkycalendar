@@ -88,7 +88,7 @@
             <h3 class="title is-size-5">大会結果一覧</h3>
             <div class="box mb-2">
                 <div class="columns is-multiline">
-                    <div class="column is-size-6">
+                    <div class="column is-12">
                         <div class="field">
                             <label class="label is-size-65">都道府県・エリア</label>
                             <div class="control">
@@ -98,7 +98,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="column is-size-6">
+                    <div class="column is-12">
                         <div class="field">
                             <label class="label is-size-65">個人戦・チーム戦</label>
                             <div class="control">
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="column is-size-6">
+                    <div class="column is-12">
                         <div class="field">
                             <label class="label is-size-65">開催年月</label>
                             <div class="control">
@@ -123,9 +123,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="column is-size-6">
+                    <div class="column is-12">
                         <div class="field">
-                            <label class="label is-size-65">大会シリーズ ※2件以上のみ表示</label>
+                            <div class="is-flex is-align-items-center is-flex-wrap-wrap">
+                                <label class="label is-size-65 mb-0">大会シリーズ ※2件以上のみ表示</label>
+                                <button type="button" id="clear-series-filter"
+                                    class="button is-small ml-2 mb-2">クリア</button>
+                            </div>
                             <div class="control">
                                 <div class="select is-fullwidth">
                                     <select class="filter-series is-size-65">
@@ -135,7 +139,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="column is-size-6">
+                    <div class="column is-12">
                         <div class="field">
                             <label class="label is-size-65">シーズン</label>
                             <div class="control">

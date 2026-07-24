@@ -153,7 +153,7 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
             const label = item.event_name || item.event_id || '大会';
             const eventDate = item.event_date ? new Date(item.event_date).toLocaleDateString() : '';
             return `<li class="mb-1"><span class="tag is-light is-small ml-2 has-text-weight-bold">${eventDate}</span>
-                <a href="../tournament?id=${item.event_id}" class="is-size-65">${label}</a></li>`;
+                <a href="../tournament/?id=${item.event_id}" class="is-size-65">${label}</a></li>`;
         }).join('');
 
         $(".section.jaja-calendar-points-tournament-remarks").append(`
@@ -305,7 +305,7 @@ function appendTournamentResultRow(data) {
             dispName = `<span class="has-text-grey-light">（未登録）</span>`;
         } else if (isApply) {
             dispName = resd.map(
-                r => `<a href="../player?pid=${r.pid}"><span>${r.pname}</span>
+                r => `<a href="../player/?pid=${r.pid}"><span>${r.pname}</span>
                     <i class="las la-tshirt ml-1 has-text-grey is-size-6"></i>
                     <span class="has-text-grey-light is-size-7">${r.pas}</span></a><br/>`
             ).join('')

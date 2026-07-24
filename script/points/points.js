@@ -79,10 +79,10 @@ function appendRecentPoints(datas) {
             break;
         }
         const rec = datas[i];
-        const pName = `<a href="./player?pid=${rec.player_id}">
+        const pName = `<a href="./player/?pid=${rec.player_id}">
             <span class="has-text-weight-semibold">
             ${rec.player_name}</span></a>`
-        const eName = `<a href="./tournament?id=${rec.event_id}"><span class="has-text-weight-semibold">${rec.event_name}</span></a>`
+        const eName = `<a href="./tournament/?id=${rec.event_id}"><span class="has-text-weight-semibold">${rec.event_name}</span></a>`
         const rankPoint = `<span class="has-text-primary-50 has-text-weight-semibold">${rec.rank}位 ${rec.points}P</span>`
         $("#recent-points-list").append(`
             <li class="is-size-7 mb-2 ${i >= 10 ? "jaja-display-none" : ""}">${pName} が ${eName} で ${rankPoint}を獲得！
@@ -211,7 +211,7 @@ function appendPlayerDetail(playerId, pointsDatas, player) {
         <div class="card mb-3">
             <header class="card-header has-background-danger">
                 <p class="card-header-title is-size-5 has-text-light">
-                    <a href="./player?pid=${playerId}"><u>${playerDispName}</u></a>
+                    <a href="./player/?pid=${playerId}"><u>${playerDispName}</u></a>
                 </p>
                 <p class="pt-3 mx-2">
                     <span class="is-size-5 has-text-weight-bold has-text-light">${rank}</span><br/>
@@ -309,7 +309,7 @@ function appendStandings(datas) {
                 <td>
                     <p class="is-size-6 player-name-tag my-1">
                         ${newPlayerIcon}${updateIcon}
-                        <a href="./player?pid=${record['player_id']}">
+                        <a href="./player/?pid=${record['player_id']}">
                             <span class="has-text-weight-bold has-text-link">${playerDispName}</span></a>
                         ${links}
                     </p>

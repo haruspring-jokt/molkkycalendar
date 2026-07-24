@@ -8,6 +8,7 @@ $(document).ready(async function () {
  * 選手ページの初期設定
  * @param {String} playerId 
  */
+// 選手ページの初期化処理を実行する。
 async function initSettingPlayerPage(playerId) {
     await fetchPlayerPageData(playerId);
 }
@@ -16,6 +17,7 @@ async function initSettingPlayerPage(playerId) {
  * 選手ページのデータ取得、描画
 * @param {String} playerId 選手ID
  */
+// 選手情報と入賞履歴を取得して、ページに反映する。
 async function fetchPlayerPageData(playerId) {
     try {
         const playerInfo = await fetchPlayerDetail(playerId);
@@ -33,6 +35,7 @@ async function fetchPlayerPageData(playerId) {
  * 選手ページ 選手情報の設定
  * @param {*} datas 選手情報JSON
  */
+// 選手の基本情報とプロフィール要素を画面に描画する。
 function appendPlayerInfo(datas) {
     if (datas.length === 0 || datas.length > 1) {
         return;
@@ -78,10 +81,23 @@ function appendPlayerInfo(datas) {
  * @param {*} datas 入賞履歴JSON
  * @param {*} tournaments 入賞した大会情報一覧JSON
  */
+// 入賞履歴と大会情報を結びつけて、一覧として描画する。
 function appendPointsDetail(datas, tournaments) {
     if (datas.length === 0) {
         return;
     }
+    const seriesCounts = new Map();
+    tournaments.forEach(tournament => {
+        const seriesId = tournament?.series_id;
+        if (!seriesId) {
+            return;
+        }
+
+        const current = seriesCounts.get(seriesId) || { count: 0 };
+        current.count += 1;
+        seriesCounts.set(seriesId, current);
+    });
+
     datas.sort((a, b) => {
         const dateA = new Date(a.event_date);
         const dateB = new Date(b.event_date);
@@ -117,6 +133,13 @@ function appendPointsDetail(datas, tournaments) {
         const prefecture = data.event_area === "その他・海外"
             ? "海外"
             : data.event_area;
+        const seriesCount = seriesCounts.get(tournament?.series_id || '')?.count || 0;
+        const isSeriesFilterEnabled = seriesCount >= 2;
+        const seriesTagHTML = tournament.series_name
+            ? (isSeriesFilterEnabled
+                ? `<a href="../tournament/list/?series=${encodeURIComponent(tournament.series_id || '')}" class="mt-1 tag is-danger is-light shadow has-text-weight-semibold is-size-7" style="cursor: pointer;">${tournament.series_name}</a>`
+                : `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${tournament.series_name}</span>`)
+            : '';
 
         $("#player-result-content").append(`
             <tr>
@@ -127,8 +150,9 @@ function appendPointsDetail(datas, tournaments) {
                         <span class="tag narrow ${pointTierClass}"><span class="is-size-7 has-text-light has-text-weight-bold">
                             ${tournament.point_tier} <i class="las la-user"></i>${data.entry_num}</span></span>
                     </p>
-                    <a href="../tournament?id=${data.event_id}"><span class="is-size-7">${data.event_name}</span></a><br/>
-                    <span class="has-text-grey is-size-7"><i class="las la-tshirt mr-1"></i>${data.entry_team_name}</span>
+                    <a href="../tournament/?id=${data.event_id}"><span class="is-size-7">${data.event_name}</span></a><br/>
+                    <span class="has-text-grey is-size-7"><i class="las la-tshirt mr-1"></i>${data.entry_team_name}</span><br/>
+                    ${seriesTagHTML}
                 </td>
                 <td class="is-middle">
                     <span class="is-size-7">${eventDate}</span>
@@ -158,30 +182,35 @@ function appendPointsDetail(datas, tournaments) {
     `)
 }
 
+// XアカウントへのリンクHTMLを生成する。
 function createXLink(account) {
     return account != "" ?
         ` <a class="has-text-danger" href="https://x.com/${account}" target="_blank">
                         <i class="lab la-twitter"></i></a>` : '';
 }
 
+// InstagramアカウントへのリンクHTMLを生成する。
 function createInstagramLink(account) {
     return account != "" ?
         ` <a class="has-text-danger" href="https://www.instagram.com/${account}" target="_blank">
                         <i class="lab la-instagram"></i></a>` : '';
 }
 
+// TikTokアカウントへのリンクHTMLを生成する。
 function createTiktokLink(account) {
     return account != "" ?
         ` <a class="has-text-danger" href="https://www.tiktok.com/@${account}" target="_blank">
                         Ti</a>` : '';
 }
 
+// YouTubeアカウントへのリンクHTMLを生成する。
 function createYoutubeLink(account) {
     return account != "" ?
         ` <a class="has-text-danger" href="https://www.youtube.com/@${account}" target="_blank">
                         <i class="lab la-youtube"></i></a>` : '';
 }
 
+// その他の外部リンクHTMLを生成する。
 function createOtherLink(url) {
     return url != "" ?
         ` <a class="has-text-danger" href="${url}" target="_blank">

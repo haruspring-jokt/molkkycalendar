@@ -3,8 +3,10 @@ let tournamentListData = [];
 $(async function () {
     await fetchTournamentList();
     initTournamentListFilter();
+    applySeriesFilterFromUrl();
 });
 
+// 大会一覧データを取得して、フィルターと一覧を初期描画する。
 async function fetchTournamentList() {
     try {
         const datas = await fetchTournaments("ALL");
@@ -25,6 +27,7 @@ async function fetchTournamentList() {
     }
 }
 
+// フィルター入力要素にイベントを登録し、一覧更新を有効化する。
 function initTournamentListFilter() {
     createTournamentAreaFilter();
     $('input[name="filter-play-type"]').on('change', updateTournamentList);
@@ -34,8 +37,42 @@ function initTournamentListFilter() {
     $('.filter-area').on('change', async function () {
         await updateTournamentList();
     });
+    $('#clear-series-filter').on('click', async function (event) {
+        event.preventDefault();
+        $('.filter-series').val('');
+        await updateTournamentList();
+    });
+
+    $('#tournament-list-content').on('click', '.series-filter-trigger', async function (event) {
+        event.preventDefault();
+        const seriesId = $(this).data('series-id') || '';
+        const seriesCount = Number($(this).data('series-count') || 0);
+        if (!seriesId || seriesCount < 2) {
+            return;
+        }
+
+        $('.filter-series').val(seriesId);
+        await updateTournamentList();
+    });
 }
 
+// URLのseriesパラメータを読み取り、シリーズフィルターを自動適用する。
+function applySeriesFilterFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const seriesId = urlParams.get('series') || '';
+    if (!seriesId) {
+        return;
+    }
+
+    const seriesSelect = $('.filter-series');
+    const matchingOption = seriesSelect.find(`option[value="${seriesId}"]`);
+    if (matchingOption.length) {
+        seriesSelect.val(seriesId);
+        updateTournamentList();
+    }
+}
+
+// 都道府県・エリアの選択肢をフィルターに追加する。
 function createTournamentAreaFilter() {
     const areaOptions = JajaConstants.areaSelects;
     areaOptions.forEach(opt => {
@@ -43,6 +80,7 @@ function createTournamentAreaFilter() {
     });
 }
 
+// 開催年月の一覧を抽出して、年月フィルターの選択肢を作る。
 function populateTournamentYearMonthFilter(datas) {
     const yearMonthSet = new Set();
     datas.forEach(data => {
@@ -60,6 +98,7 @@ function populateTournamentYearMonthFilter(datas) {
     });
 }
 
+// 日付文字列からYYYY-MM形式の年月を取得する。
 function getYearMonth(dateValue) {
     if (!dateValue) {
         return '';
@@ -73,6 +112,7 @@ function getYearMonth(dateValue) {
     return `${year}-${month}`;
 }
 
+// 現在のシーズンを表す文字列を返す。
 function getCurrentSeason(dateValue = new Date()) {
     const year = dateValue.getFullYear();
     const month = dateValue.getMonth() + 1;
@@ -80,7 +120,8 @@ function getCurrentSeason(dateValue = new Date()) {
     return `${String(baseYear).slice(2)}${String(baseYear + 1).slice(2)}`;
 }
 
-function populateTournamentSeriesFilter(datas) {
+// 各シリーズの件数を集計して、シリーズ別の情報を作る。
+function getTournamentSeriesCounts(datas) {
     const seriesCounts = new Map();
 
     datas.forEach(data => {
@@ -102,6 +143,13 @@ function populateTournamentSeriesFilter(datas) {
         seriesCounts.set(seriesId, current);
     });
 
+    return seriesCounts;
+}
+
+// 2件以上のシリーズだけをシリーズフィルターに表示する。
+function populateTournamentSeriesFilter(datas) {
+    const seriesCounts = getTournamentSeriesCounts(datas);
+
     const seriesOptions = Array.from(seriesCounts.values())
         .filter(item => item.count >= 2)
         .sort((a, b) => {
@@ -121,6 +169,7 @@ function populateTournamentSeriesFilter(datas) {
     });
 }
 
+// シーズンの一覧を抽出して、シーズンフィルターを構築する。
 function populateTournamentSeasonFilter(datas) {
     const seasons = new Set();
 
@@ -141,10 +190,12 @@ function populateTournamentSeasonFilter(datas) {
     });
 }
 
+// 現在のフィルター条件で大会一覧を再描画する。
 async function updateTournamentList() {
     appendTournamentList(getFilteredTournamentData());
 }
 
+// 選択中のフィルター条件に一致する大会データだけを返す。
 function getFilteredTournamentData() {
     const selectedArea = $('.filter-area').val() || '00';
     const selectedPlayType = $('input[name="filter-play-type"]:checked').val() || 'all';
@@ -190,6 +241,7 @@ function getFilteredTournamentData() {
     });
 }
 
+// フィルター済みの大会データをHTMLテーブルとして描画する。
 function appendTournamentList(datas) {
     // datasを data.event_date の降順でソートする
     datas.sort((a, b) => {
@@ -199,6 +251,8 @@ function appendTournamentList(datas) {
     });
 
     $("#tournament-list-content").empty(); // テーブルをクリア
+
+    const seriesCounts = getTournamentSeriesCounts(tournamentListData);
 
     datas.forEach(data => {
         // 大会情報の追加
@@ -261,7 +315,14 @@ function appendTournamentList(datas) {
         const prefecture = info.prefecture === "その他・海外"
             ? "海外"
             : info.prefecture;
-
+        const seriesCount = seriesCounts.get(info.series_id || '')?.count || 0;
+        const isSeriesFilterEnabled = seriesCount >= 2;
+        const seriesTagHTML = info.series_name
+            ? (isSeriesFilterEnabled
+                ? `<button type="button" class="mt-1 tag is-danger is-light shadow has-text-weight-semibold is-size-7 series-filter-trigger"
+                    data-series-id="${info.series_id || ''}" data-series-count="${seriesCount}" style="cursor: pointer;">${info.series_name}</button>`
+                : `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${info.series_name}</span>`)
+            : '';
 
         $("#tournament-list-content").append(`
             <tr class="table is-size-7">
@@ -273,7 +334,7 @@ function appendTournamentList(datas) {
                             ${pointTier} ${point}</span></span>
                     </p>
                     <a href="../?id=${data.event_id}">${eventName}</a><br/>
-                    ${info.series_name ? `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${info.series_name}</span>` : ''}
+                    ${seriesTagHTML}
                 </td>
                 <td class="is-middle">
                     ${new Date(info.event_date).toLocaleDateString()}
@@ -293,6 +354,7 @@ function appendTournamentList(datas) {
 }
 
 // プレイヤータグを生成する関数（カンマ区切りに対応）
+// 選手IDと名前をリンク付きのタグとして生成する。
 function createPlayerLinks(pid, pname) {
     if (pid === '') {
         return '';
@@ -300,11 +362,12 @@ function createPlayerLinks(pid, pname) {
     const pids = pid.split(',').map(p => p.trim());
     const pnames = pname ? pname.split(',').map(p => p.trim()) : [];
     return pids.map((p, index) =>
-        `<a href="../../player?pid=${p}">${pnames[index] || p}</a>`
+        `<a href="../../player/?pid=${p}">${pnames[index] || p}</a>`
     ).join('<br/>');
 }
 
 // 位置ごとのプレイヤータグとチームタグを生成
+// 1位・2位の表示用HTMLを生成する。
 function generatePositionHTML(result, info) {
     const playerTag = result.pid != "" ?
         createPlayerLinks(result.pid, result.pname)
