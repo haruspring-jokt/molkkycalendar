@@ -134,7 +134,7 @@ function appendPointsDetail(datas, tournaments) {
             ? "海外"
             : data.event_area;
         const seriesCount = seriesCounts.get(tournament?.series_id || '')?.count || 0;
-        const isSeriesFilterEnabled = seriesCount >= 2;
+        const isSeriesFilterEnabled = seriesCount >= 1;
         const seriesTagHTML = tournament.series_name
             ? (isSeriesFilterEnabled
                 ? `<a href="../tournament/list/?series=${encodeURIComponent(tournament.series_id || '')}" class="mt-1 tag is-danger is-light shadow has-text-weight-semibold is-size-7" style="cursor: pointer;">${tournament.series_name}</a>`

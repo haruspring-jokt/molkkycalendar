@@ -16,6 +16,24 @@ function commonPageSetting() {
     appendFooter();
 }
 
+function getRelativePathToSiteRoot() {
+    const normalizedPath = (location.pathname || '/').replace(/index\.html$/i, '').replace(/\/+$/, '');
+    const segments = normalizedPath.split('/').filter(Boolean);
+    return segments.length === 0 ? './' : '../'.repeat(segments.length);
+}
+
+function getEventIdentifier(event) {
+    return event?.serial ?? event?.id ?? event?.event_id ?? event?.eventId ?? event?.eventID ?? '';
+}
+
+function getEventDetailHref(event) {
+    const serial = getEventIdentifier(event);
+    if (!serial) {
+        return '#';
+    }
+    return `${getRelativePathToSiteRoot()}article/?serial=${encodeURIComponent(serial)}`;
+}
+
 /*
  * ===================================================
  * 全ページの共通設定
@@ -49,18 +67,12 @@ function appendHeader() {
     };
 
     // 階層調整処理
-    const depth = location.pathname.split("/").length - 1;
-    if (location.pathname !== "/") {
-        const addPath = depth === 2 ? "."
-            : depth === 3 ? "../."
-                : depth === 4 ? "../../."
-                    : "";
-        Object.keys(links).forEach((key) => {
-            if (!links[key].startsWith("http")) {
-                links[key] = addPath + links[key];
-            }
-        });
-    }
+    const addPath = getRelativePathToSiteRoot();
+    Object.keys(links).forEach((key) => {
+        if (!links[key].startsWith("http")) {
+            links[key] = addPath + links[key];
+        }
+    });
 
     // ヘッダーHTMLをテンプレートリテラルで定義
     const headerHtml = `
@@ -139,15 +151,12 @@ function appendFooter() {
     };
 
     // 階層によるパス調整
-    const depth = location.pathname.split("/").length - 1;
-    if (location.pathname !== "/") {
-        const addPath = depth === 2 ? "." : depth === 3 ? "../." : "";
-        Object.keys(links).forEach((key) => {
-            if (!links[key].startsWith("http")) {
-                links[key] = addPath + links[key];
-            }
-        });
-    }
+    const addPath = getRelativePathToSiteRoot();
+    Object.keys(links).forEach((key) => {
+        if (!links[key].startsWith("http")) {
+            links[key] = addPath + links[key];
+        }
+    });
 
     const textSize = "is-size-65";
     const textClass = "has-text-light";

@@ -47,6 +47,7 @@ function appendRecentEvents(events) {
 
     for (i in events) {
         const event = events[i];
+        event.serial = event['serial'] ?? event['id'] ?? event['event_id'] ?? event['eventId'] ?? '';
         const eventDate = new Date(event['eventDate']);
         const formattedDate = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
         const week = ['日', '月', '火', '水', '木', '金', '土'];
@@ -116,16 +117,9 @@ function appendRecentEvents(events) {
 }
 
 function createTitle(event) {
-    if (event['article'] != "") {
-        // 詳細記事URLがある場合リンクとして返す
-        return `
-            <a class="has-text-link" href="${event['article']}" target="_blank">
-                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
-        `;
-    } else {
-        return `
-            <a class="has-text-link" href="${event['source']}" target="_blank">
-                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
-        `;
-    }
+    const detailHref = getEventDetailHref(event);
+    return `
+        <a class="has-text-link" href="${detailHref}">
+            <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
+    `;
 }

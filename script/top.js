@@ -301,6 +301,7 @@ function appendEvents(events) {
         const updateDate = `${updateDateObj.getFullYear()}-${updateDateObj.getMonth() + 1}-${updateDateObj.getDate()}`;
         const updateDateMsg = isUpdated || isNew ? `<span class="has-text-success">更新日: ${updateDate}</span>` : `更新日: ${updateDate}`;
 
+        const detailHref = getEventDetailHref(event);
         // ソースボタン
         const source = `<a href="${event['source']}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold">
             <i class="las la-link"></i>ソース</a>`;
@@ -361,37 +362,22 @@ function appendEvents(events) {
 }
 
 function createTitle(event) {
-    if (event['article']) {
-        // 詳細記事URLがある場合リンクとして返す
-        return `
-            <a class="text-" href="${event['article']}" target="_blank">${event['eventName']}</a>
-        `;
-    } else {
-        return `
-            <a class="text-" href="${event['source']}" target="_blank">${event['eventName']}</a>
-        `;
-    }
+    const detailHref = getEventDetailHref(event);
+    return `
+        <a class="text-" href="${detailHref}">${event['eventName']}</a>
+    `;
 }
 
 function createImageDiv(event, i) {
     if (event['image']) {
-        if (event['article']) {
-            return `
-                <figure class="image is-fullwidth jaja-card-image">
-                    <a class="" href="${event['article']}" target="_blank">
-                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
-                    </a>
-                </figure>
-            `;
-        } else {
-            return `
-                <figure class="image is-fullwidth jaja-card-image">
-                    <a class="" href="${event['source']}" target="_blank">
-                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
-                    </a>
-                </figure>
-            `;
-        }
+        const detailHref = getEventDetailHref(event);
+        return `
+            <figure class="image is-fullwidth jaja-card-image">
+                <a class="" href="${detailHref}">
+                    <img src="${event['image']}" alt="image of ${event['eventName']}" />
+                </a>
+            </figure>
+        `;
     } else {
         return `
             <figure class="image is-fullwidth jaja-card-image-default">

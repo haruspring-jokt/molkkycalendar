@@ -212,17 +212,10 @@ function appendSimpleEvents(events) {
 }
 
 function createTitle(event) {
-    if (event['article']) {
-        // 詳細記事URLがある場合リンクとして返す
-        return `
-            <a class="" href="${event['article']}" target="_blank">
-                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
-        `;
-    } else {
-        return `
-            <a class="" href="${event['source']}" target="_blank">
-                <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
-        `;
-    }
+    const detailHref = getEventDetailHref(event);
+    return `
+        <a class="" href="${detailHref}">
+            <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
+    `;
 }
 
