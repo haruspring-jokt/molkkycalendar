@@ -73,13 +73,13 @@ function appendEventDetail(event) {
         : '';
 
     const sourceLink = event['source']
-        ? `<p class="mb-2"><a href="${event['source']}" target="_blank" class="button is-small is-link is-light"><i class="las la-external-link-alt mr-1"></i>イベント発信元を開く</a></p>`
+        ? `<p class="mb-0"><a href="${event['source']}" target="_blank" class="button is-small is-link is-light"><i class="las la-external-link-alt mr-1"></i>イベント発信元を開く</a></p>`
         : '';
     const articleLink = event['article']
-        ? `<p class="mb-2"><a href="${event['article']}" target="_blank" class="button is-small is-primary is-light"><i class="las la-newspaper mr-1"></i>全国モルックカレンダーニュースの記事</a></p>`
+        ? `<p class="mb-0"><a href="${event['article']}" target="_blank" class="button is-small is-primary is-light"><i class="las la-newspaper mr-1"></i>全国モルックカレンダーニュースの記事</a></p>`
         : '';
     const googleMapLink = event['place']
-        ? `<p class="mb-2"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank" class="button is-small is-info is-light"><i class="las la-map-marked-alt mr-1"></i>Gooleマップ</a></p>`
+        ? `<p class="mb-0"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank" class="button is-small is-info is-light"><i class="las la-map-marked-alt mr-1"></i>Gooleマップ</a></p>`
         : '';
     const calendarLink = createGoogleCalendarLink(event['eventDate'], event['eventStart'], event['eventEnd'], event['eventName'], event['article'] || event['source']);
 
@@ -101,6 +101,8 @@ function appendEventDetail(event) {
     addItem('種別', categoryLabel);
     addItem('主催者', event['org']);
     addItem('会場', event['place']);
+    addItem('サーフェス', event.ground);
+    addItem('参加数', event.teamNum);
     addItem('ルール', createEventRuleText(event));
 
     const entryDetails = [];
@@ -133,14 +135,33 @@ function appendEventDetail(event) {
     addItem('備考', event['remarks']);
     addItem('シリーズ', event['seriesName']);
 
-    const itemHtml = itemFields.map((item) => `
-        <div class="columns is-mobile py-0 mb-3 is-gapless">
-            <div class="column is-4-mobile is-3-tablet">
-                <span class="tag is-light is-rounded has-text-weight-semibold is-small is-size-7">${item.label}</span>
+    const verticalLabels = new Set(['エントリー', '備考']);
+
+    const itemHtml = itemFields.map((item) => {
+        if (verticalLabels.has(item.label)) {
+            return `
+        <div class="py-0 mb-2">
+            <div class="mb-1">
+                <span class="tag is-light has-text-weight-semibold is-small is-size-7">${item.label}</span>
             </div>
-            <div class="column has-text-grey-dark is-size-65">${item.value}</div>
+            <div class="has-text-grey-dark is-size-65 pl-3">${item.value}</div>
         </div>
-    `).join('');
+    `;
+        }
+
+        return `
+        <div class="py-0 mb-2">
+            <div class="columns is-mobile is-vcentered is-gapless">
+                <div class="column is-narrow">
+                    <span class="tag is-light has-text-weight-semibold is-small is-size-7 mr-2">${item.label}</span>
+                </div>
+                <div class="column has-text-grey-dark is-size-65 pl-3">
+                    ${item.value}
+                </div>
+            </div>
+        </div>
+    `;
+    }).join('');
 
     const metadataHtml = [
         event['registerDate'] ? `<p class="is-size-7 has-text-grey mt-4 mb-1"><strong>追加日:</strong> ${formatDateOnly(event['registerDate'])}</p>` : '',
@@ -168,10 +189,8 @@ function appendEventDetail(event) {
             <h2 class="title is-size-4 mb-2">${event['eventName']}</h2>
             <p class="subtitle is-size-65 has-text-grey mb-4">${event['seriesName'] ? `<i class="las la-scroll mr-1"></i>${event['seriesName']}<br/>` : ''}${event['org'] ? `<i class="las la-user mr-1"></i>${event['org']}` : ''}</p>
             <div class="content">
-                <div class="buttons are-small mb-3">
-                    <a href="${calendarLink}" target="_blank" class="button is-success is-light"><i class="las la-calendar-plus mr-1"></i>Goolgleカレンダー</a>
-                </div>
-                <div class="mb-3">
+                <div class="buttons are-small">
+                    <a href="${calendarLink}" target="_blank" class="button is-small is-success is-light mb-0"><i class="las la-calendar-plus mr-1"></i>Goolgleカレンダー</a>
                     ${sourceLink}
                     ${articleLink}
                     ${googleMapLink}
@@ -185,7 +204,7 @@ function appendEventDetail(event) {
         <div id="event-image-modal" class="modal">
             <div class="modal-background"></div>
             <div class="modal-content has-text-centered">
-                <img id="event-image-modal-img" src="" alt="イベント画像" style="max-height: 80vh; max-width: 100%; object-fit: contain; border-radius: 8px; background: white;" />
+                <img id="event-image-modal-img" src="" alt="${event['eventName']}" style="max-height: 80vh; max-width: 100%; object-fit: contain; border-radius: 8px; background: white;" />
             </div>
             <button class="modal-close is-large" aria-label="close"></button>
         </div>
