@@ -1,8 +1,10 @@
 // Set your brand colors
 $jaja-orange: #dea38b;
+$jaja-red: #de8c94;
 
 // Path to Bulma's sass folder
 @use "bulma/sass" with ($primary: $jaja-orange,
+  $danger: $jaja-red,
   $section-padding: 3rem 0.8rem,
   $content-table-cell-padding: 0.25em 0.25em,
 );
@@ -29,9 +31,32 @@ table {
   }
 }
 
-.jaja-card-image {
-  height: 200px;
-  overflow: hidden;
+.jaja-display-none {
+  display: none;
+}
+
+ul.jaja-list-style-none {
+  list-style: none;
+}
+
+.jaja-event-detail-border {
+  border-inline-start-width: 2px;
+  border-inline-start-style: solid;
+  border-inline-start-color: #f4dfd7;
+}
+
+@media screen and (max-width: 768px) {
+  .jaja-card-image {
+    height: 150px;
+    overflow: hidden;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .jaja-card-image {
+    height: 200px;
+    overflow: hidden;
+  }
 }
 
 .jaja-card-image-default {
@@ -43,12 +68,16 @@ table {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.9;
-  filter: brightness(0.8);
+  opacity: 0.75;
 }
 
 .jaja-tags .tag.shadow {
   box-shadow: rgba(9, 10, 12, 0.1) 0px 9px 18px -2.25px, rgba(9, 10, 12, 0.02) 0px 0px 0px 1px;
+}
+
+.jaja-tags .tag.narrow,
+.tag.narrow {
+  height: 1.75em;
 }
 
 .is-middle {
@@ -63,6 +92,7 @@ table {
   gap: 6px;
   z-index: 10;
   pointer-events: auto;
+  flex-wrap: wrap;
   /* 必要ならクリック可能に */
 }
 
@@ -133,4 +163,35 @@ print {
   .is-size-8-fullhd {
     font-size: 0.65rem !important;
   }
+}
+
+.thumbnail {
+  width: 112px;
+  height: 63px;
+  object-fit: cover;
+}
+
+.topIcon {
+  display: inline-block;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 10px;
+  background: #303742;
+  color: #ffffff;
+  opacity: 0.5;
+  border-radius: 50%;
+  font-size: 14pt;
+  font-weight: bold;
+  line-height: 1.2em;
+  letter-spacing: 2px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 999;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+.topIcon:hover {
+  opacity: 0.9;
+  /* カーソル時透明度 */
 }

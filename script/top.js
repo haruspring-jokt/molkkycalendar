@@ -1,80 +1,93 @@
 $(async function () {
+    appendTopPageCommonParts();
     await initSetting();
+    createAreaFilter();
+    detailOpenEvent();
+    createFilterResetEvent();
+    initDateFilter();
     initCategoryFilter();
+    createRecentVideos();
 });
 
 async function initSetting() {
-    createAreaFilter();
-    initDateFilter();
+    
+    const prefecture = localStorage.getItem('areaFilter');
     var dateParam = fetchDefaultDateParam();
-    var param = {
-        'prefecture': '00',
+    await fetchTopPageEvents(true, {
+        'prefecture': prefecture || '00',
         'calendarFrom': dateParam['from'],
         'calendarTo': dateParam['to'],
-    };
-    await fetchTopPageEvents(true, param);
+    });
+}
+
+function appendTopPageCommonParts() {
+    appendCommonEventInfoForm();
+    appendCommonSiteLinks();
+    appendCommonGoogleAds();
+}
+
+function detailOpenEvent() {
+    $(document).on('click', '.jaja-display-click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $click = $(this);
+        const $target = $click.nextAll('.jaja-display-target').first();
+        if (!$target.length) return;
+
+        // アイコン要素（最初の .las を想定）
+        const $icon = $click.find('i.las').first();
+
+        if ($target.hasClass('jaja-display-none')) {
+            // 開く
+            $target.removeClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-right').addClass('la-angle-down');
+            }
+        } else {
+            // 閉じる
+            $target.addClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-down').addClass('la-angle-right');
+            }
+        }
+    });
+}
+
+function createFilterResetEvent() {
+    createCommonCalenderFilterResetEvent();
 }
 
 /**
  * カテゴリフィルターボタンの設定
  */
 function initCategoryFilter() {
-    // 初期状態ですべてのイベントを表示
-    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
-
-    // カテゴリーフィルターボタンのクリックイベント
-    $('.filter-category').click(function () {
-        $('.filter-category').addClass('is-light').removeClass('is-primary');
-        $(this).addClass('is-primary').removeClass('is-light');
-
-        // カテゴリー番号に応じてイベントカードをフィルタリング
-        const categoryNum = $(this).attr('class').match(/filter-category-(\d+)/)[1];
-        if (categoryNum === '0') {
-            // 「すべて」が選択された場合
-            $('.filter-item').show();
-            // すべての日付インデックスを表示
-            $('[id^="date-"]').show();
-        } else {
-            // 特定のカテゴリーが選択された場合
-            $('.filter-item').hide();
-            $(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).show();
-            // 各日付インデックスについて、表示すべきイベントがあるかチェック
-            $('[id^="date-"]').each(function () {
-                const dateId = $(this).attr('id');
-                // この日付インデックス内の表示されているイベント数をカウント
-                const visibleEvents = $(this).find(`.filter-item[data-tag*="event-tag-${categoryNum}"]`).length;
-                // イベントの有無に応じて日付インデックスの表示/非表示を切り替え
-                $(this).toggle(visibleEvents > 0);
-            });
-        }
-    });
+    initCommonCategoryFilter();
 }
 
 /**
  * 日付フィルタの設定
  */
 function initDateFilter() {
-    var dateParam = fetchDefaultDateParam();
-    $('.filter-calendar-from').val(dateParam['from']);
-    $('.filter-calendar-to').val(dateParam['to']);
+    initCommonDateFilter();
+}
 
-    // fromの日付が変更された時のイベントハンドラ
-    $('.filter-calendar-from').on('change', async function () {
-        const fromDate = new Date($(this).val());
-        // fromの1ヶ月後の日付を計算
-        const toDate = new Date(fromDate);
-        toDate.setMonth(toDate.getMonth() + 1);
-        // toの日付を更新
-        const toDateString = toDate.toISOString().split('T')[0];
-        $('.filter-calendar-to').val(toDateString);
-        // イベントを再取得
-        await updateEvents();
-    });
+/**
+ * 都道府県フィルタの設定
+ */
+function createAreaFilter() {
+    createCommonAreaFilter();
+}
 
-    // toの日付が変更された時のイベントハンドラ
-    $('.filter-calendar-to').on('change', async function () {
-        await updateEvents();
-    });
+/**
+ * 最近の動画リストを取得
+ */
+async function createRecentVideos() {
+    try {
+        const videos = await fetchRecentVideos(20);
+        appendRecentVideos(videos);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+    }
 }
 
 /**
@@ -92,30 +105,9 @@ async function fetchTopPageEvents(isInit, param) {
 }
 
 /**
- * 都道府県フィルタの設定
- */
-function createAreaFilter() {
-    areaOptions = JajaConstants.areaSelects;
-    for (i in areaOptions) {
-        opt = areaOptions[i];
-        $(".filter-area").append($("<option>").val(opt["key"]).text(opt["text"]));
-    }
-
-    // エリア選択時のイベントハンドラを追加
-    $('.filter-area').on('change', async function () {
-        await updateEvents();
-    });
-}
-
-
-/**
  * イベントの再取得・表示
  */
 async function updateEvents() {
-    // カテゴリフィルターを「すべて」に戻す
-    $('.filter-category').addClass('is-light').removeClass('is-primary');
-    $('.filter-category-0').addClass('is-primary').removeClass('is-light');
-
     const param = {
         'prefecture': $('.filter-area').val() || '00',
         'calendarFrom': $('.filter-calendar-from').val(),
@@ -127,6 +119,40 @@ async function updateEvents() {
 
     // 新しいイベントを取得して表示
     await fetchTopPageEvents(false, param);
+    applyCategoryFilter();
+}
+
+/**
+ * 最近の動画リストを描画
+ * @param {} videos 
+ */
+function appendRecentVideos(videos) {
+    videos.sort((a, b) => b['uoload_date'] - a['uoload_date']);
+    
+    for (const i in videos) {
+        const video = videos[i];
+
+        // Format upload_date to JST (UTC+9) in yyyy-MM-dd format
+        const uploadDate = new Date(new Date(video.uoload_date).getTime() + 9 * 60 * 60 * 1000);
+        const formattedDate = `${uploadDate.getFullYear()}-${String(uploadDate.getMonth() + 1).padStart(2, '0')}-${String(uploadDate.getDate()).padStart(2, '0')}`;
+        
+        $('#recent-videos').append(
+            `<tr class="">
+                <td class="is-middle" style="width: 120px;">
+                    <a class="" href="${video.video_url}" target="_blank">
+                        <img class="thumbnail p-0" src="${video.thumbnail_url}" />
+                    </a>
+                </td>
+                <td class="is-middle">
+                    <p class="is-size-65 m-0"><a class="" href="${video.video_url}" target="_blank">${video.video_title}</a></p>
+                    <p class="subtitle is-size-7 has-text-grey m-0">
+                        <i class="lar la-calendar"></i> ${formattedDate} <i class="las la-tv"></i> ${video.channel_name}
+                    </p>
+                </td>
+            </tr>`
+        );
+    }
+
 }
 
 /**
@@ -137,6 +163,7 @@ function appendEvents(events) {
     let currentDate = null;
     let dateList = [];
 
+    events.sort((a, b) => a['sortKey'] - b['sortKey']);
     // 最初に日付のリストを作成
     events.forEach(event => {
         const eventDate = new Date(event.eventDate);
@@ -173,6 +200,7 @@ function appendEvents(events) {
                     次の日<i class="las la-angle-right"></i>
                 </a>` : '';
             const minWidth = "style='min-width: 80px;'";
+            const youbiColor = youbi === '(土)' ? "has-text-info-50" : youbi === '(日)' ? "has-text-danger-50" : "";
 
             $("#events").append(`
                 <div id="date-${formattedDate}" class="">
@@ -184,7 +212,7 @@ function appendEvents(events) {
                                 </div>
                                 <div class="level-item has-text-centered">
                                     <p class="is-size-65 mb-0 has-text-weight-semibold">
-                                        <i class="lar la-calendar"></i> ${formattedDate} ${youbi}
+                                        <i class="lar la-calendar"></i> ${formattedDate} <span class="${youbiColor}">${youbi}</span>
                                     </p>
                                 </div>
                                 <div class="level-right" ${minWidth}>
@@ -193,6 +221,7 @@ function appendEvents(events) {
                             </div>
                         </div>
                     </div>
+
                 <div class="date-events p-0">
             `);
             lastDate = currentDate;
@@ -214,34 +243,38 @@ function appendEvents(events) {
         // 新規・最近のイベントかの判定
         const now = new Date();
         const updateDateObj = new Date(event['updateDate']);
-        const isNew = isNewEvent(event, now);
-        const isUpdated = isRecentEvent(isNew, now, updateDateObj);
-        const newEventIcon = isNew ? `<i class="las la-angle-double-up has-text-danger"></i>` : "";
-        const updateIcon = isUpdated ? `<i class="las la-chevron-up has-text-primary"></i>` : "";
+        const isNew = isNewCommonEvent(event, now);
+        const isUpdated = isRecentCommonEvent(isNew, now, updateDateObj);
+        const newEventIcon = isNew ? `<i class="las la-leaf has-text-success"></i>` : "";
+        const updateIcon = isUpdated ? `<i class="las la-angle-double-up has-text-info"></i>` : "";
         // イベント種類フィルタ用data-tag値
         const dataTag = createDataTag(event);
-        
+
         // 都道府県ラベル
-        const prefecture = `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${event['prefecture']}</span>`;
+        const prefectureName = event['prefecture'].slice(-3) == "その他" ? event['prefecture'].slice(0, -3) : event['prefecture'];
+        const prefecture = 
+            `<span class="tag m-1 is-primary is-light shadow has-text-weight-bold">${prefectureName}</span>`;
         // カテゴリーラベル
         const category = `<span class="tag m-1 ${labelColor} shadow has-text-weight-bold">${event['category']}</span>`;
         // 大会ルールラベル
         const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
             `<span class="tag m-1 is-light shadow has-text-weight-bold">${event['composition']}</span>` : '';
         // 詳細ありラベル
-        const detailLabel = createDetailLabel(event['article']);
+        const detailLabel = createDetailLabel(event['article'], event['pickupSerial']);
 
         // イベント画像
         const imageArea = createImageDiv(event, i);
 
+        // 曜日クラス
+        const youbiColor = youbi === '(土)' ? "has-text-info-50" : youbi === '(日)' ? "has-text-danger-50" : "";
         // イベントタイトル
         const eventTitle = createTitle(event);
         // イベントシリーズ
-        const seriesName = event['seriesName'] ? `<span class="">${event['seriesName']}</span>／` : '';
+        const seriesName = event['seriesName'] ? `<span class=""><i class="las la-scroll"></i> ${event['seriesName']}</span>／` : '';
         // 主催
-        const org = event['org'] ? "by: " + event['org'] : "";
-        
-        
+        const org = event['org'] ? `<i class="las la-user"></i> ${event['org']}` : "";
+
+
         // 個人・チーム構成
         const composition = createComposition(
             event['composition'], event['maxMember'], event['minMember'], event['rule']);
@@ -249,29 +282,34 @@ function appendEvents(events) {
         // 会場
         const gMapLink = event['place'] ?
             `<a class="has-text-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}" target="_blank">${event['place']}</a>` : '';
-        const placeLink = `<p class="is-size-7 m-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
+        const placeLink = `<p class="is-size-7 my-1">${createDefaultTagClass("会場")}${gMapLink}</p>`;
         // ルール
         const rule = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("ルール")}${composition}</p>` : '';
+                `<p class="is-size-7 my-1">${createDefaultTagClass("ルール")}${composition} ${event['rule']}</p>` : '';
         // 定員
         const teamNum = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("定員")}${event['teamNum']}</p>` : '';
         // エントリー開始
         const entryStart = isCompetition(event['category']) ?
-            `<p class="is-size-7 m-1">${createDefaultTagClass("エントリー開始")}${event['entryStart']}</p>` : '';
+            `<p class="is-size-7 my-1">${createDefaultTagClass("エントリー")}${event['entryStart']}</p>` : '';
         // 参加費
-        const entryFee = `<p class="is-size-7 m-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
+        const entryFee = `<p class="is-size-7 my-1">${createDefaultTagClass("参加費")}${event['entryFee']}</p>`;
         // 備考
         const remarks = createRemarksDiv(event, i);
 
         // 更新日時の日付フォーマット
         const updateDate = `${updateDateObj.getFullYear()}-${updateDateObj.getMonth() + 1}-${updateDateObj.getDate()}`;
+        const updateDateMsg = isUpdated || isNew ? `<span class="has-text-success">更新日: ${updateDate}</span>` : `更新日: ${updateDate}`;
 
+        const detailHref = getEventDetailHref(event);
         // ソースボタン
         const source = `<a href="${event['source']}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold">
             <i class="las la-link"></i>ソース</a>`;
         // Googleカレンダー登録ボタン
-        const gCalLink = createGoogleCalendarLink(event);
+        const gCalUrl = createGoogleCalendarLink(event['eventDate'], event['eventStart'],
+            event['eventEnd'], event['eventName'], event['article'] ? event['article'] : event['source']);
+        const gCalLink = `<a href="${gCalUrl}" target="_blank"
+            class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i class="las la-plus-circle"></i>カレンダー</a>`;
         // 記事リンクボタン
         const articleLink = createArticleLink(event['article']);
 
@@ -286,20 +324,27 @@ function appendEvents(events) {
                     </div>
                     ${imageArea}
                 </div>
-                <div class="card-content p-3">
+                <div class="card-content px-3 py-1">
                     <div class="content">
-                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} ${youbi} ${eventTime}</span>
-                        <p class="title is-5 mb-0 mt-2 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
+                        <span class="subtitle is-size-65 is-middle"><i class="lar la-calendar"></i> ${formattedDate} <span class="${youbiColor}">${youbi}</span> ${eventTime}</span>
+                        <p class="title is-5 mb-0 mt-1 has-text-link">${newEventIcon}${updateIcon}${eventTitle}</p>
                         <p class="subtitle is-size-7 has-text-grey mb-2 mt-0">${seriesName}${org}</p>
-                        <div class="jaja-event-card-detail py-2">
-                            ${placeLink}
-                            ${rule}
-                            ${teamNum}
-                            ${entryStart}
-                            ${entryFee}
-                            ${remarks}
+                        <div class="content">
+                            <p class="is-fullwidth has-text-primary is-size-65 jaja-display-click mb-1 has-text-weight-semibold">
+                                <span class="jaja-display-click-text">くわしくみる</span>
+                                <i class="las la-angle-right is-size-6 ml-2 pt-1 has-text-primary"></i></p>
+                            <div class="jaja-display-none jaja-display-target">
+                                <div class="jaja-event-card-detail-list py-1 pl-1 jaja-event-detail-border">
+                                    ${placeLink}
+                                    ${rule}
+                                    ${teamNum}
+                                    ${entryStart}
+                                    ${entryFee}
+                                    ${remarks}
+                                </div>
+                                <p class="is-size-8 has-text-grey mt-1">${updateDateMsg}</p>
+                            </div>
                         </div>
-                        <p class="is-size-8 has-text-grey mt-2">更新日: ${updateDate}</p>
                     </div>
                 </div>
                 <footer class="card-footer">
@@ -316,40 +361,23 @@ function appendEvents(events) {
     }
 }
 
-
-
 function createTitle(event) {
-    if (event['article']) {
-        // 詳細記事URLがある場合リンクとして返す
-        return `
-            <a class="text-" href="${event['article']}" target="_blank">${event['eventName']}</a>
-        `;
-    } else {
-        return `
-            <a class="text-" href="${event['source']}" target="_blank">${event['eventName']}</a>
-        `;
-    }
+    const detailHref = getEventDetailHref(event);
+    return `
+        <a class="text-" href="${detailHref}">${event['eventName']}</a>
+    `;
 }
 
 function createImageDiv(event, i) {
     if (event['image']) {
-        if (event['article']) {
-            return `
-                <figure class="image is-fullwidth jaja-card-image">
-                    <a class="" href="${event['article']}" target="_blank">
-                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
-                    </a>
-                </figure>
-            `;
-        } else {
-            return `
-                <figure class="image is-fullwidth jaja-card-image">
-                    <a class="" href="${event['source']}" target="_blank">
-                        <img src="${event['image']}" alt="image of ${event['eventName']}" />
-                    </a>
-                </figure>
-            `;
-        }
+        const detailHref = getEventDetailHref(event);
+        return `
+            <figure class="image is-fullwidth jaja-card-image">
+                <a class="" href="${detailHref}">
+                    <img src="${event['image']}" alt="image of ${event['eventName']}" />
+                </a>
+            </figure>
+        `;
     } else {
         return `
             <figure class="image is-fullwidth jaja-card-image-default">
@@ -363,39 +391,10 @@ function createImageDiv(event, i) {
 function createArticleLink(article) {
     if (article) {
         return `<a href="${article}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
-                                        class="las la-link"></i>特集</a>`;
+                class="las la-link"></i>特集</a>`;
     } else {
         return '';
     }
-}
-
-function createGoogleCalendarLink(event) {
-    // YYYY/M/D形式の文字列を0埋めしてYYYYMMDDに変換する
-    const calEventDate = event['eventDate'];
-    const calendarDate = ("0000" + new Date(calEventDate).getFullYear()).slice(-4)
-        + ("00" + (new Date(calEventDate).getMonth() + 1)).slice(-2)
-        + ("00" + new Date(calEventDate).getDate()).slice(-2);
-    const gCalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-    const gCalDetails = '情報取得元: ' + (event['article'] ? event['article'] : event['source']) + '\n全国モルックカレンダーにより追加されたイベントです。 詳細は主催者にお問い合わせください。';
-    // イベント開始・終了時刻がともにある場合
-    var gCalLink = event['eventStart'] && event['eventEnd'] ?
-        gCalUrl
-        + '&text=' + encodeURIComponent(event['eventName'])
-        + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventEnd'].replace(/:/g, '') + '00'
-        + '&details=' + encodeURIComponent(gCalDetails)
-        // イベント開始時刻のみある場合、0分のイベントとして登録する
-        : event['eventStart'] ?
-            gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00/' + calendarDate + 'T' + event['eventStart'].replace(/:/g, '') + '00'
-            + '&details=' + encodeURIComponent(gCalDetails)
-            // 開始時刻がない場合は、終日として登録する
-            : gCalUrl
-            + '&text=' + encodeURIComponent(event['eventName'])
-            + '&dates=' + calendarDate + '/' + calendarDate
-            + '&details=' + encodeURIComponent(gCalDetails);
-    return `<a href="${gCalLink}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
-                        class="las la-plus-circle"></i>カレンダー</a>`
 }
 
 function createRemarksDiv(event, i) {
@@ -413,7 +412,7 @@ function createRemarksDiv(event, i) {
     }
     if (isThereRemark) {
         return `
-            <div class="notification p-0 m-2 is-size-7 has-background-white-ter">
+            <div class="notification p-0 my-2 mx-1 is-size-7 has-background-white-ter">
                 <p class="p-2">${entryRemarks + remarks}</p>
             </div>`;
     } else {
@@ -421,8 +420,8 @@ function createRemarksDiv(event, i) {
     }
 }
 
-function createDetailLabel(article) {
-    if (article) {
+function createDetailLabel(article, pickupSerial) {
+    if (article || pickupSerial) {
         return `
             <span class="tag m-1 is-warning shadow has-text-weight-bold">注目</span>
         `;
@@ -438,28 +437,10 @@ function createGoogleMapLink(event) {
             target="_blank"> ${event['place']}</a>` : '';
 }
 
-function isNewEvent(event, now) {
-    const registerDateObj = new Date(event['registerDate']);
-    return (now - registerDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
 
-function isRecentEvent(isNewEvent, now, updateDateObj) {
-    return !isNewEvent && (now - updateDateObj) / (1000 * 60 * 60 * 24) <= 7;
-}
 
 function createDefaultTagClass(name) {
-    return `<span class="tag mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
+    return `<span class="tag narrow mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
 }
 
-// smoothScroll関数をグローバルスコープで定義
-window.smoothScroll = function (targetId) {
-    const SCROLL_OFFSET = 72;
-    const element = document.getElementById(targetId);
-    if (element) {
-        const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'instant'
-        });
-    }
-};
+

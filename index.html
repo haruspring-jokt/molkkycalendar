@@ -61,69 +61,33 @@
             <div class="content">
                 <div class="content">
                     <p class="">
-                        <div class="buttons has-addons">
-                            <button class="button is-size-65"><a href="./">トップ</a></button>
-                            <button class="button is-size-65"><a href="./simple/">シンプル</a></button>
-                            <button class="button is-size-65"><a href="./recent/">新しいイベント</a></button>
-                        </div>
+                    <div class="buttons has-addons">
+                        <button class="button is-size-65 is-static"><a href="./">トップ</a></button>
+                        <button class="button is-size-65"><a href="./simple/">シンプル</a></button>
+                        <button class="button is-size-65"><a href="./recent/">新しいイベント</a></button>
+                        <button class="button is-size-65"><a href="./video/">動画・ライブ</a></button>
+                    </div>
                     </p>
                     <p>
-                        <a href="#info">そのほかのおしらせへ</a>
+                        <a href="#videos">最近のモルック動画</a> | <a href="#info">そのほかのおしらせへ</a>
                     </p>
                 </div>
 
                 <h3 class="title is-size-6">主催者向け：掲載を申請する</h3>
-                <div class="">
-                    <p class="m-2">
-                        <a class=""
-                            href="https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform"
-                            target="_blank"><button
-                                class="button is-success is-fullwidth is-outlined is-small">イベント掲載申請（項目別）</button></a>
-                    </p>
-                    <p class="m-2">
-                        <a class=""
-                            href="https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform"
-                            target="_blank"><button
-                                class="button is-success is-fullwidth is-outlined is-small">イベント掲載申請（フリーフォーム）</button></a>
-                    </p>
+                <div class="jaja-calendar-event-info-form">
                 </div>
 
                 <h3 class="title is-size-6">リンク</h3>
-                <div class="">
-                    <p class="m-2">
-                        <a class="" href="./points"><button class="button is-primary is-fullwidth is-small"><span
-                                    class="has-text-light">独自ポイントランキング</span></button></a>
-                    </p>
-                    <p class="m-2">
-                        <a class="" href="https://blog.jajapatatas.com" target="_blank"><button
-                                class="button is-primary is-fullwidth is-small"><span
-                                    class="has-text-light">全国モルックカレンダーニュースブログ</span></button></a>
-                    </p>
-                    <p class="m-2">
-                        <a class="" href="https://x.com/molkkycalendar" target="_blank"><button
-                                class="button is-info is-fullwidth is-small"><span class="">X（Twitter）
-                                    @molkkycalendar</span></button></a>
-                    </p>
-                    <p class="m-2">
-                        <a class="" href="https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm"
-                            target="_blank"><button class="button is-info is-fullwidth is-small"><span
-                                    class="">モルック用スコアシートPDF</span></button></a>
-                    </p>
+                <div class="jaja-calendar-site-links">
                 </div>
 
-                <div class="content">
-                    <script async
-                        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8922718369591652"
-                        crossorigin="anonymous"></script>
-                    <!-- 横長 タイプA -->
-                    <ins class="adsbygoogle" style="display:ruby-text" data-ad-client="ca-pub-8922718369591652"
-                        data-ad-slot="9630561909" data-ad-format="horizontal" data-full-width-responsive="false"></ins>
-                    <script>
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                <div class="content jaja-calendar-google-ads">
                 </div>
 
-                <h3 class="title is-size-6">しらべる</h3>
+                <h3 class="title is-size-6" id="filter-top">しらべる
+                    <a href="#filter-top"
+                        class="jaja-calendar-filter-reset is-pulled-right has-text-weight-normal is-size-65">条件をリセットする</a>
+                </h3>
                 <div class="">
                     <div class="field">
                         <div class="control m-2">
@@ -140,43 +104,25 @@
                         <div class="control m-2">
                             <input type="date" name="calendar-to" class="input is-fullwidth filter-calendar-to" />
                         </div>
-                        <div class="control m-2">
+                        <div class="control m-2 jaja-calendar-filter-category">
                             <label class="label has-background-primary-90 px-2 is-size-65">イベントの種類</label>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-0">すべて</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-9">注目イベント</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-1">大会</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-2">長期の大会</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-7">大会すべて</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-3">体験会・練習会</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-5">ブース</button>
-                            <button
-                                class="button is-rounded is-light is-small m-1 filter-category filter-category-6">その他</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="content">
-                <script async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8922718369591652"
-                    crossorigin="anonymous"></script>
-                <!-- 横長 タイプA -->
-                <ins class="adsbygoogle" style="display:ruby-text" data-ad-client="ca-pub-8922718369591652"
-                    data-ad-slot="9630561909" data-ad-format="horizontal" data-full-width-responsive="false"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+
+            <div class="content jaja-calendar-google-ads">
             </div>
+
+            <div class="box amazon-box" id="amazon-box">
+            </div>
+
         </section>
 
         <section class="section">
             <div class="content" id="events">
+            </div>
+            <div class="box amazon-box" id="amazon-box">
             </div>
         </section>
 
@@ -192,7 +138,10 @@
                     </div>
                     <div class="message-body">
                         <p class="is-size-7 block">
-                            2025-10-26: デザインの変更を行いました。トップページ以外も、順次変更していきます。
+                            2026-8-4: イベント詳細ページを追加しました。
+                            <br />2025-3-4: 最近投稿されたモルック動画のページを追加しました。
+                            <br />2025-11-14: 検索用フィルタの内容が保存されるようになりました。
+                            <br />2025-10-26: デザインの変更を行いました。トップページ以外も、順次変更していきます。
                             <br />2025-10-26: <a class="has-text-link"
                                 href="./points/">全国モルックカレンダーによるオープン大会独自ポイントシステム（ベータ版）</a>
                             の運用を開始しました。オープン大会に出場している選手であればだれでも申請可能です。
@@ -206,6 +155,26 @@
                 </article>
             </div>
         </section>
+
+        <section class="section" id="videos">
+            <h3 class="title is-size-5">モルック動画・ライブ</h3>
+            <p class="subtitle is-size-65">最近投稿された動画やライブ配信を表示 <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSdPBFs0j5rdDV8-NAwpTcJeHu7vAXMKZSLewAdbAKnwCl_UYA/viewform?usp=publish-editor"
+                    target="_blank" class="has-text-weight-bold">掲載チャンネル追加の依頼はこちらまで</a></p>
+            <div class="content" id="">
+                <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="recent-videos">
+                    <thead>
+                        <tr class="has-background-primary">
+                            <th class="has-text-light">サムネイル</th>
+                            <th class="has-text-light">動画</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </div>
 
     <!-- Footer -->
@@ -214,7 +183,8 @@
         </footer>
     </div>
 
-    <div id="topScroll" class="topIcon" onclick="goTop()">⬆</div>
+    <div id="topScroll" class="topIcon" onclick="goTop()"><i
+            class="las la-angle-double-up has-text-light is-size-4"></i></div>
 </body>
 
 </html>
