@@ -2,7 +2,6 @@ $(async function () {
     appendTopPageCommonParts();
     await initSetting();
     createAreaFilter();
-    detailOpenEvent();
     createFilterResetEvent();
     initDateFilter();
     initCategoryFilter();
@@ -26,32 +25,7 @@ function appendTopPageCommonParts() {
     appendCommonGoogleAds();
 }
 
-function detailOpenEvent() {
-    $(document).on('click', '.jaja-display-click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const $click = $(this);
-        const $target = $click.nextAll('.jaja-display-target').first();
-        if (!$target.length) return;
-
-        // アイコン要素（最初の .las を想定）
-        const $icon = $click.find('i.las').first();
-
-        if ($target.hasClass('jaja-display-none')) {
-            // 開く
-            $target.removeClass('jaja-display-none');
-            if ($icon.length) {
-                $icon.removeClass('la-angle-right').addClass('la-angle-down');
-            }
-        } else {
-            // 閉じる
-            $target.addClass('jaja-display-none');
-            if ($icon.length) {
-                $icon.removeClass('la-angle-down').addClass('la-angle-right');
-            }
-        }
-    });
-}
+// detailOpenEvent is provided by script/script.js
 
 function createFilterResetEvent() {
     createCommonCalenderFilterResetEvent();
@@ -271,8 +245,8 @@ function appendEvents(events) {
         const eventTitle = createTitle(event);
         // イベントシリーズ
         const seriesName = event['seriesName'] ? `<span class=""><i class="las la-scroll"></i> ${event['seriesName']}</span>／` : '';
-        // 主催
-        const org = event['org'] ? `<i class="las la-user"></i> ${event['org']}` : "";
+        // 主催（orgId があれば主催者ページへリンク）
+        const org = event['org'] ? (event['orgId'] ? `<a href="/organizer/?orgId=${encodeURIComponent(event['orgId'])}" class="has-text-link"><i class="las la-user"></i> ${event['org']}</a>` : `<i class="las la-user"></i> ${event['org']}`) : "";
 
 
         // 個人・チーム構成
@@ -366,35 +340,6 @@ function createTitle(event) {
     return `
         <a class="text-" href="${detailHref}">${event['eventName']}</a>
     `;
-}
-
-function createImageDiv(event, i) {
-    if (event['image']) {
-        const detailHref = getEventDetailHref(event);
-        return `
-            <figure class="image is-fullwidth jaja-card-image">
-                <a class="" href="${detailHref}">
-                    <img src="${event['image']}" alt="image of ${event['eventName']}" />
-                </a>
-            </figure>
-        `;
-    } else {
-        return `
-            <figure class="image is-fullwidth jaja-card-image-default">
-                <img src="https://bulma.io/assets/images/placeholders/1280x960.png"
-                    alt="Placeholder image" />
-            </figure>
-        `;
-    }
-}
-
-function createArticleLink(article) {
-    if (article) {
-        return `<a href="${article}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
-                class="las la-link"></i>特集</a>`;
-    } else {
-        return '';
-    }
 }
 
 function createRemarksDiv(event, i) {

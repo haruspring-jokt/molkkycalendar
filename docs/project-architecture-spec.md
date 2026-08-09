@@ -36,6 +36,8 @@
 - 共通スクリプト: [script/script.js](../script/script.js)
 - 共通定数: [script/jaja_constants.js](../script/jaja_constants.js)
 - トップページ処理: [script/top.js](../script/top.js)
+- 主催者ページ: [organizer/index.html](../organizer/index.html)
+- 主催者スクリプト: [script/organizer.js](../script/organizer.js)
 - 最近追加ページ: [script/recent/recent.js](../script/recent/recent.js)
 - シンプル表示ページ: [script/simple/simple.js](../script/simple/simple.js)
 - 動画ページ: [script/video/video.js](../script/video/video.js)
@@ -91,6 +93,7 @@
 イベント・ランキング・動画データは、Google Cloud StorageのJSONをAJAXで取得して表示しています。
 
 - イベント一覧: [script/jaja_constants.js](../script/jaja_constants.js) 内の `molkkyCalendarStorage.events`
+ - 主催者情報: `script/jaja_constants.js` 内の `molkkyCalendarStorage.org`（org.json の URL）
 - 最近イベント: `recent`
 - 最近動画: `recent_videos`
 - ポイントランキング: `point_current_season`, `point_results`, `point_players`, `point_tournaments`
@@ -183,3 +186,14 @@
 - 一部のページは共通のヘッダー/フッター/広告/リンク部品を再利用しています。
 - 表示ロジックはHTML文字列を直接組み立てる形で、今後の保守性向上の余地があります。
 - 現在のコードからは自動テスト群は見当たらず、動作確認はブラウザ上での手動確認が中心です。
+ - 最近の変更（概要）:
+  - 共通ユーティリティの整理: `script/script.js` に `createImageDiv`, `createArticleLink`, `createDetailLabel`, `getEventDetailHref`, `escapeHtml` などを移動し集約。
+  - 詳細開閉ハンドラの共通化: `detailOpenEvent()` を `script/script.js` に移動して全ページで初期化、個別ページからの重複バインディングを削除。
+  - 主催者ページの追加: `organizer/index.html` と `script/organizer.js` を実装し、`orgId` による主催者情報（org.json）とその主催イベント一覧を表示する機能を追加。
+  - 主催者リンク化: `top.js` / `simple.js` / `article.js` 側で `event.orgId` が存在する場合に主催者名を `/organizer?orgId=` へリンク化。
+  - レイアウト修正: organizer のイベントカードを1列表示に変更、ヘッダー/フッターの重複生成を防止する修正を適用。
+  - 定数追加: `script/jaja_constants.js` に `molkkyCalendarStorage.org`（org.json URL）を追加。
+  - 構文チェック: 主要スクリプト群に対し簡易的な JavaScript 構文チェックを実行し、構文エラーは検出されていません。
+
+  備考: 変更は既にリポジトリに反映された前提で記載しています。追加でブラウザでの実動作検証（画像表示、開閉、リンク遷移、レスポンシブ等）を行うことを推奨します。
+

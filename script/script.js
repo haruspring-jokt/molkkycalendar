@@ -9,6 +9,10 @@ $(function () {
         $(".navbar-menu").toggleClass("is-active");
     });
     initAmazonBox();
+    // 共通の詳細開閉ハンドラを初期化
+    if (typeof detailOpenEvent === 'function') {
+        detailOpenEvent();
+    }
 });
 
 function commonPageSetting() {
@@ -32,6 +36,72 @@ function getEventDetailHref(event) {
         return '#';
     }
     return `${getRelativePathToSiteRoot()}article/?serial=${encodeURIComponent(serial)}`;
+}
+
+function detailOpenEvent() {
+    $(document).on('click', '.jaja-display-click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $click = $(this);
+        const $target = $click.nextAll('.jaja-display-target').first();
+        if (!$target.length) return;
+
+        // アイコン要素（最初の .las を想定）
+        const $icon = $click.find('i.las').first();
+
+        if ($target.hasClass('jaja-display-none')) {
+            // 開く
+            $target.removeClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-right').addClass('la-angle-down');
+            }
+        } else {
+            // 閉じる
+            $target.addClass('jaja-display-none');
+            if ($icon.length) {
+                $icon.removeClass('la-angle-down').addClass('la-angle-right');
+            }
+        }
+    });
+}
+
+function createImageDiv(event, i) {
+    if (event['image']) {
+        const detailHref = getEventDetailHref(event);
+        return `
+            <figure class="image is-fullwidth jaja-card-image">
+                <a class="" href="${detailHref}">
+                    <img src="${event['image']}" alt="image of ${event['eventName']}" />
+                </a>
+            </figure>
+        `;
+    } else {
+        return `
+            <figure class="image is-fullwidth jaja-card-image-default">
+                <img src="https://bulma.io/assets/images/placeholders/1280x960.png"
+                    alt="Placeholder image" />
+            </figure>
+        `;
+    }
+}
+
+function createArticleLink(article) {
+    if (article) {
+        return `<a href="${article}" target="_blank" class="card-footer-item is-size-65 p-2 has-text-weight-bold"><i
+                class="las la-link"></i>特集</a>`;
+    } else {
+        return '';
+    }
+}
+
+function createDetailLabel(article, pickupSerial) {
+    if (article || pickupSerial) {
+        return `
+            <span class="tag m-1 is-warning shadow has-text-weight-bold">注目</span>
+        `;
+    } else {
+        return '';
+    }
 }
 
 /*
@@ -420,6 +490,38 @@ async function fetchNewEvents(isInit, param) {
             .fail(function (jqXHR, textStatus, errorThrown) {
                 reject(new Error(`Failed to fetch events: ${textStatus}`));
             });
+    });
+}
+
+async function fetchOrganizerById(orgId) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.org;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const organizer = datas.find((item) => String(item.orgId || '').toUpperCase() === String(orgId || '').toUpperCase());
+            resolve(organizer);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            reject(new Error(`Failed to fetch organizer: ${textStatus}`));
+        });
+    });
+}
+
+async function fetchEventsByOrgId(orgId) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.events;
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: publicUrl,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (datas) {
+            const filteredDatas = datas.filter((event) => String(event.orgId || '').toUpperCase() === String(orgId || '').toUpperCase());
+            resolve(filteredDatas);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            reject(new Error(`Failed to fetch events for organizer: ${textStatus}`));
+        });
     });
 }
 

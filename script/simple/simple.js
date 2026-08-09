@@ -169,12 +169,14 @@ function appendSimpleEvents(events) {
 
         // イベントタイトル
         const eventTitle = createTitle(event);
-        // 主催
-        const org = event['org'] ?
+        // 主催（orgId があれば主催者ページへリンク）
+        const org = event['org'] ? (event['orgId'] ?
+            `</br><span class="is-size-7 has-text-link">
+                <i class="las la-user"></i> <a href="/organizer/?orgId=${encodeURIComponent(event['orgId'])}">${event['org']}</a>
+            </span>` :
             `</br><span class="is-size-7 has-text-grey">
                 <i class="las la-user"></i> ${event['org']}
-            </span>`
-            : "";
+            </span>`) : "";
         // イベントシリーズ
         const seriesName = event['seriesName'] ?
             `<br/><span class="is-size-7 has-text-grey">

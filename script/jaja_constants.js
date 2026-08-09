@@ -190,6 +190,7 @@ class JajaConstants {
                 tournaments: root + bucket + "point_tournaments" + suffix
             },
             recentVideos: root + bucket + "recent_videos" + suffix,
+            org: root + bucket + "org" + suffix,
         };
     }
 }

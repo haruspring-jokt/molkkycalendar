@@ -64,6 +64,9 @@ function appendEventDetail(event) {
         'その他': 'is-light'
     }[categoryLabel] || 'is-light';
 
+    // 主催者表示（orgId があれば主催者ページへリンク）
+    const organizerHtml = event['org'] ? (event['orgId'] ? `<a href="/organizer/?orgId=${encodeURIComponent(event['orgId'])}" class="has-text-link"><i class="las la-user mr-1"></i>${event['org']}</a>` : `<i class="las la-user mr-1"></i>${event['org']}`) : '';
+
     const imageHtml = event['image'] && String(event['image']).trim()
         ? `<a href="#" class="event-detail-image-link" data-image="${event['image']}" role="button">
             <figure class="image is-16by9" style="overflow: hidden; border-radius: 8px;">
@@ -99,7 +102,7 @@ function appendEventDetail(event) {
     addItem('時間', eventTime);
     addItem('都道府県', prefectureName);
     addItem('種別', categoryLabel);
-    addItem('主催者', event['org']);
+    addItem('主催者', organizerHtml);
     addItem('会場', event['place']);
     addItem('サーフェス', event.ground);
     addItem('参加数', event.teamNum);
@@ -187,7 +190,7 @@ function appendEventDetail(event) {
                 <span class="tag ${labelColor}">${categoryLabel}</span>
             </div>
             <h2 class="title is-size-4 mb-2">${event['eventName']}</h2>
-            <p class="subtitle is-size-65 has-text-grey mb-4">${event['seriesName'] ? `<i class="las la-scroll mr-1"></i>${event['seriesName']}<br/>` : ''}${event['org'] ? `<i class="las la-user mr-1"></i>${event['org']}` : ''}</p>
+            <p class="subtitle is-size-65 has-text-grey mb-4">${event['seriesName'] ? `<i class="las la-scroll mr-1"></i>${event['seriesName']}<br/>` : ''}${organizerHtml}</p>
             <div class="content">
                 <div class="buttons are-small">
                     <a href="${calendarLink}" target="_blank" class="button is-small is-success is-light mb-0"><i class="las la-calendar-plus mr-1"></i>Goolgleカレンダー</a>
