@@ -107,15 +107,24 @@
 
         <!-- ranking -->
         <section class="section" id="standings">
-            <h3 class="title is-size-5">2025-26シーズン ランキング</h3>
-            <p class="subtitle is-size-65 my-1">2025/9/1 - 2026/8/31</p>
             <p class="my-2 is-size-65">
                 <i class="las la-leaf has-text-success mr-1 is-size-6"></i>: 新規登録プレーヤー<br />
                 <i class="las la-angle-double-up has-text-info mr-1 is-size-6"></i>: ポイントが追加されたプレーヤー<br />
                 <span class="has-text-danger has-text-weight-bold is-size-65 py-1">選手名をタップで詳細をみる</span>
             </p>
-            <div class="content" id="">
-                <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="standings-content">
+
+            <h3 class="title is-size-5 mb-1">
+                <a href="./rank/?season=2627"><u>2026-27シーズン ランキング</u></a>
+            </h3>
+            <p class="subtitle is-size-65 my-1">2026/9/1 - 2027/8/31</p>
+            <p class="is-size-65 has-text-centered my-1">
+                <a href="./rank/?season=2627">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+            </p>
+            <div class="content" id="standings-content-container-2627">
+                <div class="notification is-light has-text-centered is-size-65" id="standings-empty-2627">
+                    大会結果が追加されると、ランキングが表示されます。
+                </div>
+                <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="standings-content-2627">
                     <thead>
                         <tr class="has-background-danger">
                             <th class="has-text-light"><abbr title="順位">位</abbr></th>
@@ -128,9 +137,38 @@
                     </tbody>
                 </table>
             </div>
+            <p class="is-size-65 has-text-centered my-1">
+                <a href="./rank/?season=2627">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+            </p>
             <div class="box amazon-box" id="amazon-box">
             </div>
+
+            <h3 class="title is-size-5 mb-1 mt-5">
+                <a href="./rank/?season=2526"><u>2025-26シーズン ランキング</u></a>
+            </h3>
+            <p class="subtitle is-size-65 my-1">2025/9/1 - 2026/8/31</p>
+            <p class="is-size-65 has-text-centered my-1">
+                <a href="./rank/?season=2526">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+            </p>
+            <div class="content" id="">
+                <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="standings-content-2526">
+                    <thead>
+                        <tr class="has-background-danger">
+                            <th class="has-text-light"><abbr title="順位">位</abbr></th>
+                            <th class="has-text-light"><abbr title="プレーヤー">プレーヤー</abbr></th>
+                            <th class="has-text-light"><abbr title="ポイント">Pts</abbr></th>
+                            <th class="has-text-light"><abbr title="入賞回数">回</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <p class="is-size-65 has-text-centered my-1">
+                <a href="./rank/?season=2526">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+            </p>
         </section>
+
 
         <!-- whatis -->
         <section class="section" id="whatis">
@@ -157,17 +195,19 @@
                 <div class="content block">
                     <article class="message is-danger">
                         <div class="message-header">
-                            <p class="">以下のような場合は本システムが定める「オープン大会」に該当しない・条件を満たしていないため、申請を受け付けません。
+                            <p class="">以下のような場合は本システムが定める「オープン大会」に該当しないか、申請の条件を満たしていないため、申請を受け付けません。
                             </p>
                         </div>
                         <div class="message-body is-size-7">
                             - エントリー条件が設定されている（在住、性別、年齢、初心者限定など）<br />
-                            - シーズン期間（2025/9/1～2026/8/31）外<br />
-                            - 参加数が16未満である<br />
+                            - 大会開催日より2ヶ月が経過した結果の申請<br />
+                            - 参加選手・チーム数が16未満である<br />
                             - 順位が全体の上位50%より下回っている<br />
                             - 事前に告知されている大会でない<br />
                             - 一般的なモルックの試合ルールにない特別ルールが設定されている<br />
-                            - 申請者がその大会の主催・運営を担当している場合は、ポイント申請は不可
+                            - 申請者がその大会の主催・運営を担当している場合は、ポイント申請は不可<br />
+                            <br />
+                            上記に該当する場合でも、幅広い選手層に影響する公式大会などの場合は運営の判断で対象とします。
                         </div>
                     </article>
                 </div>

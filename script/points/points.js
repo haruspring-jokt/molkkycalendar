@@ -10,10 +10,32 @@ async function initSetting() {
     fetchAnnounce();
 }
 
+// トップページで表示するシーズン（新しい順）。移行期のため2シーズン分を表示する。
+const TOP_PAGE_SEASONS = ['2627', '2526'];
+const TOP_PAGE_STANDINGS_MAX = 20;
+
 async function fetchPointsPageStandings() {
     try {
-        const datas = await fetchStandings();
-        appendStandings(datas);
+        const [resultsData, playersData] = await Promise.all([
+            fetchPointsDetailByPlayer(''),
+            fetchPlayerDetail('')
+        ]);
+        for (const seasonKey of TOP_PAGE_SEASONS) {
+            const datas = computeSeasonStandings(resultsData, playersData, seasonKey);
+            const tableSelector = `#standings-content-${seasonKey}`;
+            const emptySelector = `#standings-empty-${seasonKey}`;
+            if (datas.length === 0) {
+                $(tableSelector).hide();
+                $(emptySelector).show();
+                continue;
+            }
+            $(tableSelector).show();
+            $(emptySelector).hide();
+            appendStandings(datas, {
+                targetSelector: `${tableSelector} tbody`,
+                maxItems: TOP_PAGE_STANDINGS_MAX
+            });
+        }
     } catch (error) {
         console.error('Error fetching events:', error);
     }
@@ -249,10 +271,11 @@ function appendPlayerDetail(playerId, pointsDatas, player) {
     $('html, body').animate({ scrollTop: detailTop }, 'fast');
 }
 
-function appendStandings(datas) {
+function appendStandings(datas, options = {}) {
     var rank = 1;
     var tienum = 0;
-    const maxItems = 100;
+    const targetSelector = options.targetSelector || '#standings-content tbody';
+    const maxItems = options.maxItems || 100;
 
 
     for (const i in datas) {
@@ -303,7 +326,7 @@ function appendStandings(datas) {
             `;
 
         // イベントカード要素の追加
-        $('#standings-content tbody').append(
+        $(targetSelector).append(
             `<tr class="player-record" ${playerData}>
                 <td class="has-text-right has-text-weight-bold is-middle has-text-danger">${rank}</td>
                 <td>
@@ -370,14 +393,9 @@ function isRecentPlayer(now, updateDateObj) {
 function getAnnounceList() {
     return [
         {
-            date: new Date("2025-12-17"),
-            title: "日本モルック選手権関連大会をポイント対象とします",
-            msg: "日本モルック選手権2026の関連大会（地方予選・本戦）は本来申請対象外ですが、注目度が高く多くの参加が予想されるため、特別に申請可能な大会とするので、いつも通りフォームから申請してください。"
-        },
-        {
-            date: new Date("2025-12-25"),
-            title: "ポイント申請条件の変更",
-            msg: "申請者がその大会の主催・運営を担当している場合は、ポイント申請は不可とします。2025/12/25までに申請が承認されたポイントをさかのぼって取り下げることはありません。"
-        },
+            date: new Date("2026-8-29"),
+            title: "9月より新シーズンに移行します",
+            msg: "2026年9月1日より新シーズン（2026-27）が開始します。<br>・9月1日以降も、2ヶ月以内であれば2025-26シーズンの申請を引き続き対応します。<br>・ランキングはシーズン別に表示されます。<br>・2026-27シーズンはポイント評価を一部見直し、これまでは単純に計算後のポイントをチーム人数で配分していましたが、チーム戦の評価点が少ないと判断し、以下のように変更します。<br>  - 3人チーム大会: <code>評価点 * 0.42</code>（前季 0.33）<br>  - 4人チーム大会: <code>評価点 * 0.33</code>（前季 0.25）<br>前季の評価点は変更されません"
+        }
     ];
 }
