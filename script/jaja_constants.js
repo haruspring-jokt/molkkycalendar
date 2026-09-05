@@ -43,6 +43,12 @@ class JajaConstants {
             points: "https://jajapatatas.com/points"
         }
     }
+    static get currentSeason() {
+        return "2627";
+    }
+    static get pointSeasonList() {
+        return [this.currentSeason, "2526"];
+    }
     static get defaultCalendarFilterParam() {
         return {
             "area": "00",
@@ -184,7 +190,13 @@ class JajaConstants {
             events: root + bucket + "events" + suffix,
             recent: root + bucket + "recent" + suffix,
             points: {
-                currentSeason: root + bucket + "point_current_season" + suffix,
+                getSeasonUrl: (season = JajaConstants.currentSeason) => {
+                    const normalizedSeason = String(season ?? JajaConstants.currentSeason).replace(/\D/g, "");
+                    if (!/^\d{4}$/.test(normalizedSeason)) {
+                        throw new Error(`Invalid season key: ${season}`);
+                    }
+                    return root + bucket + `point_season_${normalizedSeason}` + suffix;
+                },
                 results: root + bucket + "point_results" + suffix,
                 players: root + bucket + "point_players" + suffix,
                 tournaments: root + bucket + "point_tournaments" + suffix

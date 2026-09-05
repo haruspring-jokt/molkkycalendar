@@ -96,7 +96,7 @@
  - 主催者情報: `script/jaja_constants.js` 内の `molkkyCalendarStorage.org`（org.json の URL）
 - 最近イベント: `recent`
 - 最近動画: `recent_videos`
-- ポイントランキング: `point_current_season`, `point_results`, `point_players`, `point_tournaments`
+- ポイントランキング: `JajaConstants.molkkyCalendarStorage.points.getSeasonUrl(season)`, `point_results`, `point_players`, `point_tournaments`
 
 ### 4.2 フィルターと状態管理
 
@@ -164,8 +164,9 @@
 
 ### 5.2 ポイントランキングデータ
 
-- `point_current_season`: ランキング用データ
+- `point_season_XXXX.json`: ランキング用データ
   - `player_id`, `player_name`, `points`, `rankin_count`, `area`, `update_date`
+  - シーズン名は `JajaConstants.currentSeason` と `JajaConstants.pointSeasonList` で管理し、URL生成は `getSeasonUrl(season)` に集約する
 - `point_results`: 選手別の入賞結果
   - `player_id`, `event_id`, `event_name`, `event_date`, `rank`, `points`
 - `point_players`: 選手プロフィール

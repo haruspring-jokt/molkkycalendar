@@ -554,10 +554,11 @@ async function fetchRecentVideos(num) {
 
 /**
  * ポイントランキングページの順位表データを返す
+ * @param {String} season シーズンキー。例: 2526, 2627
  * @returns 順位表データ
  */
-async function fetchStandings() {
-    const publicUrl = JajaConstants.molkkyCalendarStorage.points.currentSeason;
+async function fetchStandings(season = JajaConstants.currentSeason) {
+    const publicUrl = JajaConstants.molkkyCalendarStorage.points.getSeasonUrl(season);
     return new Promise((resolve, reject) => {
         $.ajax({
             url: publicUrl,
@@ -570,7 +571,7 @@ async function fetchStandings() {
             resolve(filteredDatas);
         })
             .fail(function (jqXHR, textStatus, errorThrown) {
-                reject(new Error(`Failed to fetch events: ${textStatus}`));
+                reject(new Error(`Failed to fetch standings for season ${season}: ${textStatus}`));
             });
     });
 }

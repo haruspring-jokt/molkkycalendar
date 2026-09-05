@@ -23,9 +23,13 @@ async function initSettingPlayerPage(playerId) {
 // 選手情報と入賞履歴を取得して、ページに反映する。
 async function fetchPlayerPageData(playerId) {
     try {
-        const playerInfo = await fetchPlayerDetail(playerId);
-        const pointsDetail = await fetchPointsDetailByPlayer(playerId);
-        const seasonSummaries = buildSeasonSummaries(playerInfo[0], pointsDetail);
+        const [playerInfo, pointsDetail, allResults, allPlayers] = await Promise.all([
+            fetchPlayerDetail(playerId),
+            fetchPointsDetailByPlayer(playerId),
+            fetchPointsDetailByPlayer(''),
+            fetchPlayerDetail('')
+        ]);
+        const seasonSummaries = buildSeasonSummaries(playerInfo[0], pointsDetail, allResults, allPlayers);
         appendPlayerInfo(playerInfo, seasonSummaries);
         const eventIdList = playerInfo[0].events.split(',');
         const tournaments = await fetchTournamentsByEventIdList(eventIdList);
@@ -106,12 +110,36 @@ function appendPlayerInfo(datas, seasonSummaries = []) {
  * @param {*} tournaments 入賞した大会情報一覧JSON
  */
 // 入賞履歴と大会情報を結びつけて、一覧として描画する。
+function populatePlayerSeasonFilter() {
+    const seasonFilter = $('#player-season-filter');
+    if (!seasonFilter.length) {
+        return;
+    }
+
+    seasonFilter.empty();
+    const allOption = $('<option>', {
+        value: 'all',
+        text: 'すべてのシーズン'
+    });
+    seasonFilter.append(allOption);
+
+    (JajaConstants.pointSeasonList || []).forEach((seasonKey) => {
+        const option = $('<option>', {
+            value: seasonKey,
+            text: getSeasonDisplayName(seasonKey)
+        });
+        seasonFilter.append(option);
+    });
+}
+
 function appendPointsDetail(datas, tournaments) {
     if (datas.length === 0) {
         $('#player-result-table').hide();
         $('#player-result-empty').removeClass('jaja-display-none');
         return;
     }
+
+    populatePlayerSeasonFilter();
 
     const seasonFilter = $('#player-season-filter');
     if (seasonFilter.length) {
@@ -237,11 +265,23 @@ function appendPointsDetail(datas, tournaments) {
     }
 }
 
-function buildSeasonSummaries(playerInfo, pointsDetail) {
-    const summaryMap = new Map([
-        ['2627', { key: '2627', label: '2026-27シーズン', points: 0, rank: '-', count: 0 }],
-        ['2526', { key: '2526', label: '2025-26シーズン', points: 0, rank: playerInfo.s2526_rank || '-', count: 0 }]
-    ]);
+function buildSeasonSummaries(playerInfo, pointsDetail, allResults = [], allPlayers = []) {
+    const seasonKeys = Array.isArray(JajaConstants.pointSeasonList) && JajaConstants.pointSeasonList.length > 0
+        ? JajaConstants.pointSeasonList
+        : [];
+    const summaryMap = new Map();
+
+    seasonKeys.forEach((seasonKey) => {
+        const range = getSeasonRange(seasonKey);
+        const label = `${range.start.getFullYear()}-${String(range.end.getFullYear()).slice(2)}シーズン`;
+        summaryMap.set(seasonKey, {
+            key: seasonKey,
+            label,
+            points: 0,
+            rank: '-',
+            count: 0
+        });
+    });
 
     pointsDetail.forEach((record) => {
         const eventDate = new Date(record.event_date);
@@ -256,6 +296,21 @@ function buildSeasonSummaries(playerInfo, pointsDetail) {
         season.points += Number(record.points || 0);
         season.count += 1;
     });
+
+    if (allResults.length > 0 && allPlayers.length > 0) {
+        seasonKeys.forEach((seasonKey) => {
+            const seasonStandings = computeSeasonStandings(allResults, allPlayers, seasonKey);
+            const target = seasonStandings.find((entry) => entry.player_id === playerInfo.player_id);
+            const season = summaryMap.get(seasonKey);
+            if (!season || !target) {
+                return;
+            }
+            const rankIndex = seasonStandings.findIndex((entry) => entry.player_id === playerInfo.player_id);
+            season.rank = rankIndex >= 0 ? rankIndex + 1 : '-';
+            season.points = Number(target.points || 0);
+            season.count = Number(target.rankin_count || 0);
+        });
+    }
 
     return Array.from(summaryMap.values()).sort((a, b) => b.key.localeCompare(a.key));
 }

@@ -5,14 +5,63 @@ $(async function () {
 });
 
 async function initSetting() {
+    renderTopPageSeasonSections();
     await fetchPointsPageStandings();
     await fetchRecentPoints();
     fetchAnnounce();
 }
 
 // トップページで表示するシーズン（新しい順）。移行期のため2シーズン分を表示する。
-const TOP_PAGE_SEASONS = ['2627', '2526'];
+const TOP_PAGE_SEASONS = JajaConstants.pointSeasonList;
 const TOP_PAGE_STANDINGS_MAX = 20;
+
+function renderTopPageSeasonSections() {
+    const container = $('#standings-seasons');
+    if (!container.length) {
+        return;
+    }
+    container.empty();
+
+    (JajaConstants.pointSeasonList || []).forEach((seasonKey, index) => {
+        const seasonLabel = getSeasonDisplayName(seasonKey);
+        const rangeLabel = getSeasonRangeLabel(seasonKey);
+        const isFirst = index === 0;
+        const sectionClass = isFirst ? '' : ' mt-5';
+
+        container.append(`
+            <div class="season-standings${sectionClass}">
+                <h3 class="title is-size-5 mb-1${isFirst ? '' : ' mt-5'}">
+                    <a href="./rank/?season=${seasonKey}"><u>${seasonLabel} ランキング</u></a>
+                </h3>
+                <p class="subtitle is-size-65 my-1">${rangeLabel}</p>
+                <p class="is-size-65 has-text-centered my-1">
+                    <a href="./rank/?season=${seasonKey}">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+                </p>
+                <div class="content" id="standings-content-container-${seasonKey}">
+                    <div class="notification is-light has-text-centered is-size-65" id="standings-empty-${seasonKey}">
+                        大会結果が追加されると、ランキングが表示されます。
+                    </div>
+                    <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="standings-content-${seasonKey}">
+                        <thead>
+                            <tr class="has-background-danger">
+                                <th class="has-text-light"><abbr title="順位">位</abbr></th>
+                                <th class="has-text-light"><abbr title="プレーヤー">プレーヤー</abbr></th>
+                                <th class="has-text-light"><abbr title="ポイント">Pts</abbr></th>
+                                <th class="has-text-light"><abbr title="入賞回数">回</abbr></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="is-size-65 has-text-centered my-1">
+                    <a href="./rank/?season=${seasonKey}">ランキング全体をみる<i class="las la-angle-right ml-1"></i></a>
+                </p>
+                <div class="box amazon-box" id="amazon-box"></div>
+            </div>
+        `);
+    });
+}
 
 async function fetchPointsPageStandings() {
     try {
