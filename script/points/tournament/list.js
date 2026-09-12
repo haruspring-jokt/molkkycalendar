@@ -12,7 +12,6 @@ async function fetchTournamentList() {
         const datas = await fetchTournaments("ALL");
         tournamentListData = datas;
         populateTournamentYearMonthFilter(datas);
-        populateTournamentSeriesFilter(datas);
         populateTournamentSeasonFilter(datas);
 
         const currentSeason = getCurrentSeason();
@@ -21,7 +20,7 @@ async function fetchTournamentList() {
             seasonSelect.val(currentSeason);
         }
 
-        appendTournamentList(getFilteredTournamentData());
+        await updateTournamentList();
     } catch (error) {
         console.error('Error fetching tournament list:', error);
     }
@@ -147,7 +146,7 @@ function getTournamentSeriesCounts(datas) {
 }
 
 // 2件以上のシリーズだけをシリーズフィルターに表示する。
-function populateTournamentSeriesFilter(datas) {
+function populateTournamentSeriesFilter(datas, selectedSeriesId = '') {
     const seriesCounts = getTournamentSeriesCounts(datas);
 
     const seriesOptions = Array.from(seriesCounts.values())
@@ -167,6 +166,10 @@ function populateTournamentSeriesFilter(datas) {
         const label = item.seriesName + ' (' + item.count + ')' || item.seriesId;
         select.append($('<option>').val(item.seriesId).text(label));
     });
+
+    if (select.find(`option[value="${selectedSeriesId}"]`).length) {
+        select.val(selectedSeriesId);
+    }
 }
 
 // シーズンの一覧を抽出して、シーズンフィルターを構築する。
@@ -192,11 +195,13 @@ function populateTournamentSeasonFilter(datas) {
 
 // 現在のフィルター条件で大会一覧を再描画する。
 async function updateTournamentList() {
+    const selectedSeriesId = $('.filter-series').val() || '';
+    populateTournamentSeriesFilter(getFilteredTournamentData(true), selectedSeriesId);
     appendTournamentList(getFilteredTournamentData());
 }
 
 // 選択中のフィルター条件に一致する大会データだけを返す。
-function getFilteredTournamentData() {
+function getFilteredTournamentData(ignoreSeriesFilter = false) {
     const selectedArea = $('.filter-area').val() || '00';
     const selectedPlayType = $('input[name="filter-play-type"]:checked').val() || 'all';
     const selectedYearMonth = $('.filter-yearmonth').val() || '';
@@ -225,7 +230,7 @@ function getFilteredTournamentData() {
             }
         }
 
-        if (selectedSeriesId) {
+        if (!ignoreSeriesFilter && selectedSeriesId) {
             if (String(data.series_id || '') !== String(selectedSeriesId)) {
                 return false;
             }
