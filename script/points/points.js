@@ -8,6 +8,7 @@ async function initSetting() {
     renderTopPageSeasonSections();
     await fetchPointsPageStandings();
     await fetchRecentPoints();
+    await fetchRecentTournaments();
     fetchAnnounce();
 }
 
@@ -93,6 +94,95 @@ async function fetchPointsPageStandings() {
 async function fetchRecentPoints() {
     const datas = await fetchPointsDetailByPlayer("");
     appendRecentPoints(datas);
+}
+
+async function fetchRecentTournaments() {
+    try {
+        const datas = await fetchTournaments("ALL");
+        appendRecentTournaments(datas);
+    } catch (error) {
+        console.error('Error fetching recent tournaments:', error);
+    }
+}
+
+function appendRecentTournaments(datas) {
+    const sortedDatas = [...datas]
+        .sort((a, b) => new Date(b.event_date) - new Date(a.event_date))
+        .slice(0, 5);
+    const seriesCounts = getRecentTournamentSeriesCounts(datas);
+
+    sortedDatas.forEach(data => {
+        const eventTeamRule = data.play_category == "個人戦" ? "SL" : `T${data.team_size || ''}`;
+        const teamTagClass = eventTeamRule == "SL"
+            ? "is-link has-text-weight-bold"
+            : "is-success has-text-weight-bold";
+        const eventSizeTier = data.event_size_tier || '';
+        const participantUnit = data.play_category == "個人戦" ? '名' : 'チーム';
+        const eventSizeTierClass = getEventSizeTierDisplayClass(eventSizeTier);
+        const prefecture = data.prefecture === "その他・海外" ? "海外" : data.prefecture;
+        const seriesCount = seriesCounts.get(data.series_id || '')?.count || 0;
+        const seriesTagHTML = data.series_name
+            ? `<a href="./tournament/list/?series=${encodeURIComponent(data.series_id || '')}"
+                class="mt-1 tag is-danger is-light shadow has-text-weight-semibold is-size-7">${data.series_name}</a>`
+            : '';
+        const results = [1, 2].map(position => ({
+            point: data[`position_${position}_point`] || 0,
+            pid: data[`position_${position}_pid`] || '',
+            pname: data[`position_${position}_pname`] || '',
+            pas: data[`position_${position}_pas`] || '',
+            pother: data[`position_${position}_pother`] || ''
+        }));
+        const eventName = (data.event_name || '').length > 30
+            ? `<abbr title="${data.event_name}">${data.event_name.slice(0, 30)}...</abbr>`
+            : data.event_name;
+
+        $("#recent-tournaments-list").append(`
+            <tr class="table is-size-7">
+                <td class="is-middle py-2">
+                    <p class="tags jaja-tags has-addons py-0 mb-1">
+                        <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                        <span class="tag narrow ${eventSizeTierClass} has-text-light">
+                            <b>${eventSizeTier} ${data.player_num}</b>${participantUnit}</span>
+                    </p>
+                    <a href="./tournament/?id=${data.event_id}">${eventName}</a><br/>
+                    ${seriesTagHTML}
+                </td>
+                <td class="is-middle">
+                    <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
+                    ${new Date(data.event_date).toLocaleDateString()}
+                </td>
+                <td class="is-middle">${generateRecentTournamentPositionHTML(results[0], data)}</td>
+                <td class="is-middle">${generateRecentTournamentPositionHTML(results[1], data)}</td>
+            </tr>
+        `);
+    });
+}
+
+function getRecentTournamentSeriesCounts(datas) {
+    const seriesCounts = new Map();
+    datas.forEach(data => {
+        if (!data.series_id) {
+            return;
+        }
+        const current = seriesCounts.get(data.series_id) || { count: 0 };
+        current.count += 1;
+        seriesCounts.set(data.series_id, current);
+    });
+    return seriesCounts;
+}
+
+function generateRecentTournamentPositionHTML(result, data) {
+    const playerHTML = result.pid
+        ? result.pid.split(',').map((pid, index) => {
+            const names = result.pname ? result.pname.split(',') : [];
+            return `<a href="./player/?pid=${pid.trim()}">${(names[index] || pid).trim()}</a>`;
+        }).join('<br/>')
+        : `<i class="las la-ghost mr-1"></i>${result.pother}`;
+    const teamHTML = data.play_category !== "個人戦" && result.pas
+        ? `<br/><span class="has-text-grey">as ${result.pas.split(',')[0].trim()}</span>`
+        : '';
+    const pointDisplayClass = getPointDisplayClass(result.point);
+    return `${playerHTML}${teamHTML}<br/><span class="is-size-7 ${pointDisplayClass}">${result.point}pt</span>`;
 }
 
 function fetchAnnounce() {

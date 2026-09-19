@@ -99,6 +99,34 @@
             </div>
         </section>
 
+        <!-- recent tournaments -->
+        <section class="section" id="recent-tournaments">
+            <h3 class="title is-size-5 mb-1">最近の大会結果</h3>
+            <p class="mb-2 is-size-65">
+                <i class="las la-ghost has-text-grey mr-1 is-size-5"></i>: システム未登録の選手・チーム<br />
+                ※ポイントランキングに登録された大会のみが表示されます。<br />
+                ※大会ティアは参加チーム／名数による機械的な表示であり、大会自体の規模や価値、評価を示すものではありません。<br />
+            </p>
+            <div class="table-container">
+                <table class="table is-narrow is-fullwidth">
+                    <thead>
+                        <tr class="has-background-danger table is-size-65">
+                            <th class="has-text-light" style="min-width: 200px;"><abbr title="大会">大会</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="大会">日付</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="1位">1位</abbr></th>
+                            <th class="has-text-light" style="min-width: 100px;"><abbr title="2位">2位</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-tournaments-list" class="table"></tbody>
+                </table>
+            </div>
+            <p class="is-size-65 has-text-centered mt-2 mb-0">
+                <a href="./tournament/list/" class="button is-fullwidth is-size-7 is-outlined is-danger">
+                    もっと見る<i class="las la-angle-right ml-1"></i>
+                </a>
+            </p>
+        </section>
+
         <!-- player detail -->
         <section class="section jaja-display-none" id="player-detail">
             <div class="content" id="player-detail-content">

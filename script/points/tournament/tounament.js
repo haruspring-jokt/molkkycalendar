@@ -58,16 +58,9 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
     const eventTeamRule = info.play_category == "個人戦" ?
         "個人" : "チーム (" + info.team_size + ")";
     const teamTagClass = eventTeamRule == "個人" ? "is-link has-text-weight-bold" : "is-success has-text-weight-bold";
-    const pointTier = info.point_tier + " Tier";
-    const pointTierClass = (function (pt) {
-        switch ((pt || '').toString().toUpperCase()) {
-            case 'S': return 'is-danger';
-            case 'A': return 'is-primary';
-            case 'B': return 'is-success';
-            case 'C': return 'has-background-grey';
-            default: return 'has-background-grey';
-        }
-    })(info.point_tier);
+    const eventSizeTier = info.event_size_tier || '';
+    const eventSizeTierClass = getEventSizeTierDisplayClass(eventSizeTier);
+    const participantUnit = info.play_category == "個人戦" ? '名' : 'チーム';
 
     const partNum = info.play_category == "個人戦" ?
         info.player_num + "名" : info.player_num + "チーム";
@@ -86,8 +79,8 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
             <p class="tags jaja-tags has-addons py-0 mb-2">
                 <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
                 <span class="tag narrow is-light">${info.prefecture}</span>
-                <span class="tag narrow ${pointTierClass}"><span class="is-size-7 has-text-light has-text-weight-bold">
-                    ${pointTier}</span></span>
+                <span class="tag narrow ${eventSizeTierClass} has-text-light">
+                    <b>${eventSizeTier} ${info.player_num}</b>${participantUnit}</span>
             </p>
             <p class="is-size-5 has-text-weight-bold mb-1">${info.event_name}</p>
             <p class="subtitle is-size-65 has-text-grey">

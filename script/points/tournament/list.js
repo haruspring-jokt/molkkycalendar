@@ -298,17 +298,10 @@ function appendTournamentList(datas) {
         const eventTeamRule = info.play_category == "個人戦" ?
             "SL" : "T" + info.team_size + "";
         const teamTagClass = eventTeamRule == "SL" ? "is-link has-text-weight-bold" : "is-success has-text-weight-bold";
-        const pointTier = info.point_tier;
+        const eventSizeTier = info.event_size_tier || '';
+        const participantUnit = info.play_category == "個人戦" ? '名' : 'チーム';
+        const eventSizeTierClass = getEventSizeTierDisplayClass(eventSizeTier);
         const point = results[0].point;
-        const pointTierClass = (function (pt) {
-            switch ((pt || '').toString().toUpperCase()) {
-                case 'S': return 'is-danger';
-                case 'A': return 'is-primary';
-                case 'B': return 'is-success';
-                case 'C': return 'has-background-grey';
-                default: return 'has-background-grey';
-            }
-        })(info.point_tier);
         // eventNameは20文字以上であれば省略する
         const eventName = info.event_name.length > 30 ?
             `<abbr title="${info.event_name}">${info.event_name.slice(0, 30) + "..."}</abbr>`
@@ -334,14 +327,14 @@ function appendTournamentList(datas) {
                 <td class="is-middle py-2">
                     <p class="tags jaja-tags has-addons py-0 mb-1">
                         <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
-                        <span class="tag narrow is-light">${prefecture}</span>
-                        <span class="tag narrow ${pointTierClass}"><span class="is-size-7 has-text-light has-text-weight-bold">
-                            ${pointTier} ${point}</span></span>
+                        <span class="tag narrow ${eventSizeTierClass} has-text-light">
+                            <b>${eventSizeTier} ${info.player_num}</b>${participantUnit}</span>
                     </p>
                     <a href="../?id=${data.event_id}">${eventName}</a><br/>
                     ${seriesTagHTML}
                 </td>
                 <td class="is-middle">
+                    <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
                     ${new Date(info.event_date).toLocaleDateString()}
                 </td>
                 <td class="is-middle">
@@ -384,6 +377,8 @@ function generatePositionHTML(result, info) {
             return `<br/><span class="has-text-grey">as ${firstAs}</span>`;
         })()
         : "";
+    const pointDisplayClass = getPointDisplayClass(result.point);
+    const pointTag = `<br/><span class="is-size-7 ${pointDisplayClass}">${result.point}pts</span>`;
 
-    return playerTag + teamTag;
+    return playerTag + teamTag + pointTag;
 }

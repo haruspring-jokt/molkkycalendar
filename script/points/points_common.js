@@ -11,6 +11,43 @@ function appendPointsPageCommonParts() {
 }
 
 /**
+ * 獲得ポイントの表示用文字色と太字クラスを返す。
+ * @param {number|string} point
+ * @returns {string}
+ */
+function getPointDisplayClass(point) {
+    const pointValue = Number(point) || 0;
+    const colorClass = pointValue >= 100
+        ? 'has-text-danger'
+        : pointValue >= 50
+            ? 'has-text-primary'
+            : pointValue >= 20
+                ? 'has-text-success'
+                : pointValue >= 10
+                    ? 'has-text-info'
+                    : 'has-text-grey';
+    const weightClass = pointValue >= 20 ? 'has-text-weight-bold' : '';
+
+    return `${colorClass} ${weightClass}`.trim();
+}
+
+/**
+ * 参加規模ティアの表示用背景色クラスを返す。
+ * @param {string} eventSizeTier
+ * @returns {string}
+ */
+function getEventSizeTierDisplayClass(eventSizeTier) {
+    const tier = String(eventSizeTier || '');
+    return tier.startsWith('Ⅰ')
+        ? 'is-danger'
+        : tier.startsWith('Ⅱ')
+            ? 'is-primary'
+            : tier.startsWith('Ⅲ')
+                ? 'is-success'
+                : 'has-background-grey';
+}
+
+/**
  * 指定日が属するシーズンキー（例: "2526"）を返す。シーズンは毎年9/1開始。
  * @param {Date} dateValue
  * @returns {String}
