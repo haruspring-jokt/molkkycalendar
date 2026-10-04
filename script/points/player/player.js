@@ -97,7 +97,7 @@ function appendPlayerInfo(datas, seasonSummaries = []) {
             <i class="las la-id-card mr-1 has-text-grey"></i>${data.player_id}
         </p>
         <p class="is-size-65">
-            <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">通算ポイント</span>${Number(data.s2526_points || 0)}<br/>
+            <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">通算ポイント</span>${seasonSummaries.reduce((sum, s) => sum + Number(s.points || 0), 0)}<br/>
             ${seasonSummaryHtml}
             <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">エリア</span>${data.area}<br/>
         </p>
@@ -158,6 +158,8 @@ function appendPointsDetail(datas, tournaments) {
             }
             return getSeasonKey(new Date(data.event_date)) === selectedSeason;
         });
+
+        appendPointsChart(filteredDatas);
 
         if (filteredDatas.length === 0) {
             $('#player-result-table').hide();
@@ -263,6 +265,65 @@ function appendPointsDetail(datas, tournaments) {
         const medalIcons = Array(medal).fill('<i class="las la-medal has-text-success is-size-6"></i>').join('');
         $("#player-achivement").empty().append(`${trophyIcons}${medalIcons}`);
     }
+}
+
+let playerPointsChart = null;
+
+/**
+ * 獲得ポイントの大会形式別（個人・チーム人数別）内訳をドーナツグラフで描画する
+ * @param {Array} pointsDetail 対象シーズンで絞り込んだ入賞履歴JSON
+ */
+function appendPointsChart(pointsDetail) {
+    const container = $('#player-points-chart-container');
+    if (playerPointsChart) {
+        playerPointsChart.destroy();
+        playerPointsChart = null;
+    }
+    container.addClass('jaja-display-none');
+    if (typeof Chart === 'undefined' || !pointsDetail || pointsDetail.length === 0) {
+        return;
+    }
+    const categories = [
+        { key: 'solo', label: '個人', cssVar: '--bulma-link' },
+        { key: '2', label: 'チーム (2人)', cssVar: '--bulma-success' },
+        { key: '3', label: 'チーム (3人)', cssVar: '--bulma-success-40' },
+        { key: '4', label: 'チーム (4人以上)', cssVar: '--bulma-success-30' }
+    ];
+    const totals = new Map(categories.map((c) => [c.key, 0]));
+    pointsDetail.forEach((record) => {
+        const teamNum = Number(record.event_team_num);
+        const key = record.event_team_rule == '個人戦' ? 'solo' : String(Math.min(teamNum, 4));
+        if (totals.has(key)) {
+            totals.set(key, totals.get(key) + Number(record.points || 0));
+        }
+    });
+    const active = categories.filter((c) => totals.get(c.key) > 0);
+    if (active.length === 0) {
+        return;
+    }
+
+    container.removeClass('jaja-display-none');
+    const rootStyle = getComputedStyle(document.documentElement);
+    playerPointsChart = new Chart(document.getElementById('player-points-chart'), {
+        type: 'doughnut',
+        data: {
+            labels: active.map((c) => c.label),
+            datasets: [{
+                data: active.map((c) => totals.get(c.key)),
+                backgroundColor: active.map((c) => rootStyle.getPropertyValue(c.cssVar).trim())
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed} pt`
+                    }
+                }
+            }
+        }
+    });
 }
 
 function buildSeasonSummaries(playerInfo, pointsDetail, allResults = [], allPlayers = []) {
