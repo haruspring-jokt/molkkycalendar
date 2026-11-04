@@ -135,6 +135,7 @@ function appendRecentTournaments(datas) {
         const eventName = (data.event_name || '').length > 30
             ? `<abbr title="${data.event_name}">${data.event_name.slice(0, 30)}...</abbr>`
             : data.event_name;
+        const applyButtonHTML = createTournamentResultApplyButtonHtml(data);
 
         $("#recent-tournaments-list").append(`
             <tr class="table is-size-7">
@@ -148,8 +149,13 @@ function appendRecentTournaments(datas) {
                     ${seriesTagHTML}
                 </td>
                 <td class="is-middle">
-                    <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
-                    ${new Date(data.event_date).toLocaleDateString()}
+                    <div class="is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%; min-height: 100%;">
+                        <div>
+                            <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
+                            ${new Date(data.event_date).toLocaleDateString()}
+                        </div>
+                        <div class="m-0 p-0">${applyButtonHTML}</div>
+                    </div>
                 </td>
                 <td class="is-middle">${generateRecentTournamentPositionHTML(results[0], data)}</td>
                 <td class="is-middle">${generateRecentTournamentPositionHTML(results[1], data)}</td>

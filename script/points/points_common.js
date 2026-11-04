@@ -10,6 +10,52 @@ function appendPointsPageCommonParts() {
     appendCommonGoogleAds();
 }
 
+function buildTournamentResultApplicationUrl(info = {}) {
+    const baseUrl = JajaConstants.formTournamentResult;
+    const url = new URL(baseUrl);
+    const eventDate = String(info.event_date || '').slice(0, 10);
+    const playCategory = String(info.play_category || '').trim();
+    const entryParams = JajaConstants.formTournamentResultEntryParams;
+
+    const params = {
+        [entryParams.tournamentName]: String(info.event_name || '').trim(),
+        [entryParams.tournamentDate]: eventDate,
+        [entryParams.organizer]: String(info.org || '').trim(),
+        [entryParams.prefecture]: String(info.prefecture || '').trim(),
+        [entryParams.playCategory]: playCategory,
+        [entryParams.participantCount]: String(info.player_num || '').trim(),
+    };
+
+    if (playCategory === 'チーム戦') {
+        const teamSize = String(info.team_size || '').trim();
+        if (teamSize) {
+            params[entryParams.teamSize] = teamSize;
+        }
+    }
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== '') {
+            url.searchParams.set(key, value);
+        }
+    });
+
+    return url.toString();
+}
+
+function createTournamentResultApplyButtonHtml(info = {}) {
+    const formUrl = buildTournamentResultApplicationUrl(info);
+    return `
+        <p class="mt-1 mb-0">
+            <a href="${formUrl}" target="_blank">
+                <button class="button is-danger is-small p-1 px-2">
+                    <i class="las la-file-upload has-text-light is-size-65"></i>
+                    <span class="has-text-light is-size-7">申請</span>
+                </button>
+            </a>
+        </p>
+    `;
+}
+
 /**
  * 獲得ポイントの表示用文字色と太字クラスを返す。
  * @param {number|string} point

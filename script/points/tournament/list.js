@@ -321,6 +321,7 @@ function appendTournamentList(datas) {
                     data-series-id="${info.series_id || ''}" data-series-count="${seriesCount}" style="cursor: pointer;">${info.series_name}</button>`
                 : `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${info.series_name}</span>`)
             : '';
+        const applyButtonHTML = createTournamentResultApplyButtonHtml(info);
 
         $("#tournament-list-content").append(`
             <tr class="table is-size-7">
@@ -334,8 +335,13 @@ function appendTournamentList(datas) {
                     ${seriesTagHTML}
                 </td>
                 <td class="is-middle">
-                    <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
-                    ${new Date(info.event_date).toLocaleDateString()}
+                    <div class="is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%; min-height: 100%;">
+                        <div>
+                            <span class="tag is-small is-light has-background-light mt-1">${prefecture}</span><br/>
+                            ${new Date(info.event_date).toLocaleDateString()}
+                        </div>
+                        <div class="m-0 p-0">${applyButtonHTML}</div>
+                    </div>
                 </td>
                 <td class="is-middle">
                     ${position1HTML}

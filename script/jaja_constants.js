@@ -32,6 +32,20 @@ class JajaConstants {
     static get formOther() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSdPBFs0j5rdDV8-NAwpTcJeHu7vAXMKZSLewAdbAKnwCl_UYA/viewform";
     }
+    static get formTournamentResult() {
+        return "https://docs.google.com/forms/d/e/1FAIpQLSchgcJM2vqkKxDnHdjjy3WJQIdMCJFDqy1-1BbV_MSQZPgz9g/viewform?usp=pp_url&";
+    }
+    static get formTournamentResultEntryParams() {
+        return {
+            tournamentName: "entry.133337687",
+            tournamentDate: "entry.391281173",
+            organizer: "entry.184678383",
+            prefecture: "entry.525658325",
+            playCategory: "entry.221418680",
+            teamSize: "entry.1249057220",
+            participantCount: "entry.1605067127",
+        };
+    }
     static get scoresheet() {
         return "https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm?usp=sharing";
     }

@@ -55,6 +55,8 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
         series_name: data.series_name,
         series_id: data.series_id,
     };
+
+    const formUrl = buildTournamentResultApplicationUrl(info);
     const eventTeamRule = info.play_category == "個人戦" ?
         "個人" : "チーム (" + info.team_size + ")";
     const teamTagClass = eventTeamRule == "個人" ? "is-link has-text-weight-bold" : "is-success has-text-weight-bold";
@@ -92,7 +94,16 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
                 <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">${eventTeamRule}</span><br/>
                 <span class="tag narrow has-text-weight-bold p-1 mr-1 mb-2">参加</span>${partNum}<br/>
                 ${seriesInfo}
-            ${resultSheet}
+                ${resultSheet}
+            </p>
+            <p class="mt-3">
+                <a href="${formUrl}" target="_blank">
+                    <button class="button is-danger is-fullwidth is-small">
+                        <i class="las la-file-upload mx-1 is-size-5 has-text-light"></i>
+                        <span class="has-text-light">この大会の結果を申請する</span>
+                    </button>
+                </a>
+            </p>
         </div>
     `);
     // 画像（表彰写真など）の追加
