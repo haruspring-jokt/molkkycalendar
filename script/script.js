@@ -276,7 +276,7 @@ function appendCommonEventInfoForm() {
     $(".jaja-calendar-event-info-form").append(`
             <p class="m-2">
                 <button type="button" class="button is-success has-text-white-bis is-fullwidth is-small" id="open-immediate-event-post-modal">
-                    <i class="las la-bolt mx-1 is-size-5"></i>すぐにイベント掲載（認証主催者向け）
+                    <i class="las la-bolt mx-1 is-size-5"></i>イベント掲載（認証済み主催者向け）
                 </button>
             </p>
             <p class="m-2">
