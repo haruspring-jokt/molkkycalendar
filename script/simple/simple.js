@@ -217,7 +217,6 @@ function createTitle(event) {
     const detailHref = getEventDetailHref(event);
     return `
         <a class="" href="${detailHref}">
-            <span class="is-size-65 has-text-weight-medium">${event['eventName']}</span></a>
+            <span class="is-size-65 has-text-weight-medium">${event['eventName']}${createAutoCreatedEventIcon(event)}</span></a>
     `;
 }
-

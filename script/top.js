@@ -338,7 +338,7 @@ function appendEvents(events) {
 function createTitle(event) {
     const detailHref = getEventDetailHref(event);
     return `
-        <a class="text-" href="${detailHref}">${event['eventName']}</a>
+        <a class="text-" href="${detailHref}">${event['eventName']}${createAutoCreatedEventIcon(event)}</a>
     `;
 }
 
@@ -387,5 +387,4 @@ function createGoogleMapLink(event) {
 function createDefaultTagClass(name) {
     return `<span class="tag narrow mx-1 is-light p-1 has-text-weight-semibold">${name}</span>`;
 }
-
 

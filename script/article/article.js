@@ -189,7 +189,7 @@ function appendEventDetail(event) {
                 <span class="tag is-primary is-light">${prefectureName || '未設定'}</span>
                 <span class="tag ${labelColor}">${categoryLabel}</span>
             </div>
-            <h2 class="title is-size-4 mb-2">${event['eventName']}</h2>
+            <h2 class="title is-size-4 mb-2">${event['eventName']}${createAutoCreatedEventIcon(event)}</h2>
             <p class="subtitle is-size-65 has-text-grey mb-4">${event['seriesName'] ? `<i class="las la-scroll mr-1"></i>${event['seriesName']}<br/>` : ''}${organizerHtml}</p>
             <div class="content">
                 <div class="buttons are-small">

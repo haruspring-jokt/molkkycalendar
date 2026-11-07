@@ -38,6 +38,12 @@ function getEventDetailHref(event) {
     return `${getRelativePathToSiteRoot()}article/?serial=${encodeURIComponent(serial)}`;
 }
 
+function createAutoCreatedEventIcon(event) {
+    return event['isAutoCreated'] === true
+        ? ' <i class="las la-robot has-text-primary" aria-label="自動投稿"></i>'
+        : '';
+}
+
 function detailOpenEvent() {
     $(document).on('click', '.jaja-display-click', function (e) {
         e.preventDefault();
@@ -269,6 +275,11 @@ function appendFooter() {
 function appendCommonEventInfoForm() {
     $(".jaja-calendar-event-info-form").append(`
             <p class="m-2">
+                <button type="button" class="button is-success has-text-white-bis is-fullwidth is-small" id="open-immediate-event-post-modal">
+                    <i class="las la-bolt mx-1 is-size-5"></i>すぐにイベント掲載（認証主催者向け）
+                </button>
+            </p>
+            <p class="m-2">
                 <a class=""
                     href="${JajaConstants.formFormat}"
                     target="_blank"><button class="button is-success is-fullwidth is-outlined is-small">
@@ -287,6 +298,348 @@ function appendCommonEventInfoForm() {
                         <i class="las la-file-upload mx-1 is-size-5 has-text-success"></i>その他各種お問い合わせ</button></a>
             </p>
         `);
+    appendImmediateEventPostModal();
+}
+
+function appendImmediateEventPostModal() {
+    if ($('#immediate-event-post-modal').length) {
+        return;
+    }
+
+    $('body').append(createImmediateEventPostModalHtml());
+
+    const $modal = $('#immediate-event-post-modal');
+    const $form = $('#immediate-event-post-form');
+    const $success = $('#immediate-event-post-success');
+    const $error = $('#immediate-event-post-error');
+    const closeModal = () => {
+        $modal.removeClass('is-active');
+        $('html').removeClass('is-clipped');
+        if (!$success.hasClass('is-hidden')) {
+            $form[0].reset();
+            $form.removeClass('is-hidden');
+            $success.addClass('is-hidden');
+        }
+    };
+
+    $('#open-immediate-event-post-modal').on('click', () => {
+        if (isLocalDevelopmentHost()) {
+            fillImmediateEventPostSampleData($form);
+        }
+        $modal.addClass('is-active');
+        $('html').addClass('is-clipped');
+        $('#immediate-event-secret-key').trigger('focus');
+    });
+
+    $modal.on('click', '[data-close-immediate-event-post]', () => {
+        closeModal();
+    });
+
+    $(document).on('keydown.immediateEventPost', (event) => {
+        if (event.key === 'Escape' && $modal.hasClass('is-active')) {
+            closeModal();
+        }
+    });
+
+    $form.on('submit', async (event) => {
+        event.preventDefault();
+        $error.addClass('is-hidden').text('');
+        $success.addClass('is-hidden');
+
+        const formData = new FormData($form[0]);
+        const payload = Object.fromEntries(formData.entries());
+        const teamSizeMin = payload.teamSizeMin ? Number(payload.teamSizeMin) : null;
+        const teamSizeMax = payload.teamSizeMax ? Number(payload.teamSizeMax) : null;
+        if ((teamSizeMin !== null && (!Number.isInteger(teamSizeMin) || teamSizeMin < 1))
+            || (teamSizeMax !== null && (!Number.isInteger(teamSizeMax) || teamSizeMax < 1))) {
+            $error.text('チーム人数は1以上の自然数で入力してください。').removeClass('is-hidden');
+            return;
+        }
+        if (teamSizeMin !== null && teamSizeMax !== null && teamSizeMin > teamSizeMax) {
+            $error.text('チーム人数最少は最大以下の値を入力してください。').removeClass('is-hidden');
+            return;
+        }
+        const isHttpUrl = (value) => {
+            try {
+                return ['http:', 'https:'].includes(new URL(value).protocol);
+            } catch {
+                return false;
+            }
+        };
+        if (!isHttpUrl(payload.source) || (payload.image && !isHttpUrl(payload.image))) {
+            $error.text('ソースとイベント画像URLは、httpまたはhttpsから始まるURLを入力してください。').removeClass('is-hidden');
+            return;
+        }
+
+        const prefecture = JajaConstants.prefectureList[payload.prefecture];
+        if (!prefecture) {
+            $error.text('都道府県を選択してください。').removeClass('is-hidden');
+            return;
+        }
+
+        payload.prefecture = prefecture;
+        payload.teamSizeMin = teamSizeMin;
+        payload.teamSizeMax = teamSizeMax;
+        payload.rules = String(payload.rules || '').replace(/[\r\n\u3000]+/g, ' ').trim();
+
+        $form.addClass('is-hidden');
+        $success.removeClass('is-hidden');
+        try {
+            const response = await fetch('https://molkkycalendar-user-post-event.cloud.run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const message = response.status === 401
+                    ? '認証IDが正しくありません。認証IDをご確認ください。'
+                    : '送信に失敗しました。時間をおいて再度お試しください。';
+                throw new Error(message);
+            }
+        } catch (error) {
+            console.error('イベント作成リクエストの送信に失敗しました。', error);
+            $success.addClass('is-hidden');
+            $form.removeClass('is-hidden');
+            $error.text(error instanceof TypeError
+                ? '通信に失敗しました。時間をおいて再度お試しください。'
+                : error.message).removeClass('is-hidden');
+        }
+    });
+}
+
+function isLocalDevelopmentHost() {
+    return ['localhost', '127.0.0.1'].includes(window.location.hostname);
+}
+
+function fillImmediateEventPostSampleData($form) {
+    const eventDate = getOneMonthFromToday();
+    const sampleData = {
+        eventDate,
+        eventStart: '09:00',
+        eventEnd: '17:00',
+        category: '大会',
+        seriesName: 'テスト用：全国モルックカレンダーカップ',
+        source: 'https://jajapatatas.com',
+        eventName: 'サンプル モルック大会',
+        prefecture: '13',
+        place: 'サンプル公園 多目的広場',
+        surface: '公園芝生',
+        configuration: 'チーム',
+        teamSizeMin: 2,
+        teamSizeMax: 4,
+        rules: '参加条件なし。初心者歓迎。',
+        capacity: '優先枠：10チーム、一般枠：20チーム',
+        entryStart: getTodayInInputDateFormat(),
+        entryEnd: eventDate,
+        entryMethod: 'Googleフォーム',
+        entryFee: '1チーム3,000円',
+        entryOther: '定員に達し次第、受付を終了します。',
+        remarks: 'これはローカル確認用のサンプルデータです。',
+        image: 'https://pbs.twimg.com/profile_banners/1658728560436330502/1763560515/1500x500'
+    };
+
+    Object.entries(sampleData).forEach(([name, value]) => {
+        $form[0].elements.namedItem(name).value = value;
+    });
+}
+
+function getTodayInInputDateFormat() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function createImmediateEventPostModalHtml() {
+    return `
+        <div class="modal" id="immediate-event-post-modal" role="dialog" aria-modal="true" aria-labelledby="immediate-event-post-title">
+            <div class="modal-background" data-close-immediate-event-post></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title" id="immediate-event-post-title"><span class="is-size-5">イベント掲載（認証済み主催者向け）</span></p>
+                    <button type="button" class="delete" aria-label="閉じる" data-close-immediate-event-post></button>
+                </header>
+                <section class="modal-card-body is-size-65">
+                    ${createImmediateEventPostGuide()}
+                    <div class="notification is-success is-light is-hidden" id="immediate-event-post-success" role="status">
+                        イベント作成リクエストを送信しました。イベントの反映は数時間～1日後の見込みです。</br>
+                        新しいイベントは、以下のページから確認することができます。
+                        <a href="https://jajapatatas.com/recent" target="_blank" rel="noopener noreferrer">新しいイベント一覧</a>
+                    </div>
+                    <div class="notification is-danger is-light is-hidden" id="immediate-event-post-error" role="alert"></div>
+                    <form id="immediate-event-post-form">
+                        ${createImmediateEventPostFormFields()}
+                    </form>
+                </section>
+                <footer class="modal-card-foot is-justify-content-flex-end">
+                    <button type="button" class="button" data-close-immediate-event-post>閉じる</button>
+                </footer>
+            </div>
+        </div>
+    `;
+}
+
+function createImmediateEventPostGuide() {
+    return `
+        <div class="content is-size-65">
+            <p>フォーム送信から数時間～数日でHPに反映されます。</pr>
+            <p>このフォームでイベントを掲載するには、認証キーが必要です。<br>
+            認証キーは、以下のメールアドレス、またはXのアカウントにDMで発行の依頼をしてください。</p>
+            <ul>
+                <li><a href="mailto:contact@jajapatatas.com">contact@jajapatatas.com</a></li>
+                <li><a href="https://x.com/molkkycalendar" target="_blank" rel="noopener noreferrer">https://x.com/molkkycalendar</a></li>
+            </ul>
+            <p>認証キーは、主催者がイベントカレンダーに掲載されたことがある場合に発行可能です。<br>
+            新規の主催者は、まずはこれまでのイベント掲載申請フォーム（Googleフォーム）から申請を依頼してください。</p>
+        </div>
+    `;
+}
+
+function createImmediateEventPostFormFields() {
+    const categoryOptions = [
+        { value: '大会', label: '大会' },
+        { value: '大会（長期）', label: '大会（長期）' },
+        { value: '練習会', label: '練習会' },
+        { value: '体験会', label: '体験会' },
+        { value: 'その他', label: 'その他' },
+        { value: 'ブース', label: 'ブース' }
+    ];
+    const configurationOptions = [
+        { value: '個人', label: '個人' },
+        { value: 'チーム', label: 'チーム' }
+    ];
+    const prefectureOptions = JajaConstants.areaSelects
+        .filter((area) => /^\d{2}$/.test(area.key) && area.key !== '00')
+        .map((area) => ({ value: area.key, label: area.text }));
+    const defaultEventDate = getOneMonthFromToday();
+
+    return `
+        ${createImmediateEventPostInputField('認証ID', 'secretKey', 'password', true)}
+        ${createImmediateEventPostInputField('開催日付', 'eventDate', 'date', true, '', {
+            value: defaultEventDate
+        })}
+        <div class="columns my-1">
+            <div class="column py-1">${createImmediateEventPostInputField('開始時間', 'eventStart', 'time', false, '', {
+                value: '09:00',
+                fieldClass: 'mb-1'
+            })}</div>
+            <div class="column py-1">${createImmediateEventPostInputField('終了時間', 'eventEnd', 'time', false, '', {
+                value: '17:00',
+                fieldClass: 'mb-1'
+            })}</div>
+        </div>
+        ${createImmediateEventPostSelectField('種別', 'category', categoryOptions, true)}
+        ${createImmediateEventPostInputField('イベントシリーズ', 'seriesName', 'text', false, '', {
+            helpText: '長期大会や定期的に開催されている大会の場合、その名称を入力'
+        })}
+        ${createImmediateEventPostInputField('ソース（告知ページ）', 'source', 'url', true, 'https://example.com')}
+        ${createImmediateEventPostInputField('イベント名称', 'eventName', 'text', true)}
+        ${createImmediateEventPostSelectField('都道府県', 'prefecture', prefectureOptions, true)}
+        ${createImmediateEventPostInputField('開催場所', 'place')}
+        ${createImmediateEventPostInputField('サーフェス', 'surface', 'text', false, '', {
+            helpText: 'クレー、公園芝生、天然芝、人工芝、ビーチ、室内、など'
+        })}
+        ${createImmediateEventPostSelectField('構成', 'configuration', configurationOptions)}
+        <div class="columns my-1">
+            <div class="column py-1">${createImmediateEventPostInputField('チーム人数最少', 'teamSizeMin', 'number', false, '', {
+                attributes: 'min="1" step="1"',
+                fieldClass: 'mb-1'
+            })}</div>
+            <div class="column py-1">${createImmediateEventPostInputField('チーム人数最大', 'teamSizeMax', 'number', false, '', {
+                attributes: 'min="1" step="1"',
+                fieldClass: 'mb-1'
+            })}</div>
+        </div>
+        ${createImmediateEventPostTextareaField('ルール・参加条件', 'rules')}
+        ${createImmediateEventPostInputField('定員', 'capacity', 'text', false, '', {
+            helpText: '参加上限の人数またはチーム数。「優先枠：XX、一般枠：YY」のような自由な記載でもよい。'
+        })}
+        ${createImmediateEventPostInputField('エントリー開始日', 'entryStart')}
+        ${createImmediateEventPostInputField('エントリー終了日', 'entryEnd')}
+        ${createImmediateEventPostInputField('エントリー媒体', 'entryMethod')}
+        ${createImmediateEventPostInputField('エントリー参加費', 'entryFee')}
+        ${createImmediateEventPostTextareaField('エントリーその他', 'entryOther')}
+        ${createImmediateEventPostTextareaField('備考', 'remarks')}
+        ${createImmediateEventPostInputField('イベント画像URL', 'image', 'url', false, 'https://example.com/image.jpg')}
+        <p class="help mb-4">フォーム送信後、イベントの反映まで数時間～1日ほどかかる見込みです。</p>
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary is-fullwidth is-size-6" id="immediate-event-post-submit" type="submit">イベント作成リクエストを送信</button>
+            </div>
+        </div>
+    `;
+}
+
+function getOneMonthFromToday() {
+    const date = new Date();
+    const dayOfMonth = date.getDate();
+    const targetMonth = date.getMonth() + 1;
+    date.setDate(1);
+    date.setMonth(targetMonth);
+    const lastDayOfTargetMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    date.setDate(Math.min(dayOfMonth, lastDayOfTargetMonth));
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function createImmediateEventPostInputField(label, name, type = 'text', required = false, placeholder = '', options = {}) {
+    const id = `immediate-event-${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+    const requiredAttribute = required ? 'required' : '';
+    const requiredLabel = required ? ' <span class="has-text-danger">必須</span>' : '';
+    const placeholderAttribute = placeholder ? `placeholder="${placeholder}"` : '';
+    const keyAttributes = name === 'secretKey'
+        ? 'minlength="8" maxlength="8" pattern="[A-Za-z0-9]{8}" autocomplete="off" title="半角英数字8桁で入力してください"'
+        : options.attributes || '';
+    const valueAttribute = options.value ? `value="${options.value}"` : '';
+    const helpText = options.helpText || (name === 'secretKey'
+        ? '事前に配布された8桁の英数字を入力してください。'
+        : '');
+    const fieldClass = options.fieldClass || '';
+
+    return `
+        <div class="field ${fieldClass}">
+            <label class="label is-size-65" for="${id}">${label}${requiredLabel}</label>
+            <div class="control">
+                <input class="input" id="${id}" name="${name}" type="${type}" ${requiredAttribute} ${placeholderAttribute} ${valueAttribute} ${keyAttributes}>
+            </div>
+            ${helpText ? `<p class="help">${helpText}</p>` : ''}
+        </div>
+    `;
+}
+
+function createImmediateEventPostTextareaField(label, name) {
+    const id = `immediate-event-${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+    return `
+        <div class="field">
+            <label class="label is-size-65" for="${id}">${label}</label>
+            <div class="control"><textarea class="textarea" id="${id}" name="${name}"></textarea></div>
+        </div>
+    `;
+}
+
+function createImmediateEventPostSelectField(label, name, options, required = false) {
+    const id = `immediate-event-${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+    const requiredAttribute = required ? 'required' : '';
+    const requiredLabel = required ? ' <span class="has-text-danger">必須</span>' : '';
+    const optionHtml = options
+        .map((option) => `<option value="${option.value}">${option.label}</option>`)
+        .join('');
+
+    return `
+        <div class="field">
+            <label class="label is-size-65" for="${id}">${label}${requiredLabel}</label>
+            <div class="control select is-fullwidth">
+                <select id="${id}" name="${name}" ${requiredAttribute}>
+                    <option value="">選択してください</option>
+                    ${optionHtml}
+                </select>
+            </div>
+        </div>
+    `;
 }
 
 function appendCommonPointsSiteLinks() {
