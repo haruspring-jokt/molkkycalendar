@@ -34,6 +34,8 @@
 - ルートページ: [index.html](../index.html)
 - イベント詳細ページ: [article/index.html](../article/index.html)
 - 共通スクリプト: [script/script.js](../script/script.js)
+- ユーザーによるイベント作成: [script/user_event_post.js](../script/user_event_post.js)
+- イベント掲載時の認証ID照合: [google_cloud/cloud_run/molkkycalendar-user-post-authid-check/index.js](../google_cloud/cloud_run/molkkycalendar-user-post-authid-check/index.js)
 - 共通定数: [script/jaja_constants.js](../script/jaja_constants.js)
 - トップページ処理: [script/top.js](../script/top.js)
 - 主催者ページ: [organizer/index.html](../organizer/index.html)
@@ -64,6 +66,8 @@
 - 最近追加イベントおよび最近の動画の表示
 - イベントの詳細ページへの内部遷移
 - 申請フォーム・関連リンクの表示
+- 認証済み主催者によるイベント作成リクエスト（Cloud Run 関数への送信）
+- 認証ID入力時の主催者照合、同じ主催者の既存イベントからのフォーム入力コピー
 - 広告・Amazon提携バナーの表示
 
 ### 3.2 表示バリエーション
@@ -96,6 +100,7 @@
  - 主催者情報: `script/jaja_constants.js` 内の `molkkyCalendarStorage.org`（org.json の URL）
 - 最近イベント: `recent`
 - 最近動画: `recent_videos`
+- イベント投稿フォームのコピー候補: `events.json`を主催者IDで絞り込み
 - ポイントランキング: `JajaConstants.molkkyCalendarStorage.points.getSeasonUrl(season)`, `point_results`, `point_players`, `point_tournaments`
 
 ### 4.2 フィルターと状態管理
@@ -178,6 +183,7 @@
 
 - 管理画面や管理用APIは実装されておらず、イベント登録は外部フォームと外部データ更新に依存しています。
 - 申請・掲載依頼はGoogleフォーム経由です。
+- 認証ID確認用Cloud Run関数は `MASTER_SPREADSHEET_ID` とGoogle OAuth認証情報を使い、主催マスタのS列を照合してA列・E列の主催情報を返します。イベント送信時も既存の投稿関数で認証IDを再照合します。
 - 画像・動画・外部リンクは主に外部サービスに依存しています。
 - サイト自体は静的に配信されるため、簡単な保守・改修に向いています。
 
@@ -197,4 +203,3 @@
   - 構文チェック: 主要スクリプト群に対し簡易的な JavaScript 構文チェックを実行し、構文エラーは検出されていません。
 
   備考: 変更は既にリポジトリに反映された前提で記載しています。追加でブラウザでの実動作検証（画像表示、開閉、リンク遷移、レスポンシブ等）を行うことを推奨します。
-

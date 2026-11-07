@@ -1,40 +1,53 @@
 class JajaConstants {
+    /** YouTubeチャンネルのURLを返す。 */
     static get youtube() {
         return "https://youtube.com/@molkkyclanjajapatatas/";
     }
+    /** XアカウントのURLを返す。 */
     static get twitter() {
         return "https://x.com/molkkycalendar";
     }
+    /** グッズ販売ページのURLを返す。 */
     static get suzuri() {
         return "https://suzuri.jp/haruspring_jokt/";
     }
+    /** ニュースブログのURLを返す。 */
     static get blog() {
         return "https://blog.jajapatatas.com/";
     }
+    /** 2026年版イベント一覧のURLを返す。 */
     static get archive2026() {
         return "https://docs.google.com/spreadsheets/d/1_YkA48QMmdshBVWfGWFppTWsTlFJfpct1-lyhgob7X8";
     }
+    /** 2025年版イベント一覧のURLを返す。 */
     static get archive2025() {
         return "https://docs.google.com/spreadsheets/d/1neikRlOUUUmeZDgZh_NlzL-QDSTrJYt3fGmIV6IUjA4";
     }
+    /** 2024年版イベント一覧のURLを返す。 */
     static get archive2024() {
         return "https://docs.google.com/spreadsheets/d/1TrmgKPVHvg1VqF4sXU_NGf5-rVghhFNv3pYrgKlhMEE";
     }
+    /** 2023年版イベント一覧のURLを返す。 */
     static get archive2023() {
         return "https://docs.google.com/spreadsheets/d/1AgddHVxbOcQPw0duGCAKDQLIqXu3K4hzRoVxnSGFRBk";
     }
+    /** 項目別のイベント掲載申請フォームのURLを返す。 */
     static get formFormat() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSc2YoTNKP18VHvYUvzksLNJDnxMIi_dUWtneS5pYyBHHiR8PQ/viewform";
     }
+    /** フリーフォーマットの掲載申請フォームのURLを返す。 */
     static get formFree() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSdckaqci6BQdFR01mOKFSy6Le2_RUY3weyc2nrQocFp9Vz1aw/viewform";
     }
+    /** その他のお問い合わせフォームのURLを返す。 */
     static get formOther() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSdPBFs0j5rdDV8-NAwpTcJeHu7vAXMKZSLewAdbAKnwCl_UYA/viewform";
     }
+    /** 大会結果の申請フォームのURLを返す。 */
     static get formTournamentResult() {
         return "https://docs.google.com/forms/d/e/1FAIpQLSchgcJM2vqkKxDnHdjjy3WJQIdMCJFDqy1-1BbV_MSQZPgz9g/viewform?usp=pp_url&";
     }
+    /** 大会結果の申請フォームに値を渡すための項目IDを返す。 */
     static get formTournamentResultEntryParams() {
         return {
             tournamentName: "entry.133337687",
@@ -46,23 +59,29 @@ class JajaConstants {
             participantCount: "entry.1605067127",
         };
     }
+    /** スコアシートの配布先URLを返す。 */
     static get scoresheet() {
         return "https://drive.google.com/drive/folders/17MPlK0MsZkxTMi0IvWQqxDdFdnD2a9Pm?usp=sharing";
     }
+    /** モルック関東プライムリーグのURLを返す。 */
     static get molkkyprime() {
         return "https://www.molkkyprime.com";
     }
+    /** サイト内ページの絶対URLを返す。 */
     static get fullPath() {
         return {
             points: "https://jajapatatas.com/points"
         }
     }
+    /** 現在のポイントランキングのシーズンキーを返す。 */
     static get currentSeason() {
         return "2627";
     }
+    /** 選択可能なポイントランキングのシーズンを返す。 */
     static get pointSeasonList() {
         return [this.currentSeason, "2526"];
     }
+    /** カレンダーのフィルター初期値を返す。 */
     static get defaultCalendarFilterParam() {
         return {
             "area": "00",
@@ -70,6 +89,7 @@ class JajaConstants {
             "category": "0"
         };
     }
+    /** エリア・都道府県の選択肢を返す。 */
     static get areaSelects() {
         return [
             { "key": "00", "text": "すべて" },
@@ -131,6 +151,7 @@ class JajaConstants {
             { "key": "A0", "text": "【海外】" }
         ]
     }
+    /** エリアコードに属する都道府県などの一覧を返す。 */
     static get areaList() {
         return {
             'A1': ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島', '北海道・東北その他'],
@@ -144,6 +165,7 @@ class JajaConstants {
             'A0': ['海外']
         };
     }
+    /** 都道府県コードと照合用の名称の対応を返す。 */
     static get prefectureList() {
         return {
             '01': '北海道', '02': '青森', '03': '岩手', '04': '宮城', '05': '秋田', '06': '山形',
@@ -156,6 +178,7 @@ class JajaConstants {
             '43': '熊本', '44': '大分', '45': '宮崎', '46': '鹿児島', '47': '沖縄'
         };
     }
+    /** イベント種別のフィルターボタンに使う項目を返す。 */
     static get categoryFilters() {
         return [
             { key: "0", name: "すべて" },
@@ -168,7 +191,9 @@ class JajaConstants {
             { key: "6", name: "その他" }
         ];
     }
+    /** 広告枠に表示する商品情報の一覧を返す。 */
     static get amazonBoxList() {
+        /** 商品IDからアフィリエイトリンクを作成する。 */
         function getLink(dp) {
             return `https://www.amazon.co.jp/dp/${dp}?tag=molkkycalenda-22&amp;linkCode=osi&amp;th=1&amp;psc=1`;
         }
@@ -193,9 +218,11 @@ class JajaConstants {
             }
         ]
     }
+    /** イベント一覧JSONのURLを返す。 */
     static get molkkyCalendarEventsStorage() {
         return "https://storage.googleapis.com/molkky-calendar-json/events.json";
     }
+    /** カレンダーやランキングのJSON取得先を返す。 */
     static get molkkyCalendarStorage() {
         const root = "https://storage.googleapis.com/";
         const bucket = "molkky-calendar-json/";
@@ -204,6 +231,7 @@ class JajaConstants {
             events: root + bucket + "events" + suffix,
             recent: root + bucket + "recent" + suffix,
             points: {
+                /** シーズンキーを整え、ランキングJSONのURLを返す。 */
                 getSeasonUrl: (season = JajaConstants.currentSeason) => {
                     const normalizedSeason = String(season ?? JajaConstants.currentSeason).replace(/\D/g, "");
                     if (!/^\d{4}$/.test(normalizedSeason)) {
