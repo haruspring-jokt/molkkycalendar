@@ -61,16 +61,18 @@ function appendRecentEvents(events) {
         // イベント種類フィルタ用data-tag値
         const dataTag = createDataTag(event);
         // 開催日の日付フォーマット変更
-        var eventTime = '';
-        if (!(event['eventStart'] + event['eventEnd'])) { } else {
-            eventTime = event['eventStart'] + ' - ' + event['eventEnd'];
-        }
-        const eventTimeSpan = event['eventTime'] != "" && event['eventTime'] != "-"
-            ? `<br/><span class="is-size-7">${event['eventTime']}</span>`
-            : ""
+        const eventStart = event['eventStart'] && event['eventStart'] !== "-"
+            ? event['eventStart']
+            : event['eventTime'];
+        const eventTime = String(eventStart || '').split('-')[0].trim();
+        const startTimeMatch = eventTime.match(/^(\d{1,2})[:/](\d{2})$/);
+        const eventTimeSpan = startTimeMatch
+            ? `<br/><span class="is-size-7">${startTimeMatch[1].padStart(2, '0')}:${startTimeMatch[2]}</span>`
+            : "";
         // 都道府県ラベル
-        const prefecture = `<br/><span class="tag my-2 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
-            <span class="has-text-primary-20">${event['prefecture']}</span></span>`;
+        const prefecture = event['prefecture'] ? `<span class="tag mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
+            <span class="has-text-primary-20">${event['prefecture']}</span></span>`
+            : "";
         // イベントラベルカラー
         const labelColor = {
             '大会': 'is-link', '大会（長期）': 'is-success',
@@ -89,27 +91,26 @@ function appendRecentEvents(events) {
             : "";
         // マップリンク
         const gMapLink = event['place'] ?
-            `<br/><span class="is-size-7">
+            `<span class="is-size-7">
                 <i class="las la-map-marker mr-1"></i><a class="has-text-link"
                     href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}"
                     target="_blank">${event['place']}</a></span>`
             : '';
+        const locationInfo = gMapLink ? `<br/>${gMapLink}` : '';
         // 最新アイコン
         const mostRecent = isMostRecent ?
             `<i class="las la-leaf has-text-success mr-1"></i>` : "";
 
         $("#recent-events").append(`
             <tr class="${dataTag} filter-item" data-tag="${dataTag}">
-                <td class="is-middle py-3 my-3">
+                <td class="is-middle py-2">
                     <span class="is-size-7">${formattedDate} ${youbi}</span>
                     ${eventTimeSpan}
-                    ${prefecture}
-                    ${category}
                 </td>
-                <td class="is-middle py-3 my-3">
-                    ${mostRecent}${eventTitle}
+                <td class="is-middle py-2">
+                    ${mostRecent}${category}${prefecture}${eventTitle}
                     ${org}
-                    ${gMapLink}
+                    ${locationInfo}
                 </td>
             </tr>
         `);

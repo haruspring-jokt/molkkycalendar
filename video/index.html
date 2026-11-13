@@ -92,6 +92,14 @@
             <p class="subtitle is-size-65">最近投稿された動画やライブ配信を表示 <a
                     href="https://docs.google.com/forms/d/e/1FAIpQLSdPBFs0j5rdDV8-NAwpTcJeHu7vAXMKZSLewAdbAKnwCl_UYA/viewform?usp=publish-editor"
                     target="_blank" class="has-text-weight-bold">掲載チャンネル追加の依頼はこちらまで</a></p>
+            <div class="buttons has-addons mb-3" role="group" aria-label="動画の種類">
+                <button type="button" class="button is-size-65 is-primary video-type-filter" data-video-filter="all"
+                    aria-pressed="true">すべて</button>
+                <button type="button" class="button is-size-65 is-light video-type-filter" data-video-filter="video"
+                    aria-pressed="false">動画</button>
+                <button type="button" class="button is-size-65 is-light video-type-filter" data-video-filter="short"
+                    aria-pressed="false">ショート</button>
+            </div>
             <div class="content" id="">
                 <table class="table is-fullwidth is-narrow is-size-65 is-striped" id="recent-videos">
                     <thead>

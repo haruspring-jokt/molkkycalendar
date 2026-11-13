@@ -118,7 +118,7 @@ function appendSimpleEvents(events) {
                     <table id="simple-table" class="table is-fullwidth is-narrow is-striped is-size-65">
                         <thead id="simple-head">
                             <tr class="is-selected has-text-light">
-                                <th style="width:120px;">時間</th>
+                                <th style="min-width:100px;">時間</th>
                                 <th>イベント</th>
                             </tr>
                         </thead>
@@ -140,6 +140,7 @@ function appendSimpleEvents(events) {
             '体験会': 'is-light', '練習会': 'is-light',
             'ブース': 'is-light', 'その他': 'is-light'
         }[event['category']];
+        const categoryName = event['category'] === '大会（長期）' ? '長期' : event['category'];
         // 新規・最近のイベントかの判定
         const now = new Date();
         const updateDateObj = new Date(event['updateDate']);
@@ -153,56 +154,51 @@ function appendSimpleEvents(events) {
         const eventTimeSpan = eventTime != "" ? `<span class="is-size-7">${eventTime}</span><br/>`
             : ""
         // 都道府県ラベル
-        const prefecture = `<span class="tag narrow mb-1 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
-            <span class="has-text-primary-20">${event['prefecture']}</span></span><br/>`;
+        const prefecture = event['prefecture'] ? `<span class="tag narrow mb-1 mr-1 px-1 is-primary is-light has-text-weight-bold is-size-7">
+            <span class="has-text-primary-20">${event['prefecture']}</span></span>` : "";
         // カテゴリーラベル
-        const category = `<span class="tag narrow mb-1 mr-1 px-1 is-size-7 has-text-weight-medium ${labelColor}">${event['category']}</span>`;
+        const category = `<span class="tag narrow px-1 is-size-7 has-text-weight-medium ${labelColor}">${categoryName}</span>`;
         // 個人・チーム構成
         const composition = createComposition(
-            event['composition'], "", "", "");
+            event['composition'], "", "", "").trim();
         // 大会ルールラベル
         const compCate = (event['composition'] != "" && isCompetition(event['category'])) ?
             composition != "" ?
-                `<span class="tag narrow mr-1 px-1 is-size-8 has-text-weight-medium">${composition}</span>` :
-                `<span class="tag narrow mr-1 px-1 is-size-8 has-text-weight-medium">${event['composition']}</span>` :
+                `<span class="tag narrow px-1 is-size-8 has-text-weight-medium">${composition}</span>` :
+                `<span class="tag narrow px-1 is-size-8 has-text-weight-medium">${event['composition']}</span>` :
             "";
+        const categoryTags = `<div class="tags my-1 ${compCate ? 'has-addons' : ''} mb-0">${category}${compCate}</div>`;
 
         // イベントタイトル
         const eventTitle = createTitle(event);
         // 主催（orgId があれば主催者ページへリンク）
         const org = event['org'] ? (event['orgId'] ?
-            `</br><span class="is-size-7 has-text-link">
+            `<span class="is-size-7 has-text-link">
                 <i class="las la-user"></i> <a href="/organizer/?orgId=${encodeURIComponent(event['orgId'])}">${event['org']}</a>
             </span>` :
-            `</br><span class="is-size-7 has-text-grey">
+            `<span class="is-size-7 has-text-grey">
                 <i class="las la-user"></i> ${event['org']}
             </span>`) : "";
-        // イベントシリーズ
-        const seriesName = event['seriesName'] ?
-            `<br/><span class="is-size-7 has-text-grey">
-                <i class="las la-scroll"></i> ${event['seriesName']}
-            </span>`
-            : '';
         // マップリンク
         const gMapLink = event['place'] ?
-            `<br/><span class="is-size-7">
+            `<span class="is-size-7">
                 <i class="las la-map-marker"></i><a class="has-text-link"
                     href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event['prefecture'] + ' ' + event['place'])}"
                     target="_blank">${event['place']}</a></span>`
+            : '';
+        const orgAndPlace = org || gMapLink
+            ? `<br/>${org}${org && gMapLink ? '｜' : ''}${gMapLink}`
             : '';
 
         $(`#simple-body-${formattedDate}`).append(`
             <tr class="${dataTag} filter-item" data-tag="${dataTag}">
                 <td class="is-middle">
                     ${eventTimeSpan}
-                    ${prefecture}
-                    ${category} ${compCate}
+                    ${categoryTags}
                 </td>
                 <td>
-                    ${newEventIcon}${updateIcon}${eventTitle}
-                    ${org}
-                    ${seriesName}
-                    ${gMapLink}
+                    ${newEventIcon}${updateIcon}${prefecture}${eventTitle}
+                    ${orgAndPlace}
                 </td>
             </tr>
         `);
