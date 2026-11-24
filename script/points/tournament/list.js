@@ -13,6 +13,7 @@ async function fetchTournamentList() {
         tournamentListData = datas;
         populateTournamentYearMonthFilter(datas);
         populateTournamentSeasonFilter(datas);
+        populateTournamentSeriesFilter(datas);
 
         const currentSeason = getCurrentSeason();
         const seasonSelect = $('.filter-season');
@@ -145,8 +146,8 @@ function getTournamentSeriesCounts(datas) {
     return seriesCounts;
 }
 
-// 2件以上のシリーズだけをシリーズフィルターに表示する。
-function populateTournamentSeriesFilter(datas, selectedSeriesId = '') {
+// 全シーズンで2件以上のシリーズだけをシリーズフィルターに表示する。
+function populateTournamentSeriesFilter(datas) {
     const seriesCounts = getTournamentSeriesCounts(datas);
 
     const seriesOptions = Array.from(seriesCounts.values())
@@ -166,10 +167,6 @@ function populateTournamentSeriesFilter(datas, selectedSeriesId = '') {
         const label = item.seriesName + ' (' + item.count + ')' || item.seriesId;
         select.append($('<option>').val(item.seriesId).text(label));
     });
-
-    if (select.find(`option[value="${selectedSeriesId}"]`).length) {
-        select.val(selectedSeriesId);
-    }
 }
 
 // シーズンの一覧を抽出して、シーズンフィルターを構築する。
@@ -195,13 +192,11 @@ function populateTournamentSeasonFilter(datas) {
 
 // 現在のフィルター条件で大会一覧を再描画する。
 async function updateTournamentList() {
-    const selectedSeriesId = $('.filter-series').val() || '';
-    populateTournamentSeriesFilter(getFilteredTournamentData(true), selectedSeriesId);
     appendTournamentList(getFilteredTournamentData());
 }
 
 // 選択中のフィルター条件に一致する大会データだけを返す。
-function getFilteredTournamentData(ignoreSeriesFilter = false) {
+function getFilteredTournamentData() {
     const selectedArea = $('.filter-area').val() || '00';
     const selectedPlayType = $('input[name="filter-play-type"]:checked').val() || 'all';
     const selectedYearMonth = $('.filter-yearmonth').val() || '';
@@ -230,7 +225,7 @@ function getFilteredTournamentData(ignoreSeriesFilter = false) {
             }
         }
 
-        if (!ignoreSeriesFilter && selectedSeriesId) {
+        if (selectedSeriesId) {
             if (String(data.series_id || '') !== String(selectedSeriesId)) {
                 return false;
             }
@@ -322,15 +317,21 @@ function appendTournamentList(datas) {
                 : `<span class="mt-1 tag is-light shadow has-text-weight-semibold is-size-7">${info.series_name}</span>`)
             : '';
         const applyButtonHTML = createTournamentResultApplyButtonHtml(info);
+        const { videoTagHTML, resultSheetIconHTML, resultSnsIconHTML } = createTournamentResourceIconsHtml(info);
 
         $("#tournament-list-content").append(`
             <tr class="table is-size-7">
                 <td class="is-middle py-2">
-                    <p class="tags jaja-tags has-addons py-0 mb-1">
-                        <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
-                        <span class="tag narrow ${eventSizeTierClass} has-text-light">
-                            <b>${eventSizeTier} ${info.player_num}</b>${participantUnit}</span>
-                    </p>
+                    <div class="is-flex is-align-items-center">
+                        <p class="tags jaja-tags has-addons py-0 mb-1">
+                            <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                            <span class="tag narrow ${eventSizeTierClass} has-text-light">
+                                <b>${eventSizeTier} ${info.player_num}</b><span class="is-size-8">${participantUnit}</span></span>
+                            ${videoTagHTML}
+                        </p>
+                        ${resultSheetIconHTML}
+                        ${resultSnsIconHTML}
+                    </div>
                     <a href="../?id=${data.event_id}">${eventName}</a><br/>
                     ${seriesTagHTML}
                 </td>

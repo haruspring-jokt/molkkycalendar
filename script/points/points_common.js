@@ -56,6 +56,32 @@ function createTournamentResultApplyButtonHtml(info = {}) {
     `;
 }
 
+// VODのURL文字列を半角カンマ区切りで分割する
+function splitVodUrls(vodUrlValue) {
+    if (!vodUrlValue) {
+        return [];
+    }
+
+    return String(vodUrlValue)
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+}
+
+function createTournamentResourceIconsHtml(info) {
+    return {
+        videoTagHTML: splitVodUrls(info.vod_url).length > 0
+            ? '<span class="tag narrow is-danger has-text-light pl-1 pr-1"><i class="lab la-youtube has-text-light is-size-5"></i></span>'
+            : '',
+        resultSheetIconHTML: String(info.result_sheet || '').trim()
+            ? `<a href="${info.result_sheet}" target="_blank" rel="noopener noreferrer" aria-label="結果スプレッドシートを開く" class="ml-1 mb-1"><i class="las la-table has-text-link"></i></a>`
+            : '',
+        resultSnsIconHTML: String(info.result_sns || '').trim()
+            ? `<a href="${info.result_sns}" target="_blank" rel="noopener noreferrer" aria-label="結果のSNS投稿を開く" class="ml-1 mb-1"><i class="las la-globe has-text-link"></i></a>`
+            : ''
+    };
+}
+
 /**
  * 獲得ポイントの表示用文字色と太字クラスを返す。
  * @param {number|string} point

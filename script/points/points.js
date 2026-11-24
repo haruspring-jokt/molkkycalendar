@@ -136,15 +136,21 @@ function appendRecentTournaments(datas) {
             ? `<abbr title="${data.event_name}">${data.event_name.slice(0, 30)}...</abbr>`
             : data.event_name;
         const applyButtonHTML = createTournamentResultApplyButtonHtml(data);
+        const { videoTagHTML, resultSheetIconHTML, resultSnsIconHTML } = createTournamentResourceIconsHtml(data);
 
         $("#recent-tournaments-list").append(`
             <tr class="table is-size-7">
                 <td class="is-middle py-2">
-                    <p class="tags jaja-tags has-addons py-0 mb-1">
-                        <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
-                        <span class="tag narrow ${eventSizeTierClass} has-text-light">
-                            <b>${eventSizeTier} ${data.player_num}</b>${participantUnit}</span>
-                    </p>
+                    <div class="is-flex is-align-items-center">
+                        <p class="tags jaja-tags has-addons py-0 mb-1">
+                            <span class="tag narrow ${teamTagClass}"><span class="has-text-light">${eventTeamRule}</span></span>
+                            <span class="tag narrow ${eventSizeTierClass} has-text-light">
+                                <b>${eventSizeTier} ${data.player_num}</b>${participantUnit}</span>
+                            ${videoTagHTML}
+                        </p>
+                        ${resultSheetIconHTML}
+                        ${resultSnsIconHTML}
+                    </div>
                     <a href="./tournament/?id=${data.event_id}">${eventName}</a><br/>
                     ${seriesTagHTML}
                 </td>

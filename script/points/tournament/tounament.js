@@ -171,18 +171,6 @@ function appendTournamentResultBaseInfo(data, seriesDatas = []) {
     }
 }
 
-// VODのURL文字列を半角カンマ区切りで分割する
-function splitVodUrls(vodUrlValue) {
-    if (!vodUrlValue) {
-        return [];
-    }
-
-    return String(vodUrlValue)
-        .split(',')
-        .map(item => item.trim())
-        .filter(Boolean);
-}
-
 // YouTube URLを埋め込み用のURLに変換する
 function getYoutubeEmbedUrl(url) {
     if (!url) {
